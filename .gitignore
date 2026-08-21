@@ -1,0 +1,21 @@
+# Dépendances
+node_modules/
+
+# Build
+dist/
+dev-dist/
+
+# Tests
+coverage/
+playwright-report/
+test-results/
+.lighthouseci/
+
+# Environnement — jamais de secrets committés
+.env
+.env.local
+.env.*.local
+
+# Outils
+*.tsbuildinfo
+.DS_Store

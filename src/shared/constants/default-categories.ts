@@ -1,0 +1,112 @@
+import type { Category } from '../../entities/category/model';
+
+/**
+ * Catégories initiales (seed). Source de vérité runtime : CategoryRepository —
+ * l'administration peut en ajouter, renommer, désactiver sans toucher au code UI.
+ */
+export const DEFAULT_CATEGORIES: readonly Category[] = [
+  {
+    id: 'cat-parc',
+    slug: 'parc',
+    label: 'Parc',
+    icon: 'Trees',
+    sortOrder: 0,
+    active: true,
+  },
+  {
+    id: 'cat-aire-de-jeux',
+    slug: 'aire-de-jeux',
+    label: 'Aire de jeux',
+    icon: 'ToyBrick',
+    sortOrder: 1,
+    active: true,
+  },
+  {
+    id: 'cat-balade',
+    slug: 'balade',
+    label: 'Balade',
+    icon: 'Footprints',
+    sortOrder: 2,
+    active: true,
+  },
+  {
+    id: 'cat-randonnee',
+    slug: 'randonnee-familiale',
+    label: 'Randonnée familiale',
+    icon: 'Mountain',
+    sortOrder: 3,
+    active: true,
+  },
+  {
+    id: 'cat-sport',
+    slug: 'activite-sportive',
+    label: 'Activité sportive',
+    icon: 'Bike',
+    sortOrder: 4,
+    active: true,
+  },
+  {
+    id: 'cat-culture',
+    slug: 'activite-culturelle',
+    label: 'Activité culturelle',
+    icon: 'Palette',
+    sortOrder: 5,
+    active: true,
+  },
+  {
+    id: 'cat-musee',
+    slug: 'musee',
+    label: 'Musée',
+    icon: 'Landmark',
+    sortOrder: 6,
+    active: true,
+  },
+  {
+    id: 'cat-ferme',
+    slug: 'ferme-pedagogique',
+    label: 'Ferme pédagogique',
+    icon: 'Tractor',
+    sortOrder: 7,
+    active: true,
+  },
+  {
+    id: 'cat-baignade',
+    slug: 'baignade',
+    label: 'Baignade',
+    icon: 'Waves',
+    sortOrder: 8,
+    active: true,
+  },
+  {
+    id: 'cat-pique-nique',
+    slug: 'pique-nique',
+    label: 'Pique-nique',
+    icon: 'Apple',
+    sortOrder: 9,
+    active: true,
+  },
+  {
+    id: 'cat-restaurant',
+    slug: 'restaurant-familial',
+    label: 'Restaurant adapté aux familles',
+    icon: 'UtensilsCrossed',
+    sortOrder: 10,
+    active: true,
+  },
+  {
+    id: 'cat-evenement',
+    slug: 'evenement-ponctuel',
+    label: 'Événement ponctuel',
+    icon: 'CalendarDays',
+    sortOrder: 11,
+    active: true,
+  },
+  {
+    id: 'cat-autre',
+    slug: 'autre',
+    label: 'Autre activité familiale',
+    icon: 'Sparkles',
+    sortOrder: 12,
+    active: true,
+  },
+];

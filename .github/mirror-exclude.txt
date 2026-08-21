@@ -1,0 +1,16 @@
+# Chemins RETIRÉS de la publication publique en mode « snapshot »
+# (variable de dépôt MIRROR_MODE=snapshot — cf. docs/MIRRORING.md).
+# Un chemin par ligne (fichier ou dossier), relatif à la racine ; les lignes
+# vides et les commentaires (#) sont ignorés.
+#
+# ⚠️ Ce filtre ne s'applique PAS en mode « mirror » (défaut), où main est
+# publié à l'identique. Si un fichier ne doit JAMAIS être public, il ne doit
+# pas être committé sur main du tout.
+
+# Outillage du miroir lui-même : sans objet sur le dépôt public.
+.github/workflows/mirror.yml
+.github/mirror-exclude.txt
+
+# Exemples de candidats internes (décommenter selon la politique retenue) :
+# docs/THREAT-MODEL.md
+# docs/AUDIT-DEV-WPA-CONFIG.md

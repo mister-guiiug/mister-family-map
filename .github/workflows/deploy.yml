@@ -1,0 +1,31 @@
+# Déploiement GitHub Pages : délégué au reusable pwa-deploy.yml@v3.
+#
+# ⚠️ Permissions au niveau caller (héritage par intersection) :
+#   - pages: write + id-token: write → déploiement Pages ;
+#   - packages: read → installation de @mister-guiiug/dev-wpa-config.
+# ⚠️ Ne PAS déclarer `concurrency: pages` ici : le reusable le déclare déjà
+# (un doublon caller/reusable provoque un interblocage documenté).
+name: Deploy
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+  packages: read
+
+jobs:
+  deploy:
+    uses: mister-guiiug/dev-wpa-config/.github/workflows/pwa-deploy.yml@v3
+    secrets: inherit
+    with:
+      use-base-path: true
+      # Variables de build applicatives (aucun secret ici — la clé anon
+      # Supabase est publique par conception, mais elle vit dans les secrets
+      # du dépôt pour rester hors du code source) :
+      # build-env: |
+      #   VITE_SUPABASE_URL=...
+      #   VITE_SUPABASE_ANON_KEY=...

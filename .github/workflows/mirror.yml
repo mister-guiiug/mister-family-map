@@ -1,0 +1,164 @@
+# Mirroring sélectif vers le dépôt PUBLIC mister-guiiug/mister-family-map.
+#
+# Modèle : bac-sable (privé) = développement complet ; le dépôt public ne
+# reçoit QUE la branche main et les tags v* atteignables depuis main.
+# Aucune autre branche n'est jamais poussée.
+#
+# Déclencheurs : push sur main, push d'un tag v*, ou lancement manuel
+# (workflow_dispatch) — la synchronisation peut donc être automatisée ou
+# manuelle, au choix.
+#
+# Deux modes, choisis par la variable de dépôt MIRROR_MODE (défaut : mirror),
+# surchargable ponctuellement via l'input du lancement manuel :
+#   - mirror   : publie main à l'identique (historique complet de main) ;
+#   - snapshot : publie un instantané FILTRÉ (fichiers de
+#                .github/mirror-exclude.txt retirés) SANS exposer
+#                l'historique privé — un commit public par publication,
+#                chaîné au précédent (historique public propre et linéaire).
+#
+# Secret requis : MIRROR_PUSH_TOKEN — PAT fine-grained limité au seul dépôt
+# public avec la permission « Contents: Read and write ». Jamais le token
+# d'un autre périmètre. Mise en place : docs/MIRRORING.md.
+name: Mirror public
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Mode de publication (vide = variable MIRROR_MODE, sinon mirror)'
+        type: choice
+        options: ['', 'mirror', 'snapshot']
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+# Une publication à la fois, sans annulation : l'ordre des pushes publics
+# doit suivre l'ordre des événements.
+concurrency:
+  group: mirror-public
+  cancel-in-progress: false
+
+env:
+  PUBLIC_REPO: mister-guiiug/mister-family-map
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Vérifier le secret de publication
+        env:
+          TOKEN: ${{ secrets.MIRROR_PUSH_TOKEN }}
+        run: |
+          if [ -z "$TOKEN" ]; then
+            echo "::error::Secret MIRROR_PUSH_TOKEN absent — cf. docs/MIRRORING.md (PAT fine-grained limité à ${PUBLIC_REPO}, Contents: Read and write)."
+            exit 1
+          fi
+
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Publier main (et le tag éventuel)
+        id: publish
+        env:
+          MIRROR_PUSH_TOKEN: ${{ secrets.MIRROR_PUSH_TOKEN }}
+          MODE_INPUT: ${{ inputs.mode }}
+          MODE_VAR: ${{ vars.MIRROR_MODE }}
+        run: |
+          set -euo pipefail
+          PUBLIC_URL="https://x-access-token:${MIRROR_PUSH_TOKEN}@github.com/${PUBLIC_REPO}.git"
+          MODE="${MODE_INPUT:-${MODE_VAR:-mirror}}"
+          echo "Mode de publication : $MODE"
+
+          # Garde-fou : main doit exister (le mirroring ne publie QUE main).
+          if ! git rev-parse --verify --quiet origin/main >/dev/null; then
+            echo "::error::La branche main n'existe pas encore dans ce dépôt — rien à publier."
+            exit 1
+          fi
+
+          # Réf source : le tag poussé, sinon main.
+          TAG_NAME=""
+          SRC_REF="origin/main"
+          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+            TAG_NAME="${GITHUB_REF_NAME}"
+            SRC_REF="refs/tags/${TAG_NAME}"
+            # Un tag hors de main (branche de travail, préversion non fusionnée)
+            # n'est JAMAIS publié.
+            if ! git merge-base --is-ancestor "$SRC_REF" origin/main; then
+              echo "::warning::Le tag ${TAG_NAME} n'est pas atteignable depuis main — non publié."
+              echo "published=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+          fi
+
+          if [ "$MODE" = "mirror" ]; then
+            # Historique complet de main, à l'identique.
+            git push --force "$PUBLIC_URL" "refs/remotes/origin/main:refs/heads/main"
+            if [ -n "$TAG_NAME" ]; then
+              git push --force "$PUBLIC_URL" "refs/tags/${TAG_NAME}:refs/tags/${TAG_NAME}"
+            fi
+          else
+            # snapshot : arbre de la réf source, fichiers exclus retirés,
+            # historique privé jamais poussé. Le commit publié est chaîné au
+            # main public précédent (fast-forward, pas de force).
+            export GIT_INDEX_FILE="$(mktemp)"
+            git read-tree "$SRC_REF"
+            if git cat-file -e "$SRC_REF:.github/mirror-exclude.txt" 2>/dev/null; then
+              git show "$SRC_REF:.github/mirror-exclude.txt" \
+                | grep -vE '^[[:space:]]*(#|$)' \
+                | while IFS= read -r path; do
+                    git rm -r -q --cached --ignore-unmatch -- "$path"
+                  done
+            fi
+            TREE="$(git write-tree)"
+
+            SRC_SHA="$(git rev-parse "$SRC_REF")"
+            LABEL="${TAG_NAME:-main}"
+            export GIT_AUTHOR_NAME="github-actions[bot]" \
+                   GIT_AUTHOR_EMAIL="41898282+github-actions[bot]@users.noreply.github.com" \
+                   GIT_COMMITTER_NAME="github-actions[bot]" \
+                   GIT_COMMITTER_EMAIL="41898282+github-actions[bot]@users.noreply.github.com"
+
+            PARENT="$(git ls-remote "$PUBLIC_URL" refs/heads/main | cut -f1)"
+            if [ -n "$PARENT" ]; then
+              git fetch "$PUBLIC_URL" refs/heads/main
+              COMMIT="$(git commit-tree "$TREE" -p "$PARENT" \
+                -m "Publication publique de ${LABEL} (source ${SRC_SHA:0:12})")"
+            else
+              COMMIT="$(git commit-tree "$TREE" \
+                -m "Publication publique de ${LABEL} (source ${SRC_SHA:0:12})")"
+            fi
+            git push "$PUBLIC_URL" "${COMMIT}:refs/heads/main"
+            if [ -n "$TAG_NAME" ]; then
+              git tag -f "$TAG_NAME" "$COMMIT"
+              git push --force "$PUBLIC_URL" "refs/tags/${TAG_NAME}:refs/tags/${TAG_NAME}"
+            fi
+          fi
+          echo "published=true" >> "$GITHUB_OUTPUT"
+
+      - name: Créer la release publique du tag
+        # Reprend titre et notes de la release privée si elle existe (les
+        # relire avant de taguer : elles deviennent publiques). Idempotent.
+        if: github.ref_type == 'tag' && steps.publish.outputs.published == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.MIRROR_PUSH_TOKEN }}
+          PRIVATE_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          TAG="${GITHUB_REF_NAME}"
+          if gh release view "$TAG" --repo "$PUBLIC_REPO" >/dev/null 2>&1; then
+            echo "Release ${TAG} déjà présente sur ${PUBLIC_REPO} — rien à faire."
+            exit 0
+          fi
+          TITLE="$(GH_TOKEN="$PRIVATE_TOKEN" gh release view "$TAG" \
+            --repo "$GITHUB_REPOSITORY" --json name -q .name 2>/dev/null || echo "$TAG")"
+          NOTES="$(GH_TOKEN="$PRIVATE_TOKEN" gh release view "$TAG" \
+            --repo "$GITHUB_REPOSITORY" --json body -q .body 2>/dev/null || true)"
+          gh release create "$TAG" --repo "$PUBLIC_REPO" \
+            --title "${TITLE:-$TAG}" --notes "${NOTES:-Version $TAG}"
