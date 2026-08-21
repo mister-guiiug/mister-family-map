@@ -97,6 +97,17 @@ volontairement sans `resolved`/`integrity` (`npm ci` fonctionne). Premier
 contributeur : lancer `npm install` avec un accès au registre, committer le
 lockfile complété, puis passer `verify-lockfile: true` dans `ci.yml`.
 
+## Publication publique (mirroring)
+
+Ce dépôt privé est le dépôt principal de développement. La version publiée
+vit sur le dépôt public dédié
+[`mister-guiiug/mister-family-map`](https://github.com/mister-guiiug/mister-family-map),
+alimenté par le workflow `mirror.yml` : **seules la branche `main` et les
+tags `v*` atteignables depuis `main`** y sont synchronisés (automatiquement à
+chaque push, ou manuellement via _Run workflow_), avec un mode `snapshot`
+pour publier un historique filtré. Mise en place (secret `MIRROR_PUSH_TOKEN`,
+variable `MIRROR_MODE`, filtre d'exclusion) : [docs/MIRRORING.md](./docs/MIRRORING.md).
+
 ## Hooks git (optionnel, recommandé)
 
 `commitlint.config.js` et `lint-staged.config.js` sont prêts. Pour activer :
