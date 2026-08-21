@@ -1,8 +1,14 @@
-# Budget qualité (perf / a11y / best-practices / SEO) sur PR, via le reusable
+# Budget qualité (perf / a11y / best-practices / SEO), via le reusable
 # pwa-lighthouse.yml@v3. Seuils dans .lighthouserc.json.
+#
+# 💰 Coût zéro : ne s'exécute QUE sur le dépôt PUBLIC
+# mister-guiiug/mister-family-map — à chaque publication sur main, ou à la
+# demande (Run workflow). Sur le dépôt privé, le job est `skipped`.
 name: Lighthouse
 on:
-  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
 
 # ⚠️ Le reusable déclare `pull-requests: write` : le caller doit l'accorder
 # aussi (héritage par intersection), sinon le run échoue en startup_failure.
@@ -13,5 +19,7 @@ permissions:
 
 jobs:
   lighthouse:
+    # Exécution réservée au miroir public — cf. commentaire d'en-tête.
+    if: github.repository == 'mister-guiiug/mister-family-map'
     uses: mister-guiiug/dev-wpa-config/.github/workflows/pwa-lighthouse.yml@v3
     secrets: inherit

@@ -39,6 +39,8 @@ Pour brancher Supabase : appliquer `supabase/migrations/`, puis définir
 | `npm run test:e2e` / `test:e2e:critical` | Playwright (parcours critiques `@critical`, a11y `@a11y`)                     |
 | `npm run build`                          | `tsc -b` + Vite 8 + PWA (précache + manifest)                                 |
 | `npm run icons`                          | Régénère les icônes PWA depuis `public/favicon.svg` (bin famille `pwa-icons`) |
+| `npm run verify`                         | Portail qualité complet (format + lint + types + tests + build)               |
+| `npm run mirror` / `mirror:snapshot`     | Publication vers le dépôt public (cf. docs/MIRRORING.md)                      |
 
 ## Architecture
 
@@ -84,12 +86,22 @@ Décisions documentées : [ADR-0001 carte](./docs/adr/0001-map-provider.md) ·
 
 Détails, menaces et restes à faire : [docs/THREAT-MODEL.md](./docs/THREAT-MODEL.md).
 
-## CI/CD
+## CI/CD — à coût zéro
 
-Reusable workflows famille (permissions minimales au niveau caller) :
+Les minutes Actions ne sont pas disponibles sur ce dépôt privé : toute
+l'automatisation s'exécute **gratuitement sur le miroir public**
+`mister-guiiug/mister-family-map`, alimenté par `npm run mirror`.
+
+Reusable workflows famille (permissions minimales au niveau caller), tous
+gardés par `if: github.repository == 'mister-guiiug/mister-family-map'` —
+`skipped` ici (0 minute, 0 rouge), exécutés sur le public :
 `ci.yml` → `pwa-ci.yml@v3` (format · lint · type · test · build · audit npm ·
-E2E `@critical`), `deploy.yml` → `pwa-deploy.yml@v3` (GitHub Pages),
+E2E `@critical`), `deploy.yml` → `pwa-deploy.yml@v3` (GitHub Pages publiques),
 `lighthouse.yml` → `pwa-lighthouse.yml@v3`.
+
+Côté privé, le portail qualité est **`npm run verify`**, exigé par le script
+de publication avant tout push (et exécutable à tout moment, y compris par
+les hooks git optionnels ci-dessous).
 
 ⚠️ Bootstrap lockfile : le `package-lock.json` a été généré sans accès
 authentifié à GitHub Packages — l'entrée `@mister-guiiug/dev-wpa-config` est
@@ -102,11 +114,12 @@ lockfile complété, puis passer `verify-lockfile: true` dans `ci.yml`.
 Ce dépôt privé est le dépôt principal de développement. La version publiée
 vit sur le dépôt public dédié
 [`mister-guiiug/mister-family-map`](https://github.com/mister-guiiug/mister-family-map),
-alimenté par le workflow `mirror.yml` : **seules la branche `main` et les
-tags `v*` atteignables depuis `main`** y sont synchronisés (automatiquement à
-chaque push, ou manuellement via _Run workflow_), avec un mode `snapshot`
-pour publier un historique filtré. Mise en place (secret `MIRROR_PUSH_TOKEN`,
-variable `MIRROR_MODE`, filtre d'exclusion) : [docs/MIRRORING.md](./docs/MIRRORING.md).
+alimenté par **`npm run mirror`** depuis le poste de travail (aucune minute
+Actions, aucun secret — vos identifiants git suffisent) : **seules la branche
+`main` et les tags `v*` atteignables depuis `main`** y sont publiés, avec un
+mode `snapshot` (`npm run mirror:snapshot`) pour publier un historique filtré
+par `.github/mirror-exclude.txt`. Le contrôle qualité `npm run verify` est
+exigé avant chaque publication. Détails : [docs/MIRRORING.md](./docs/MIRRORING.md).
 
 ## Hooks git (optionnel, recommandé)
 
