@@ -1,0 +1,14 @@
+# Budget qualité (perf / a11y / best-practices / SEO) sur PR, via le reusable
+# pwa-lighthouse.yml@v3. Seuils dans .lighthouserc.json.
+name: Lighthouse
+on:
+  pull_request:
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  lighthouse:
+    uses: mister-guiiug/dev-wpa-config/.github/workflows/pwa-lighthouse.yml@v3
+    secrets: inherit

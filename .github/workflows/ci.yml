@@ -1,0 +1,32 @@
+# CI famille : délégué au reusable workflow pwa-ci.yml@v3 de dev-wpa-config
+# (format · lint · type-check · test · build · verify-lockfile · E2E · audit).
+#
+# ⚠️ Permissions déclarées ICI (niveau caller) : les reusable workflows héritent
+# des permissions du caller (intersection uniquement). `packages: read` est
+# requis pour installer @mister-guiiug/dev-wpa-config depuis GitHub Packages.
+name: CI
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  ci:
+    uses: mister-guiiug/dev-wpa-config/.github/workflows/pwa-ci.yml@v3
+    secrets: inherit
+    with:
+      # TODO(bootstrap) : le lockfile a été généré sans accès authentifié à
+      # GitHub Packages — l'entrée @mister-guiiug/dev-wpa-config n'a donc ni
+      # `resolved` ni `integrity` (npm les complète au premier `npm install`
+      # authentifié). Étapes : `npm install` en local ou en CI, committer le
+      # lockfile mis à jour, puis repasser verify-lockfile à true.
+      verify-lockfile: false
+      # Audit SCA des dépendances de production (seuil : high).
+      run-npm-audit: true
+      # E2E critiques (Chromium). Les specs sont taguées @critical.
+      run-e2e: true
+      e2e-grep: '@critical'

@@ -1,0 +1,320 @@
+import type { Place } from '../../../entities/place/model';
+import { UNKNOWN_FEATURES } from '../../../entities/place/model';
+import type { FamilyEvent } from '../../../entities/event/model';
+import type { Review } from '../../../entities/review/model';
+
+/**
+ * Données de démonstration (agglomération lyonnaise) pour le backend
+ * local-first : elles rendent l'app utilisable sans compte ni serveur, et
+ * servent de fixtures aux tests E2E. Elles sont remplacées par les données
+ * réelles dès que le backend Supabase est branché.
+ */
+
+const T0 = '2026-06-01T10:00:00+02:00';
+const AUTHOR = 'seed-author';
+
+function seedPlace(
+  p: Partial<Place> & Pick<Place, 'id' | 'name' | 'categoryId' | 'coordinates'>
+): Place {
+  return {
+    shortDescription: '',
+    description: '',
+    address: '',
+    city: '',
+    ageRange: null,
+    durationMinutes: null,
+    price: { kind: 'unknown' },
+    openingHours: null,
+    websiteUrl: null,
+    phone: null,
+    features: { ...UNKNOWN_FEATURES },
+    practicalTips: '',
+    status: 'published',
+    authorId: AUTHOR,
+    lastVerifiedAt: null,
+    photos: [],
+    createdAt: T0,
+    updatedAt: T0,
+    deletedAt: null,
+    ...p,
+  };
+}
+
+export const SEED_PLACES: readonly Place[] = [
+  seedPlace({
+    id: 'seed-tete-dor',
+    name: 'Parc de la Tête d’Or',
+    categoryId: 'cat-parc',
+    coordinates: { lat: 45.7797, lng: 4.8527 },
+    city: 'Lyon',
+    shortDescription:
+      'Immense parc urbain : lac, grandes pelouses, zoo gratuit et petit train.',
+    ageRange: { min: 0, max: 18 },
+    durationMinutes: 180,
+    price: { kind: 'free' },
+    features: {
+      ...UNKNOWN_FEATURES,
+      stroller: 'yes',
+      toilets: 'yes',
+      picnicArea: 'yes',
+      waterPoint: 'yes',
+      setting: 'outdoor',
+      difficulty: 'easy',
+    },
+    practicalTips:
+      'Entrée porte des Enfants du Rhône plus calme le week-end. Location de barques près de l’embarcadère.',
+    lastVerifiedAt: '2026-07-12T09:00:00+02:00',
+  }),
+  seedPlace({
+    id: 'seed-parc-blandan',
+    name: 'Parc Sergent Blandan',
+    categoryId: 'cat-aire-de-jeux',
+    coordinates: { lat: 45.7455, lng: 4.8564 },
+    city: 'Lyon',
+    shortDescription:
+      'Aire de jeux géante « la Grande Vague », skatepark et esplanades.',
+    ageRange: { min: 2, max: 14 },
+    durationMinutes: 120,
+    price: { kind: 'free' },
+    features: {
+      ...UNKNOWN_FEATURES,
+      stroller: 'yes',
+      toilets: 'yes',
+      picnicArea: 'yes',
+      setting: 'outdoor',
+      difficulty: 'easy',
+    },
+  }),
+  seedPlace({
+    id: 'seed-musee-confluences',
+    name: 'Musée des Confluences',
+    categoryId: 'cat-musee',
+    coordinates: { lat: 45.7326, lng: 4.8184 },
+    city: 'Lyon',
+    shortDescription:
+      'Sciences et sociétés : squelettes de dinosaures, expositions immersives.',
+    ageRange: { min: 4, max: 18 },
+    durationMinutes: 150,
+    price: { kind: 'paid', minEuros: 0, maxEuros: 12 },
+    websiteUrl: 'https://www.museedesconfluences.fr',
+    features: {
+      ...UNKNOWN_FEATURES,
+      accessibility: 'yes',
+      stroller: 'yes',
+      toilets: 'yes',
+      foodNearby: 'yes',
+      weatherProof: 'yes',
+      setting: 'indoor',
+    },
+    practicalTips:
+      'Gratuit pour les moins de 18 ans. Vestiaires poussettes au rez-de-chaussée.',
+    lastVerifiedAt: '2026-05-20T09:00:00+02:00',
+  }),
+  seedPlace({
+    id: 'seed-grand-parc',
+    name: 'Grand Parc Miribel Jonage',
+    categoryId: 'cat-baignade',
+    coordinates: { lat: 45.8103, lng: 4.9331 },
+    city: 'Vaulx-en-Velin',
+    shortDescription:
+      'Lacs surveillés l’été, plages, pistes cyclables et observatoire des oiseaux.',
+    ageRange: { min: 0, max: 18 },
+    durationMinutes: 300,
+    price: { kind: 'free' },
+    features: {
+      ...UNKNOWN_FEATURES,
+      picnicArea: 'yes',
+      waterPoint: 'yes',
+      toilets: 'yes',
+      petsAllowed: 'no',
+      setting: 'outdoor',
+      difficulty: 'easy',
+    },
+    practicalTips: 'Baignade surveillée uniquement en saison, zones signalées.',
+  }),
+  seedPlace({
+    id: 'seed-ferme-abeilles',
+    name: 'Ferme pédagogique des Abeilles',
+    categoryId: 'cat-ferme',
+    coordinates: { lat: 45.7014, lng: 4.7902 },
+    city: 'Sainte-Foy-lès-Lyon',
+    shortDescription:
+      'Petite ferme associative : chèvres, poules, ruches vitrées et ateliers.',
+    ageRange: { min: 1, max: 10 },
+    durationMinutes: 90,
+    price: { kind: 'paid', minEuros: 3, maxEuros: 6 },
+    features: {
+      ...UNKNOWN_FEATURES,
+      stroller: 'no',
+      toilets: 'yes',
+      setting: 'mixed',
+    },
+    status: 'pending',
+    lastVerifiedAt: null,
+  }),
+  seedPlace({
+    id: 'seed-sentier-yzeron',
+    name: 'Sentier découverte de l’Yzeron',
+    categoryId: 'cat-randonnee',
+    coordinates: { lat: 45.7431, lng: 4.7404 },
+    city: 'Francheville',
+    shortDescription:
+      'Boucle ombragée de 4 km le long de la rivière, passerelles et gués.',
+    ageRange: { min: 4, max: 18 },
+    durationMinutes: 120,
+    price: { kind: 'free' },
+    features: {
+      ...UNKNOWN_FEATURES,
+      stroller: 'no',
+      petsAllowed: 'yes',
+      setting: 'outdoor',
+      difficulty: 'moderate',
+    },
+    practicalTips:
+      'Chaussures fermées conseillées, passages boueux après la pluie.',
+  }),
+];
+
+export const SEED_EVENTS: readonly FamilyEvent[] = [
+  {
+    id: 'seed-evt-nature',
+    title: 'Atelier nature : petites bêtes de la mare',
+    description:
+      'Découverte des habitants de la mare avec un animateur, épuisettes fournies.',
+    categoryId: 'cat-evenement',
+    organizer: 'Grand Parc Miribel Jonage',
+    placeId: 'seed-grand-parc',
+    address: '',
+    coordinates: { lat: 45.8103, lng: 4.9331 },
+    startsAt: '2026-08-22T10:00:00+02:00',
+    endsAt: '2026-08-22T12:00:00+02:00',
+    timezone: 'Europe/Paris',
+    allDay: false,
+    recurrence: null,
+    registrationDeadline: '2026-08-21T18:00:00+02:00',
+    price: { kind: 'paid', minEuros: 5, maxEuros: 5 },
+    ageRange: { min: 5, max: 12 },
+    capacity: 15,
+    websiteUrl: null,
+    bookingInfo: 'Réservation en ligne obligatoire.',
+    contact: '',
+    accessibility: 'Chemin stabilisé jusqu’à la mare.',
+    indoor: 'outdoor',
+    status: 'published',
+    authorId: AUTHOR,
+    lastVerifiedAt: '2026-08-01T09:00:00+02:00',
+    createdAt: T0,
+    updatedAt: T0,
+    deletedAt: null,
+  },
+  {
+    id: 'seed-evt-contes',
+    title: 'Heure du conte en famille',
+    description:
+      'Lectures pour les 3-6 ans, suivies d’un temps de jeux calmes.',
+    categoryId: 'cat-culture',
+    organizer: 'Bibliothèque municipale',
+    placeId: null,
+    address: '30 boulevard Vivier-Merle, Lyon 3e',
+    coordinates: { lat: 45.7606, lng: 4.8577 },
+    startsAt: '2026-08-26T16:30:00+02:00',
+    endsAt: '2026-08-26T17:15:00+02:00',
+    timezone: 'Europe/Paris',
+    allDay: false,
+    recurrence: {
+      frequency: 'weekly',
+      interval: 1,
+      until: '2026-10-28T18:00:00+01:00',
+    },
+    registrationDeadline: null,
+    price: { kind: 'free' },
+    ageRange: { min: 3, max: 6 },
+    capacity: null,
+    websiteUrl: null,
+    bookingInfo: '',
+    contact: '',
+    accessibility: '',
+    indoor: 'indoor',
+    status: 'published',
+    authorId: AUTHOR,
+    lastVerifiedAt: null,
+    createdAt: T0,
+    updatedAt: T0,
+    deletedAt: null,
+  },
+  {
+    id: 'seed-evt-fete-parc',
+    title: 'Fête d’automne du parc Blandan',
+    description:
+      'Jeux en bois, spectacle de rue et stands associatifs sur deux jours.',
+    categoryId: 'cat-evenement',
+    organizer: 'Ville de Lyon',
+    placeId: 'seed-parc-blandan',
+    address: '',
+    coordinates: { lat: 45.7455, lng: 4.8564 },
+    startsAt: '2026-09-19T00:00:00+02:00',
+    endsAt: '2026-09-20T23:59:00+02:00',
+    timezone: 'Europe/Paris',
+    allDay: true,
+    recurrence: null,
+    registrationDeadline: null,
+    price: { kind: 'free' },
+    ageRange: null,
+    capacity: null,
+    websiteUrl: null,
+    bookingInfo: '',
+    contact: '',
+    accessibility: '',
+    indoor: 'outdoor',
+    status: 'published',
+    authorId: AUTHOR,
+    lastVerifiedAt: null,
+    createdAt: T0,
+    updatedAt: T0,
+    deletedAt: null,
+  },
+];
+
+export const SEED_REVIEWS: readonly Review[] = [
+  {
+    id: 'seed-rev-1',
+    placeId: 'seed-tete-dor',
+    authorId: AUTHOR,
+    visitedOn: '2026-07-05',
+    ageBrackets: ['3-5', '6-9'],
+    rating: 5,
+    positives:
+      'Zoo gratuit, grandes pelouses ombragées, toilettes propres près de la roseraie.',
+    watchouts:
+      'Beaucoup de monde le dimanche après-midi ; vélos rapides sur les allées principales.',
+    accessibilityNotes:
+      'Allées larges et planes, très roulables en poussette double.',
+    crowdLevel: 'busy',
+    valueForMoney: 'good',
+    practicalTips: 'Arriver avant 11 h pour se garer facilement.',
+    photoIds: [],
+    status: 'published',
+    createdAt: '2026-07-06T09:00:00+02:00',
+    updatedAt: '2026-07-06T09:00:00+02:00',
+    deletedAt: null,
+  },
+  {
+    id: 'seed-rev-2',
+    placeId: 'seed-musee-confluences',
+    authorId: AUTHOR,
+    visitedOn: '2026-02-15',
+    ageBrackets: ['6-9'],
+    rating: 4,
+    positives: 'Squelettes spectaculaires, parcours enfants bien pensé.',
+    watchouts: 'Prévoir la sieste : la visite fatigue vite les moins de 5 ans.',
+    accessibilityNotes: 'Ascenseurs partout, prêt de poussettes à l’accueil.',
+    crowdLevel: 'moderate',
+    valueForMoney: 'good',
+    practicalTips: '',
+    photoIds: [],
+    status: 'published',
+    createdAt: '2026-02-16T09:00:00+01:00',
+    updatedAt: '2026-02-16T09:00:00+01:00',
+    deletedAt: null,
+  },
+];

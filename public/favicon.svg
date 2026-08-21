@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Mister Family Map">
+  <!-- Icône TEMPORAIRE (pictogramme générique) : repère de carte + cœur.
+       À remplacer par le vrai logo puis relancer `npm run icons`. -->
+  <rect width="128" height="128" rx="28" fill="#2f6f4f"/>
+  <path d="M64 18c-19.9 0-36 15.7-36 35 0 26.3 36 57 36 57s36-30.7 36-57c0-19.3-16.1-35-36-35z" fill="#fdfaf5"/>
+  <path d="M64 76.5 49.6 62.4c-4.8-4.7-4.8-12.3 0-17 4.7-4.7 12.4-4.7 17.1 0l-2.7 2.6 2.7-2.6c4.7-4.7 12.4-4.7 17.1 0 4.8 4.7 4.8 12.3 0 17L64 76.5z" fill="#e0704f"/>
+</svg>
