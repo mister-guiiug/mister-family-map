@@ -4,9 +4,12 @@ name: Lighthouse
 on:
   pull_request:
 
+# ⚠️ Le reusable déclare `pull-requests: write` : le caller doit l'accorder
+# aussi (héritage par intersection), sinon le run échoue en startup_failure.
 permissions:
   contents: read
   packages: read
+  pull-requests: write
 
 jobs:
   lighthouse:
