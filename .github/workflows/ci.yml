@@ -1,9 +1,18 @@
 # CI famille : délégué au reusable workflow pwa-ci.yml@v3 de dev-wpa-config
 # (format · lint · type-check · test · build · verify-lockfile · E2E · audit).
 #
-# ⚠️ Permissions déclarées ICI (niveau caller) : les reusable workflows héritent
-# des permissions du caller (intersection uniquement). `packages: read` est
-# requis pour installer @mister-guiiug/dev-wpa-config depuis GitHub Packages.
+# 💰 Coût zéro : ce workflow ne s'exécute QUE sur le dépôt PUBLIC
+# mister-guiiug/mister-family-map (minutes Actions gratuites et illimitées),
+# alimenté par `npm run mirror`. Sur le dépôt privé bac-sable — dont les
+# minutes Actions ne sont pas disponibles — le job est `skipped` (aucun
+# runner demandé, aucune minute, aucun échec) ; la qualité y est garantie
+# par `npm run verify`, exigé avant chaque publication.
+#
+# ⚠️ Permissions déclarées ICI (niveau caller) : les reusable workflows
+# héritent des permissions du caller (intersection uniquement).
+# `packages: read` est requis pour installer @mister-guiiug/dev-wpa-config
+# depuis GitHub Packages (même owner que le dépôt public → GITHUB_TOKEN
+# suffit).
 name: CI
 on:
   pull_request:
@@ -16,14 +25,16 @@ permissions:
 
 jobs:
   ci:
+    # Exécution réservée au miroir public — cf. commentaire d'en-tête.
+    if: github.repository == 'mister-guiiug/mister-family-map'
     uses: mister-guiiug/dev-wpa-config/.github/workflows/pwa-ci.yml@v3
     secrets: inherit
     with:
       # TODO(bootstrap) : le lockfile a été généré sans accès authentifié à
       # GitHub Packages — l'entrée @mister-guiiug/dev-wpa-config n'a donc ni
       # `resolved` ni `integrity` (npm les complète au premier `npm install`
-      # authentifié). Étapes : `npm install` en local ou en CI, committer le
-      # lockfile mis à jour, puis repasser verify-lockfile à true.
+      # authentifié). Étapes : `npm install` en local, committer le lockfile
+      # mis à jour, puis repasser verify-lockfile à true.
       verify-lockfile: false
       # Audit SCA des dépendances de production (seuil : high).
       run-npm-audit: true

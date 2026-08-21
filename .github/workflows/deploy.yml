@@ -1,5 +1,11 @@
 # Déploiement GitHub Pages : délégué au reusable pwa-deploy.yml@v3.
 #
+# 💰 Coût zéro : ne s'exécute QUE sur le dépôt PUBLIC
+# mister-guiiug/mister-family-map (Pages + minutes gratuites), après chaque
+# publication via `npm run mirror`. Sur le dépôt privé, le job est `skipped`.
+# L'app est servie sous https://mister-guiiug.github.io/mister-family-map/
+# (base path automatique).
+#
 # ⚠️ Permissions au niveau caller (héritage par intersection) :
 #   - pages: write + id-token: write → déploiement Pages ;
 #   - packages: read → installation de @mister-guiiug/dev-wpa-config.
@@ -19,6 +25,8 @@ permissions:
 
 jobs:
   deploy:
+    # Exécution réservée au miroir public — cf. commentaire d'en-tête.
+    if: github.repository == 'mister-guiiug/mister-family-map'
     uses: mister-guiiug/dev-wpa-config/.github/workflows/pwa-deploy.yml@v3
     secrets: inherit
     with:
