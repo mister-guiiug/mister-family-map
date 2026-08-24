@@ -3,7 +3,7 @@ import { createBrowserRouter } from 'react-router';
 import { SkeletonGroup } from '@mister-guiiug/dev-wpa-config/react';
 import { RootLayout } from '../layouts/RootLayout';
 
-/** Pages en lazy-loading : le shell reste léger, la carte (Leaflet) n'est chargée qu'à l'usage. */
+/** Pages en lazy-loading : le shell reste léger, la carte (MapLibre GL) n'est chargée qu'à l'usage. */
 const ExplorePage = lazy(() => import('../../pages/ExplorePage'));
 const MapPage = lazy(() => import('../../pages/MapPage'));
 const PlaceDetailPage = lazy(() => import('../../pages/PlaceDetailPage'));

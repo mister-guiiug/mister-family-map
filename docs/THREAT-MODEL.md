@@ -83,8 +83,13 @@ journal de modération conservés 12 mois (base légale : intérêt légitime).
 ## CSP (récapitulatif)
 
 Prod (via `cspPlugin`, hash SHA-256 des scripts inline) : `default-src 'self'` ;
-`connect-src` : self + `*.supabase.co` (+wss) + `nominatim.openstreetmap.org` ;
-`img-src` : self + data/blob + `tile.openstreetmap.org` + `*.supabase.co` ;
+`connect-src` : self + `tile.openstreetmap.org` + `*.supabase.co` (+wss) +
+`nominatim.openstreetmap.org` — MapLibre charge les tuiles par `fetch`, elles
+relèvent donc de `connect-src` et non de `img-src` ;
+`img-src` : self + data/blob + `tile.openstreetmap.org` + `*.supabase.co`
+(repli `<img>` des navigateurs sans `createImageBitmap`) ;
+`worker-src 'self'` : le worker MapLibre est un asset de l'origine, émis par
+Vite — aucune URL `blob:` n'est autorisée ;
 `object-src 'none'`, `frame-ancestors 'none'`, `base-uri 'self'`,
 `form-action 'self'`. Toute nouvelle dépendance réseau doit être ajoutée ici
 ET dans `vite.config.ts`.

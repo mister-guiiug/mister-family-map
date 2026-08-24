@@ -22,7 +22,16 @@ export default defineConfig(({ command }) => ({
     // Après pwaSeoPlugin (ordre requis : les hash sont calculés sur le HTML final).
     cspPlugin({
       dev: command === 'serve',
-      connectSrc: ["'self'", ...SUPABASE_HOSTS, NOMINATIM_HOST],
+      // MapLibre récupère les tuiles raster via `fetch` → elles relèvent de
+      // `connect-src` (et non de `img-src` comme avec une balise <img>).
+      // `img-src` garde les mêmes hôtes pour le repli <img> des navigateurs
+      // sans `createImageBitmap`.
+      connectSrc: [
+        "'self'",
+        ...OSM_TILE_HOSTS,
+        ...SUPABASE_HOSTS,
+        NOMINATIM_HOST,
+      ],
       imgSrc: [
         "'self'",
         'data:',

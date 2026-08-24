@@ -2,8 +2,8 @@ import type { BoundingBox, Coordinates } from '../../shared/lib/geo';
 
 /**
  * Port MapProvider : le domaine et les écrans ne connaissent QUE cette
- * interface. Le fournisseur initial (Leaflet + tuiles OSM) est un adaptateur
- * remplaçable — critères et stratégie de remplacement dans
+ * interface. Le fournisseur courant (MapLibre GL + tuiles OSM) est un
+ * adaptateur remplaçable — critères et stratégie de remplacement dans
  * docs/adr/0001-map-provider.md.
  */
 
