@@ -18,7 +18,7 @@ test('@critical un visiteur consulte la carte et ouvre un lieu', async ({
   page,
 }) => {
   await page.goto('/carte');
-  // La carte est montée (fournisseur Leaflet) avec son alternative textuelle.
+  // La carte est montée (fournisseur MapLibre GL) avec son alternative textuelle.
   await expect(page.getByTestId('map-container')).toBeVisible();
   // La liste synchronisée présente les mêmes résultats : on ouvre une fiche.
   await page

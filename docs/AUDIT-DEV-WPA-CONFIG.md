@@ -107,7 +107,7 @@ ESLint en 10.x en « latest » — le projet **respecte les ranges famille**
 
 | Décision                                                  | Justification                                                                                            | Où                    |
 | --------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- | --------------------- |
-| Leaflet 1.9 + tuiles OSM derrière un port `MapProvider`   | cf. ADR                                                                                                  | docs/adr/0001         |
+| MapLibre GL 6 + tuiles OSM derrière un port `MapProvider` | cf. ADR                                                                                                  | docs/adr/0001         |
 | Supabase (schéma + RLS livrés) avec démarrage local-first | cf. ADR                                                                                                  | docs/adr/0002         |
 | Export ICS sans dépendance                                | cf. ADR                                                                                                  | docs/adr/0003         |
 | react-router ^8, zustand ^5                               | routage SPA et état léger ; versions relevées sur npm le 2026-08-21                                      | package.json          |

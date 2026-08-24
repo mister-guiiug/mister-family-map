@@ -49,7 +49,7 @@ src/
   app/          providers (Backend), router, layouts (nav 5 onglets), config (env, backend)
   pages/        écrans (lazy) : Explorer, Carte, fiche/ajout lieu, Agenda, fiche/ajout
                 événement, Favoris, Connexion, Profil, Contributions, Modération, 404…
-  features/     par domaine fonctionnel : map (port MapProvider + adaptateur Leaflet),
+  features/     par domaine fonctionnel : map (port MapProvider + adaptateur MapLibre GL),
                 search (store filtres), places, events, reviews, contributions (wizard),
                 favorites, auth, moderation
   entities/     modèles + schémas Zod + logique métier pure (place, event, review,
@@ -65,7 +65,7 @@ src/
 
 Règles : la logique métier vit dans `entities/` et `shared/lib/` (pas dans les
 composants) ; les écrans ne dépendent que des **ports** (`shared/api/ports.ts`) ;
-un seul fichier importe Leaflet, un seul importe supabase-js.
+un seul fichier importe maplibre-gl, un seul importe supabase-js.
 
 Décisions documentées : [ADR-0001 carte](./docs/adr/0001-map-provider.md) ·
 [ADR-0002 backend](./docs/adr/0002-backend.md) ·

@@ -6,7 +6,7 @@ import { clusterByGrid } from '../../../shared/lib/cluster';
 import type { Coordinates } from '../../../shared/lib/geo';
 import { useGeolocation } from '../../../shared/hooks/useGeolocation';
 import type { MapProviderFactory, MapViewport } from '../map-provider';
-import { createLeafletMapProvider } from '../leaflet/leaflet-map-provider';
+import { createMapLibreMapProvider } from '../maplibre/maplibre-map-provider';
 
 /** Centre par défaut (France) tant qu'aucune position n'est consentie. */
 const DEFAULT_CENTER: Coordinates = { lat: 46.6, lng: 2.4 };
@@ -17,7 +17,7 @@ export interface MapViewProps {
   onOpenPlace: (placeId: string) => void;
   onViewportChange?: ((viewport: MapViewport) => void) | undefined;
   onUserLocated?: ((coordinates: Coordinates) => void) | undefined;
-  /** Injectable en test ; Leaflet par défaut. */
+  /** Injectable en test ; MapLibre GL par défaut. */
   providerFactory?: MapProviderFactory;
   /** Alternative textuelle : liste liée affichée ailleurs sur l'écran. */
   ariaLabel?: string;
@@ -33,7 +33,7 @@ export function MapView({
   onOpenPlace,
   onViewportChange,
   onUserLocated,
-  providerFactory = createLeafletMapProvider,
+  providerFactory = createMapLibreMapProvider,
   ariaLabel = 'Carte des lieux — la liste ci-dessous présente les mêmes résultats',
 }: MapViewProps) {
   const containerRef = useRef<HTMLDivElement>(null);

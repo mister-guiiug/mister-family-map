@@ -1,7 +1,7 @@
 @import 'tailwindcss';
 @import '@mister-guiiug/dev-wpa-config/tailwind-preset.css';
 @import '@mister-guiiug/dev-wpa-config/components.css';
-@import 'leaflet/dist/leaflet.css';
+@import 'maplibre-gl/dist/maplibre-gl.css';
 
 /* Tokens de l'app — thème clair. Palette « nature rassurante », sobre. */
 @theme {
@@ -93,15 +93,22 @@ body {
   }
 }
 
-/* La carte Leaflet doit rester sous la navigation et les feuilles modales. */
-.leaflet-container {
+/* La carte MapLibre doit rester sous la navigation et les feuilles modales. */
+.maplibregl-map {
   z-index: 0;
 }
 
 /* Marqueurs (icônes SVG-free : dessinés en CSS, thèmables). */
 .mfm-marker {
+  display: block;
+  padding: 0;
   background: transparent;
   border: none;
+  cursor: pointer;
+}
+.mfm-pin,
+.mfm-cluster {
+  display: block;
 }
 .mfm-pin {
   width: 1.5rem;
