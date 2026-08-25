@@ -49,7 +49,7 @@ src/
   app/          providers (Backend), router, layouts (nav 5 onglets), config (env, backend)
   pages/        écrans (lazy) : Explorer, Carte, fiche/ajout lieu, Agenda, fiche/ajout
                 événement, Favoris, Connexion, Profil, Contributions, Modération, 404…
-  features/     par domaine fonctionnel : map (port MapProvider + adaptateur MapLibre GL),
+  features/     par domaine fonctionnel : map (port + adaptateur MapLibre GL du paquet partagé),
                 search (store filtres), places, events, reviews, contributions (wizard),
                 favorites, auth, moderation
   entities/     modèles + schémas Zod + logique métier pure (place, event, review,
@@ -57,15 +57,18 @@ src/
   shared/
     api/        ports.ts (11 interfaces) · local/ (adaptateurs local-first + seed)
                 · supabase/ (client + adaptateur de référence places)
-    lib/        geo, dates, cluster, dedupe, recommend, ics, sanitize, images,
-                rate-limit — pur et testé
+    lib/        geo, dates, dedupe, recommend, ics, sanitize, images,
+                rate-limit — pur et testé (le clustering vient du paquet partagé)
     schemas/    filtres de recherche (tri-état : oui / non / inconnu)
     hooks/ components/ constants/ styles/ types/
 ```
 
 Règles : la logique métier vit dans `entities/` et `shared/lib/` (pas dans les
 composants) ; les écrans ne dépendent que des **ports** (`shared/api/ports.ts`) ;
-un seul fichier importe maplibre-gl, un seul importe supabase-js.
+un seul fichier importe supabase-js. La carte n'est plus implémentée ici : le
+port `MapProvider`, l'adaptateur MapLibre, le regroupement de marqueurs et les
+helpers CSP/cache viennent de
+[`@mister-guiiug/dev-wpa-config/map`](https://github.com/mister-guiiug/dev-wpa-config#carte-mister-guiiugdev-wpa-configmap).
 
 Décisions documentées : [ADR-0001 carte](./docs/adr/0001-map-provider.md) ·
 [ADR-0002 backend](./docs/adr/0002-backend.md) ·

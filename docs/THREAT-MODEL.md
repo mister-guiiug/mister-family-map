@@ -92,4 +92,6 @@ relèvent donc de `connect-src` et non de `img-src` ;
 Vite — aucune URL `blob:` n'est autorisée ;
 `object-src 'none'`, `frame-ancestors 'none'`, `base-uri 'self'`,
 `form-action 'self'`. Toute nouvelle dépendance réseau doit être ajoutée ici
-ET dans `vite.config.ts`.
+ET dans `vite.config.ts`. Les hôtes de tuiles ne sont plus écrits à la main :
+ils sont dérivés de la source (`osmRasterTiles()`) par `mapCspDirectives()`,
+qui alimente aussi le cache workbox — une seule déclaration, deux usages.

@@ -2,11 +2,14 @@ import { useEffect, useRef, useState } from 'react';
 import { Button, ErrorBanner } from '@mister-guiiug/dev-wpa-config/react';
 import { LocateFixed } from 'lucide-react';
 import type { Place } from '../../../entities/place/model';
-import { clusterByGrid } from '../../../shared/lib/cluster';
+import {
+  clusterByGrid,
+  clustersToMarkers,
+} from '@mister-guiiug/dev-wpa-config/map';
+import { createMapLibreMapProvider } from '@mister-guiiug/dev-wpa-config/map/maplibre';
 import type { Coordinates } from '../../../shared/lib/geo';
 import { useGeolocation } from '../../../shared/hooks/useGeolocation';
 import type { MapProviderFactory, MapViewport } from '../map-provider';
-import { createMapLibreMapProvider } from '../maplibre/maplibre-map-provider';
 
 /** Centre par défaut (France) tant qu'aucune position n'est consentie. */
 const DEFAULT_CENTER: Coordinates = { lat: 46.6, lng: 2.4 };
@@ -80,21 +83,14 @@ export function MapView({
       zoom
     );
     provider.setMarkers(
-      clusters.map(c => {
-        const first = c.items[0];
-        return c.items.length === 1 && first
-          ? {
-              id: first.id,
-              coordinates: first.coordinates,
-              label: first.item.name,
-            }
-          : {
-              id: `cluster-${c.coordinates.lat.toFixed(3)}-${c.coordinates.lng.toFixed(3)}`,
-              coordinates: c.coordinates,
-              label: `${c.items.length} lieux regroupés`,
-              count: c.items.length,
-            };
-      })
+      // Le paquet calcule identifiants, centres et comptes ; on ne reprend la
+      // main que sur le libellé du groupe, qui sert d'alternative textuelle et
+      // gagne à nommer des « lieux » plutôt que des « éléments ».
+      clustersToMarkers(clusters, input => input.item.name).map(marker =>
+        marker.count
+          ? { ...marker, label: `${marker.count} lieux regroupés` }
+          : marker
+      )
     );
   }, [places, zoom, failed]);
 
