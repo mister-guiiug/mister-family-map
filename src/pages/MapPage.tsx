@@ -13,6 +13,7 @@ import { applyFilters } from '../shared/schemas/filters';
 import { isInBoundingBox, type BoundingBox } from '../shared/lib/geo';
 import { useSearchStore } from '../features/search/store';
 import { useFavoritesStore } from '../features/favorites/store';
+import { isClusterId } from '@mister-guiiug/dev-wpa-config/map';
 import { MapView } from '../features/map/components/MapView';
 import { FilterSheet } from '../features/search/components/FilterSheet';
 import { PlaceCard } from '../features/places/components/PlaceCard';
@@ -80,7 +81,9 @@ export default function MapPage() {
           <MapView
             places={filtered}
             onOpenPlace={id => {
-              if (!id.startsWith('cluster-')) navigate(`/lieux/${id}`);
+              // Un clic sur un groupe n'ouvre pas de fiche : le test vient du
+              // paquet, pas d'un préfixe recopié ici.
+              if (!isClusterId(id)) navigate(`/lieux/${id}`);
             }}
             onViewportChange={viewport => setVisibleArea(viewport.bounds)}
             onUserLocated={setOrigin}

@@ -105,12 +105,12 @@ ESLint en 10.x en « latest » — le projet **respecte les ranges famille**
 
 ## Décisions techniques HORS dépôt partagé (→ propositions à valider)
 
-| Décision                                                  | Justification                                                                                            | Où                    |
-| --------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- | --------------------- |
-| MapLibre GL 6 + tuiles OSM derrière un port `MapProvider` | cf. ADR                                                                                                  | docs/adr/0001         |
-| Supabase (schéma + RLS livrés) avec démarrage local-first | cf. ADR                                                                                                  | docs/adr/0002         |
-| Export ICS sans dépendance                                | cf. ADR                                                                                                  | docs/adr/0003         |
-| react-router ^8, zustand ^5                               | routage SPA et état léger ; versions relevées sur npm le 2026-08-21                                      | package.json          |
-| App à la RACINE du dépôt bac-sable                        | les reusable workflows famille opèrent à la racine (npm ci sans working-directory) ; le dépôt était vide | —                     |
-| Clustering par grille maison                              | évite une dépendance ; testé unitairement                                                                | shared/lib/cluster.ts |
-| husky/commitlint non installés (configs livrées)          | hooks git = choix d'équipe ; templates famille prêts à copier                                            | README « Hooks git »  |
+| Décision                                                   | Justification                                                                                            | Où                    |
+| ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- | --------------------- |
+| Carte : `/map` + `/map/maplibre` du paquet partagé (v3.12) | cf. ADR                                                                                                  | docs/adr/0001         |
+| Supabase (schéma + RLS livrés) avec démarrage local-first  | cf. ADR                                                                                                  | docs/adr/0002         |
+| Export ICS sans dépendance                                 | cf. ADR                                                                                                  | docs/adr/0003         |
+| react-router ^8, zustand ^5                                | routage SPA et état léger ; versions relevées sur npm le 2026-08-21                                      | package.json          |
+| App à la RACINE du dépôt bac-sable                         | les reusable workflows famille opèrent à la racine (npm ci sans working-directory) ; le dépôt était vide | —                     |
+| Clustering par grille maison                               | évite une dépendance ; testé unitairement                                                                | shared/lib/cluster.ts |
+| husky/commitlint non installés (configs livrées)           | hooks git = choix d'équipe ; templates famille prêts à copier                                            | README « Hooks git »  |

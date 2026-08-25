@@ -98,19 +98,20 @@ body {
   z-index: 0;
 }
 
-/* Marqueurs (icônes SVG-free : dessinés en CSS, thèmables). */
-.mfm-marker {
+/* Marqueurs : classes posées par l'adaptateur du paquet partagé, habillage
+   laissé à l'app (icônes SVG-free, dessinées en CSS, thèmables). */
+.dwc-map-marker {
   display: block;
   padding: 0;
   background: transparent;
   border: none;
   cursor: pointer;
 }
-.mfm-pin,
-.mfm-cluster {
+.dwc-map-pin,
+.dwc-map-cluster {
   display: block;
 }
-.mfm-pin {
+.dwc-map-pin {
   width: 1.5rem;
   height: 1.5rem;
   margin: 0 auto;
@@ -120,7 +121,7 @@ body {
   transform: rotate(-45deg);
   box-shadow: 0 1px 3px rgb(0 0 0 / 0.4);
 }
-.mfm-cluster {
+.dwc-map-cluster {
   display: grid;
   place-items: center;
   width: 2.5rem;

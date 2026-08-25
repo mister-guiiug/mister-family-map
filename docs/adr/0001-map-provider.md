@@ -1,13 +1,14 @@
 # ADR-0001 — Fournisseur cartographique : MapLibre GL + tuiles OpenStreetMap
 
-Statut : accepté · Date : 2026-08-24
-(remplace la décision initiale « Leaflet + tuiles OSM » du 2026-08-21)
+Statut : accepté · Date : 2026-08-25
+(2026-08-21 « Leaflet + tuiles OSM » → 2026-08-24 MapLibre → 2026-08-25 socle
+remonté dans le paquet partagé)
 
 ## Contexte
 
 La carte est centrale mais ne doit pas contaminer le domaine : l'app dépend du
-port `MapProvider` (`src/features/map/map-provider.ts`) ; un seul adaptateur
-(`maplibre/maplibre-map-provider.ts`) importe la bibliothèque.
+port `MapProvider`, réexporté par `src/features/map/map-provider.ts` depuis
+**`@mister-guiiug/dev-wpa-config/map`** — l'app n'implémente plus d'adaptateur.
 
 Candidats évalués : Leaflet (raster), MapLibre GL (WebGL), fournisseurs
 commerciaux (Mapbox, Google Maps).
@@ -18,7 +19,11 @@ commerciaux (Mapbox, Google Maps).
 style défini **en dur dans l'adaptateur** (pas d'URL de style distante).
 
 Le passage de Leaflet à MapLibre a coûté un seul fichier d'adaptateur : le port
-a tenu, aucun écran n'a changé. C'est la validation du découpage.
+a tenu, aucun écran n'a changé. C'est ce qui a justifié de remonter l'ensemble
+— port, adaptateurs Leaflet ET MapLibre, regroupement, helpers CSP et cache —
+dans le paquet partagé, où les trois pièges ci-dessous sont traités une fois
+pour toutes. L'app fournit désormais uniquement l'habillage CSS des marqueurs
+(`.dwc-map-marker` / `.dwc-map-pin` / `.dwc-map-cluster`) et son repli liste.
 
 ## Avantages
 
@@ -55,6 +60,12 @@ production — ils ne se voient pas en développement :
    `…/maplibre-gl-worker.mjs?worker&url`, qui fait empaqueter le worker **avec
    ses dépendances** par Vite. Le worker est un asset de l'origine (donc
    `worker-src 'self'` suffit, sans `blob:`) et il est précaché par workbox.
+   **Contrepartie** : ce suffixe `?worker&url` n'est pas compris par le
+   pré-bundling des dépendances de Vite. L'adaptateur vivant dans
+   `node_modules`, `npm run dev` refusait de démarrer jusqu'à ce que
+   `optimizeDeps.exclude` sorte ce sous-chemin de l'optimiseur — voir
+   `vite.config.ts`. Le build de production, lui, n'a jamais été concerné :
+   c'est l'exact symétrique du piège nº 1.
 2. **CSP** : MapLibre récupère les tuiles raster par `fetch`, pas par `<img>` —
    elles relèvent de **`connect-src`**. L'hôte reste aussi dans `img-src` pour
    le repli `<img>` des navigateurs sans `createImageBitmap`.
