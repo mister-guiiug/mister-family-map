@@ -7,12 +7,17 @@ import { createClient, type SupabaseClient } from '@supabase/supabase-js';
  */
 export function createSupabaseClient(
   url: string,
-  anonKey: string
+  anonKey: string,
+  options: { fetch?: typeof fetch } = {}
 ): SupabaseClient {
   return createClient(url, anonKey, {
     auth: {
       persistSession: true,
       autoRefreshToken: true,
     },
+    // `fetch` corrélé : chaque requête part avec X-Correlation-Id et
+    // X-Session-Id, si bien que le journal du serveur et l'erreur remontée
+    // côté client désignent le même incident.
+    ...(options.fetch ? { global: { fetch: options.fetch } } : {}),
   });
 }

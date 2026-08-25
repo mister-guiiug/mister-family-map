@@ -22,14 +22,6 @@ const NOMINATIM_HOST = 'https://nominatim.openstreetmap.org';
 
 export default defineConfig(({ command }) => ({
   base: process.env.VITE_BASE_PATH ?? '/',
-  optimizeDeps: {
-    // L'adaptateur MapLibre du paquet partagé résout l'URL de son worker par
-    // le suffixe Vite `?worker&url`. Le pré-bundling des dépendances ne sait
-    // pas interpréter ce suffixe et échoue au démarrage de `npm run dev` —
-    // alors que le build de production, lui, le gère. On sort donc ce
-    // sous-chemin de l'optimiseur ; Vite le sert alors tel quel.
-    exclude: ['@mister-guiiug/dev-wpa-config/map/maplibre'],
-  },
   plugins: [
     react(),
     tailwindcss(),

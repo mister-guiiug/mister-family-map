@@ -14,7 +14,7 @@ import { readEnv, resolveBackendKind } from './env';
  *   ne sont pas écrits — migration port par port, suivie dans le README
  *   (« Feuille de route backend »).
  */
-export function createBackend(): Backend {
+export function createBackend(options: { fetch?: typeof fetch } = {}): Backend {
   const env = readEnv();
   const kind = resolveBackendKind(env);
   const local = createLocalBackend();
@@ -26,7 +26,8 @@ export function createBackend(): Backend {
   ) {
     const client = createSupabaseClient(
       env.VITE_SUPABASE_URL,
-      env.VITE_SUPABASE_ANON_KEY
+      env.VITE_SUPABASE_ANON_KEY,
+      { ...(options.fetch ? { fetch: options.fetch } : {}) }
     );
     return {
       ...local,
