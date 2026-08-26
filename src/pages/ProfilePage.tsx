@@ -1,5 +1,10 @@
 import { Link, useNavigate } from 'react-router';
-import { Badge, Button } from '@mister-guiiug/dev-wpa-config/react';
+import {
+  Badge,
+  Button,
+  FamilyApps,
+  UpdateButton,
+} from '@mister-guiiug/dev-wpa-config/react';
 import { AppVersion } from '@mister-guiiug/dev-wpa-config/react/app-version';
 import { useBackend } from '../app/providers/BackendProvider';
 import { useAuthStore, useCurrentRole } from '../features/auth/store';
@@ -105,7 +110,32 @@ export default function ProfilePage() {
             details
             repoUrl="https://github.com/mister-guiiug/mister-family-map"
           />
+
+          {/*
+            « Forcer la mise à jour » : le bandeau de `UpdatePromptBanner` ne
+            paraît que quand le navigateur a DÉJÀ vu la nouvelle version. Ce
+            bouton sert au cas inverse — l'utilisateur qui soupçonne d'être en
+            retard, c'est-à-dire précisément quand aucun bandeau n'existe. Il
+            vide le cache de l'app et recharge ; les données locales
+            (localStorage, favoris, brouillons) ne sont jamais touchées.
+          */}
+          <UpdateButton
+            className="mt-3 touch-target rounded-(--radius-card) border border-line px-fluid-sm py-2 text-fluid-sm"
+            showHint
+          />
         </section>
+
+        {/*
+          Code source, « M'offrir un café » et les autres applications de la
+          famille : le socle tient le catalogue (`apps-catalog.js`), les badges
+          de maturité et les liens sortants sécurisés. `currentAppId` retire
+          l'app courante de la grille.
+        */}
+        <FamilyApps
+          className="mt-4 border-t border-line pt-4"
+          currentAppId="mister-family-map"
+          repoUrl="https://github.com/mister-guiiug/mister-family-map"
+        />
       </div>
     </div>
   );

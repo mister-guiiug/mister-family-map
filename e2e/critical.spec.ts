@@ -214,3 +214,28 @@ test('@critical la version de l’app est lisible dans « À propos »', async (
     version.locator('a[data-dwc="app-version-value"]')
   ).toHaveAttribute('href', /\/releases\/tag\/v\d+\.\d+\.\d+$/);
 });
+
+test('@critical le profil offre la mise à jour forcée, le code source, le café et les autres apps', async ({
+  page,
+}) => {
+  // Trois composants du socle vivaient dans le paquet sans être montés nulle
+  // part : le bouton « Forcer la mise à jour » (le seul recours quand le
+  // bandeau n'apparaît pas, faute de version déjà vue par le navigateur), le
+  // lien code source, le lien sponsor et la grille des applications de la
+  // famille. Livrés dans le paquet ne veut pas dire visibles à l'écran — la
+  // version l'avait déjà démontré.
+  await page.goto('/profil');
+
+  await expect(page.locator('[data-dwc="update-button"]')).toBeVisible();
+
+  const source = page.locator('[data-dwc="family-source"]');
+  await expect(source).toBeVisible();
+  await expect(source).toHaveAttribute('rel', 'noopener noreferrer');
+
+  const sponsor = page.locator('[data-dwc="family-sponsor"]');
+  await expect(sponsor).toBeVisible();
+  await expect(sponsor).toHaveAttribute('href', /buymeacoffee\.com/);
+
+  // La grille des autres apps, alimentée par le catalogue du socle.
+  await expect(page.locator('[data-dwc="family-app"]').first()).toBeVisible();
+});
