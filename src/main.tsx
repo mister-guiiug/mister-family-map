@@ -2,6 +2,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { RouterProvider } from 'react-router/dom';
 import { ObservabilityBoundary } from '@mister-guiiug/dev-wpa-config/react';
+import { VersionProvider } from '@mister-guiiug/dev-wpa-config/react/version';
 import { installObservability } from '@mister-guiiug/dev-wpa-config/react/observability';
 import { installCorrelation } from '@mister-guiiug/dev-wpa-config/correlation';
 import { BackendProvider } from './app/providers/BackendProvider';
@@ -35,9 +36,17 @@ createRoot(container).render(
   <StrictMode>
     {/* Enregistre le crash ET affiche la référence à citer au support. */}
     <ObservabilityBoundary>
-      <BackendProvider backend={backend}>
-        <RouterProvider router={router} />
-      </BackendProvider>
+      {/*
+        La version qui tourne, celle du démarrage précédent, celle qui est en
+        ligne. `checkEvery` sonde `version.json` : une PWA installée ouverte
+        plusieurs jours ne redécouvre pas son service worker toute seule, et
+        c'est le seul canal qui transporte le NUMÉRO.
+      */}
+      <VersionProvider checkEvery="1h">
+        <BackendProvider backend={backend}>
+          <RouterProvider router={router} />
+        </BackendProvider>
+      </VersionProvider>
     </ObservabilityBoundary>
   </StrictMode>
 );

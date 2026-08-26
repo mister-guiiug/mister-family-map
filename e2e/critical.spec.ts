@@ -190,3 +190,27 @@ test('@critical hors ligne : l’app reste utilisable sur les données locales',
   ).toBeVisible();
   await context.setOffline(false);
 });
+
+test('@critical la version de l’app est lisible dans « À propos »', async ({
+  page,
+}) => {
+  // Le numéro doit être ATTEIGNABLE par un utilisateur qui remplit un rapport
+  // de bug — pas seulement présent dans le bundle. La première mise en place
+  // câblait `versionPlugin()` sans rien afficher : la version existait dans
+  // `globalThis.__DWC_BUILD__` et dans le contexte d'erreur, et restait
+  // invisible à l'écran.
+  await page.goto('/profil');
+
+  const version = page.locator('[data-dwc="app-version"]');
+  await expect(version).toBeVisible();
+
+  // Un numéro, pas un « v » orphelin ni « undefined ».
+  await expect(version.locator('[data-dwc="app-version-value"]')).toHaveText(
+    /^\d+\.\d+\.\d+/
+  );
+
+  // Et il mène à la release correspondante.
+  await expect(
+    version.locator('a[data-dwc="app-version-value"]')
+  ).toHaveAttribute('href', /\/releases\/tag\/v\d+\.\d+\.\d+$/);
+});
