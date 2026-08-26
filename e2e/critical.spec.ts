@@ -47,7 +47,37 @@ test('@critical un membre ajoute un lieu et le système propose les doublons', a
 
   // Étape 2 : détection de doublons sur le nom + la proximité.
   await page.getByLabel('Nom du lieu').fill('Parc Tête d’Or');
-  await expect(page.getByTestId('duplicate-suggestion').first()).toBeVisible();
+
+  // La suggestion dépend de TROIS entrées : le nom saisi, les coordonnées du
+  // brouillon, et la liste des lieux chargée depuis le backend local. Une
+  // assertion nue ne dit pas laquelle manque — et ce parcours a échoué sur le
+  // runner de CI sans qu'on sache le reproduire ailleurs, trois fois de suite,
+  // en ne disant rien d'autre que « element(s) not found ».
+  try {
+    await expect(
+      page.getByTestId('duplicate-suggestion').first()
+    ).toBeVisible();
+  } catch (error) {
+    const etat = await page.evaluate(() => {
+      const lire = (cle: string) => {
+        try {
+          return localStorage.getItem(cle);
+        } catch {
+          return '<stockage indisponible>';
+        }
+      };
+      const lieux = lire('mfm_places');
+      return {
+        brouillon: lire('mfm_place_wizard_draft'),
+        nbLieux: lieux ? (JSON.parse(lieux) as unknown[]).length : null,
+        clesStockage: Object.keys(localStorage),
+        titreEtape: document.querySelector('h1, h2')?.textContent ?? null,
+      };
+    });
+    throw new Error(
+      `${(error as Error).message}\n\nÉtat au moment de l'échec :\n${JSON.stringify(etat, null, 2)}`
+    );
+  }
 
   // On assume un lieu distinct et on poursuit le parcours.
   await page.getByLabel('Nom du lieu').fill('Kiosque à musique du parc');
