@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { useOnline } from '@mister-guiiug/dev-wpa-config/react';
 import { UpdatePromptBanner } from '@mister-guiiug/dev-wpa-config/react/update-prompt-banner';
+import { registerSW } from 'virtual:pwa-register';
 import { useBackend } from '../providers/BackendProvider';
 import { useAuthStore } from '../../features/auth/store';
 import { useFavoritesStore } from '../../features/favorites/store';
@@ -43,7 +44,14 @@ export function RootLayout() {
         Aller au contenu
       </a>
 
-      <UpdatePromptBanner />
+      {/*
+        `registerSW` est ce qui fait EXISTER le bandeau. Sans lui, le socle
+        n'a personne pour lui annoncer qu'un worker attend : `needRefresh`
+        reste faux et le bandeau ne s'affiche jamais — monté, mais muet. Le
+        module `virtual:pwa-register` n'existe que dans un build Vite, d'où
+        l'injection plutôt qu'un import en dur côté paquet.
+      */}
+      <UpdatePromptBanner registerSW={registerSW} snoozeHours={6} />
 
       {!online ? (
         <p
