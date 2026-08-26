@@ -1,5 +1,6 @@
 import { Link, useNavigate } from 'react-router';
 import { Badge, Button } from '@mister-guiiug/dev-wpa-config/react';
+import { AppVersion } from '@mister-guiiug/dev-wpa-config/react/app-version';
 import { useBackend } from '../app/providers/BackendProvider';
 import { useAuthStore, useCurrentRole } from '../features/auth/store';
 import { ROLE_LABELS } from '../entities/user/model';
@@ -92,6 +93,18 @@ export default function ProfilePage() {
               Cartographie © OpenStreetMap — recherche d’adresse © Nominatim.
             </li>
           </ul>
+
+          {/*
+            Le numéro de version, là où on le cherche quand on remplit un
+            rapport de bug : dans « À propos », pas dans une console. `details`
+            ajoute la date de compilation et le commit court — les deux autres
+            informations qu'un rapport utile porte.
+          */}
+          <AppVersion
+            className="mt-3"
+            details
+            repoUrl="https://github.com/mister-guiiug/mister-family-map"
+          />
         </section>
       </div>
     </div>
