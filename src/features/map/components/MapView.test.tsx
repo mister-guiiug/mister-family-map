@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import type { Place } from '../../../entities/place/model';
 import { UNKNOWN_FEATURES } from '../../../entities/place/model';
-import type { MapMarker, MapProvider } from '../map-provider';
+import type { MapMarker, MapProvider, MapViewport } from '../map-provider';
 import { MapView } from './MapView';
 
 /**
@@ -125,5 +125,59 @@ describe('MapView', () => {
     await waitFor(() => expect(provider.mount).toHaveBeenCalled());
     unmount();
     expect(provider.destroy).toHaveBeenCalledTimes(1);
+  });
+
+  /**
+   * LE DÉFAUT, TROUVÉ EN CI. Le socle annonçait la vue INITIALE de la carte par
+   * `onViewportChange` (`once('load')` côté MapLibre). `PlaceCreatePage` recopie
+   * ce callback dans les coordonnées de son brouillon : sur le runner GitHub, à
+   * WebGL logiciel, ce `load` tombait APRÈS la saisie et le centre par défaut —
+   * 46.6 / 2.4, le milieu de la France — écrasait les coordonnées tapées. La
+   * détection de doublons cherchait alors à 400 km du lieu visé.
+   *
+   * Depuis dev-wpa-config 3.15, la vue initiale passe par `onReady`. Elle sert
+   * ici à amorcer le zoom du regroupement, et ne remonte PAS à l'appelant.
+   */
+  it('n’annonce pas la vue initiale comme un déplacement', async () => {
+    let ready: ((viewport: MapViewport) => void) | undefined;
+    let moved: ((viewport: MapViewport) => void) | undefined;
+    const { provider } = fakeProvider({
+      mount: vi.fn(async (_container, options) => {
+        ready = options.onReady;
+        moved = options.onViewportChange;
+      }),
+    });
+    const onViewportChange = vi.fn();
+
+    render(
+      <MapView
+        places={[]}
+        onOpenPlace={() => {}}
+        onViewportChange={onViewportChange}
+        providerFactory={() => provider}
+      />
+    );
+
+    await waitFor(() => expect(ready).toBeTypeOf('function'));
+
+    const viewport = (lat: number, lng: number, zoom: number): MapViewport => ({
+      center: { lat, lng },
+      zoom,
+      bounds: {
+        south: lat - 0.1,
+        west: lng - 0.1,
+        north: lat + 0.1,
+        east: lng + 0.1,
+      },
+    });
+
+    // La carte finit de charger : elle n'a rien déplacé.
+    ready?.(viewport(46.6, 2.4, 6));
+    expect(onViewportChange).not.toHaveBeenCalled();
+
+    // L'utilisateur déplace la carte : là, l'écran doit être prévenu.
+    const moveTo = viewport(45.78, 4.85, 14);
+    moved?.(moveTo);
+    expect(onViewportChange).toHaveBeenCalledWith(moveTo);
   });
 });

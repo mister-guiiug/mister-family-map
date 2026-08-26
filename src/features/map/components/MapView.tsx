@@ -57,6 +57,12 @@ export function MapView({
         center: DEFAULT_CENTER,
         zoom: DEFAULT_ZOOM,
         onMarkerClick: onOpenPlace,
+        // `onReady` livre la vue INITIALE, une fois : de quoi amorcer le zoom
+        // du regroupement. Elle ne remonte PAS à l'appelant — une carte qui
+        // finit de s'initialiser n'a rien déplacé, et `PlaceCreatePage` recopie
+        // ce callback dans son brouillon : sur une machine lente, l'émission
+        // tardive écrasait les coordonnées que l'utilisateur venait de saisir.
+        onReady: viewport => setZoom(viewport.zoom),
         onViewportChange: viewport => {
           setZoom(viewport.zoom);
           onViewportChange?.(viewport);
