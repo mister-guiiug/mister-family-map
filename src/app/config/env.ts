@@ -1,4 +1,9 @@
 import { z } from 'zod';
+import { createLogger } from '@mister-guiiug/dev-wpa-config/logger';
+
+/** Journal nommé : cet avertissement finit dans le fil d'Ariane des erreurs,
+ *  au lieu de disparaître dans la console de l'utilisateur. */
+const log = createLogger('config');
 
 /**
  * Variables d'environnement de build, validées au démarrage. AUCUN secret ici :
@@ -19,7 +24,9 @@ export function readEnv(
 ): AppEnv {
   const parsed = envSchema.safeParse(raw);
   if (!parsed.success) {
-    console.warn('Variables d’environnement invalides — repli backend local.');
+    log.warn('Variables d’environnement invalides — repli backend local.', {
+      issues: parsed.error.issues.map(issue => issue.path.join('.')),
+    });
     return {};
   }
   return parsed.data;

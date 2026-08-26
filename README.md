@@ -76,6 +76,24 @@ Décisions documentées : [ADR-0001 carte](./docs/adr/0001-map-provider.md) ·
 [modèle de données](./docs/DATA-MODEL.md) ·
 [modèle de menaces](./docs/THREAT-MODEL.md).
 
+## Observabilité
+
+Au démarrage (`src/main.tsx`), `installObservability()` capture les erreurs non
+rattrapées et `installCorrelation()` pose l'identifiant qui les relie :
+
+| Canal                                                    | Ce qu'il porte                                |
+| -------------------------------------------------------- | --------------------------------------------- |
+| Journal d'erreurs local (et Sentry si un DSN est fourni) | `correlationId` en contexte de session        |
+| Requêtes Supabase                                        | en-têtes `X-Correlation-Id` et `X-Session-Id` |
+| Écran de crash (`ObservabilityBoundary`)                 | la référence à citer au support               |
+
+La télémétrie reste désactivée : l'app n'en a pas, et lier un identifiant
+stable à un profil analytique serait un choix à assumer, pas un défaut.
+
+Le journal nommé (`createLogger`) remplace les `console.warn` qui
+disparaissaient dans la console de l'utilisateur : ses lignes rejoignent le fil
+d'Ariane joint aux erreurs.
+
 ## Sécurité & vie privée (résumé)
 
 - Géolocalisation uniquement sur action explicite, jamais persistée.
