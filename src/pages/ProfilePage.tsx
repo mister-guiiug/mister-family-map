@@ -6,6 +6,7 @@ import {
   UpdateButton,
 } from '@mister-guiiug/dev-wpa-config/react';
 import { AppVersion } from '@mister-guiiug/dev-wpa-config/react/app-version';
+import { ShareButton } from '@mister-guiiug/dev-wpa-config/react/share-button';
 import { useBackend } from '../app/providers/BackendProvider';
 import { useAuthStore, useCurrentRole } from '../features/auth/store';
 import { ROLE_LABELS } from '../entities/user/model';
@@ -122,6 +123,17 @@ export default function ProfilePage() {
           <UpdateButton
             className="mt-3 touch-target rounded-(--radius-card) border border-line px-fluid-sm py-2 text-fluid-sm"
             showHint
+          />
+
+          {/*
+            Partager l'app : partage natif quand le système en a un, copie du
+            lien sinon. `currentAppUrl` n'est pas passé — le composant partage
+            la page courante, ce qui est ce qu'on attend d'un écran de réglages.
+          */}
+          <ShareButton
+            className="mt-3"
+            title="Mister Family Map"
+            text="Des idées de sorties en famille, partagées entre parents."
           />
         </section>
 

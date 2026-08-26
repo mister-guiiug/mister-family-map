@@ -238,4 +238,11 @@ test('@critical le profil offre la mise à jour forcée, le code source, le caf�
 
   // La grille des autres apps, alimentée par le catalogue du socle.
   await expect(page.locator('[data-dwc="family-app"]').first()).toBeVisible();
+
+  // Le partage, et sa zone de retour : la région `status` doit exister AVANT
+  // d'avoir quelque chose à dire, sans quoi son message ne serait pas annoncé.
+  await expect(page.locator('[data-dwc="share-button"]')).toBeVisible();
+  await expect(
+    page.locator('[data-dwc="share-button-status"]')
+  ).toHaveAttribute('role', 'status');
 });
