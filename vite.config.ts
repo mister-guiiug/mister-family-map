@@ -4,6 +4,7 @@ import tailwindcss from '@tailwindcss/vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import { pwaSeoPlugin } from '@mister-guiiug/dev-wpa-config/vite-pwa-base';
 import { cspPlugin } from '@mister-guiiug/dev-wpa-config/vite-csp';
+import { versionPlugin } from '@mister-guiiug/dev-wpa-config/vite-version';
 import {
   mapCspDirectives,
   mapTileRuntimeCaching,
@@ -28,6 +29,13 @@ export default defineConfig(({ command }) => ({
     pwaSeoPlugin({
       siteName: 'Mister Family Map',
     }),
+    // La version du package.json arrive dans le bundle, sur
+    // `globalThis.__DWC_BUILD__` dans le `<head>`, et dans `dist/version.json`.
+    // C'est la seule ligne nécessaire pour que le contexte de session cesse de
+    // partir sans version : `installObservability` la lit toute seule.
+    // AVANT cspPlugin, comme pwaSeoPlugin, et pour la même raison : les hash
+    // portent sur le HTML final, et ce plugin y ajoute un script inline.
+    versionPlugin(),
     // Après pwaSeoPlugin (ordre requis : les hash sont calculés sur le HTML final).
     cspPlugin({
       dev: command === 'serve',
