@@ -246,3 +246,37 @@ test('@critical le profil offre la mise à jour forcée, le code source, le caf�
     page.locator('[data-dwc="share-button-status"]')
   ).toHaveAttribute('role', 'status');
 });
+
+test('@critical approcher un onglet précharge sa page', async ({ page }) => {
+  // Les treize pages sont découpées en `lazy()`. Le service worker les
+  // précache — mais à partir de la DEUXIÈME visite seulement. À la première,
+  // celle qui décide si la famille revient, ouvrir « Carte » attend le réseau
+  // derrière un squelette, et MapLibre GL pèse 989 ko.
+  //
+  // Ce test est marqué `@critical` parce que c'est la seule suite que la CI
+  // exécute : un préchargement qui cesse de fonctionner ne casse rien, il rend
+  // simplement l'app lente à nouveau — exactement le genre de régression qui
+  // passe inaperçue jusqu'à ce qu'un utilisateur s'en plaigne.
+  const scripts: string[] = [];
+  page.on('request', request => {
+    if (request.resourceType() === 'script') scripts.push(request.url());
+  });
+
+  await page.goto('/');
+  await expect(page.getByRole('link', { name: 'Explorer' })).toBeVisible();
+  await page.waitForTimeout(500);
+  scripts.length = 0;
+
+  // Le pointeur approche de l'onglet — sans cliquer.
+  await page.getByRole('link', { name: 'Carte' }).hover();
+
+  await expect
+    .poll(() => scripts.filter(url => /MapPage/.test(url)).length, {
+      message: 'le morceau de la carte doit partir AVANT le clic',
+      timeout: 5000,
+    })
+    .toBeGreaterThan(0);
+
+  // Et la page n'a pas changé : on a préchargé, pas navigué.
+  await expect(page).toHaveURL(/\/$|\/index\.html$/);
+});

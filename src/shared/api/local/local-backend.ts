@@ -21,7 +21,7 @@ import type { AuthSession, Role } from '../../../entities/user/model';
 import { DEFAULT_CATEGORIES } from '../../constants/default-categories';
 import { newId } from '../../lib/id';
 import { isInBoundingBox } from '../../lib/geo';
-import { readJson, removeKey, writeJson } from '../storage';
+import { store } from '../storage';
 import type {
   AnalyticsService,
   AuthService,
@@ -39,16 +39,22 @@ import type {
 } from '../ports';
 import { SEED_EVENTS, SEED_PLACES, SEED_REVIEWS } from './seed';
 
+/**
+ * Les clés, SANS leur préfixe : `store` porte `mfm_`, si bien que
+ * `store.get('places')` lit toujours `mfm_places`. Les données déjà écrites
+ * chez les utilisateurs restent lisibles — c'était la condition de la
+ * bascule vers le stockage du socle.
+ */
 const KEYS = {
-  places: 'mfm_places',
-  events: 'mfm_events',
-  reviews: 'mfm_reviews',
-  categories: 'mfm_categories',
-  favorites: 'mfm_favorites',
-  session: 'mfm_session',
-  reports: 'mfm_reports',
-  moderationActions: 'mfm_moderation_actions',
-  revisions: 'mfm_place_revisions',
+  places: 'places',
+  events: 'events',
+  reviews: 'reviews',
+  categories: 'categories',
+  favorites: 'favorites',
+  session: 'session',
+  reports: 'reports',
+  moderationActions: 'moderation_actions',
+  revisions: 'place_revisions',
 } as const;
 
 function nowIso(): string {
@@ -56,10 +62,10 @@ function nowIso(): string {
 }
 
 function loadSeeded<T>(key: string, seed: readonly T[]): T[] {
-  const stored = readJson<T[] | null>(key, null);
+  const stored = store.get<T[] | null>(key, null);
   if (stored !== null) return stored;
   const copy = [...seed];
-  writeJson(key, copy);
+  store.set(key, copy);
   return copy;
 }
 
@@ -76,7 +82,7 @@ class NotOwnerError extends Error {
 }
 
 function currentSession(): AuthSession | null {
-  return readJson<AuthSession | null>(KEYS.session, null);
+  return store.get<AuthSession | null>(KEYS.session, null);
 }
 
 function requireSession(): AuthSession {
@@ -127,7 +133,7 @@ function createLocalPlaceRepository(): PlaceRepository {
         updatedAt: nowIso(),
         deletedAt: null,
       };
-      writeJson(KEYS.places, [...places, place]);
+      store.set(KEYS.places, [...places, place]);
       return place;
     },
     async updateOwn(id, draft) {
@@ -143,7 +149,7 @@ function createLocalPlaceRepository(): PlaceRepository {
         status: 'pending',
         updatedAt: nowIso(),
       };
-      writeJson(
+      store.set(
         KEYS.places,
         places.map(p => (p.id === id ? updated : p))
       );
@@ -151,8 +157,8 @@ function createLocalPlaceRepository(): PlaceRepository {
     },
     async suggestRevision(placeId, draft, note) {
       const session = requireSession();
-      const revisions = readJson<unknown[]>(KEYS.revisions, []);
-      writeJson(KEYS.revisions, [
+      const revisions = store.get<unknown[]>(KEYS.revisions, []);
+      store.set(KEYS.revisions, [
         ...revisions,
         {
           id: newId(),
@@ -200,7 +206,7 @@ function createLocalEventRepository(): EventRepository {
         updatedAt: nowIso(),
         deletedAt: null,
       };
-      writeJson(KEYS.events, [...events, event]);
+      store.set(KEYS.events, [...events, event]);
       return event;
     },
     async updateOwn(id, draft) {
@@ -215,7 +221,7 @@ function createLocalEventRepository(): EventRepository {
         status: 'proposed',
         updatedAt: nowIso(),
       };
-      writeJson(
+      store.set(
         KEYS.events,
         events.map(e => (e.id === id ? updated : e))
       );
@@ -254,7 +260,7 @@ function createLocalReviewRepository(): ReviewRepository {
         updatedAt: nowIso(),
         deletedAt: null,
       };
-      writeJson(KEYS.reviews, [...reviews, review]);
+      store.set(KEYS.reviews, [...reviews, review]);
       return review;
     },
     async updateOwn(id, draft) {
@@ -264,7 +270,7 @@ function createLocalReviewRepository(): ReviewRepository {
       if (!existing) throw new Error('Retour introuvable.');
       if (existing.authorId !== session.userId) throw new NotOwnerError();
       const updated: Review = { ...existing, ...draft, updatedAt: nowIso() };
-      writeJson(
+      store.set(
         KEYS.reviews,
         reviews.map(r => (r.id === id ? updated : r))
       );
@@ -284,7 +290,7 @@ function createLocalCategoryRepository(): CategoryRepository {
     async save(category: Category) {
       const categories = loadSeeded(KEYS.categories, DEFAULT_CATEGORIES);
       const exists = categories.some(c => c.id === category.id);
-      writeJson(
+      store.set(
         KEYS.categories,
         exists
           ? categories.map(c => (c.id === category.id ? category : c))
@@ -298,15 +304,15 @@ function createLocalCategoryRepository(): CategoryRepository {
 function createLocalFavoriteRepository(): FavoriteRepository {
   return {
     async listIds() {
-      return readJson<string[]>(KEYS.favorites, []);
+      return store.get<string[]>(KEYS.favorites, []);
     },
     async add(placeId) {
-      const ids = readJson<string[]>(KEYS.favorites, []);
-      if (!ids.includes(placeId)) writeJson(KEYS.favorites, [...ids, placeId]);
+      const ids = store.get<string[]>(KEYS.favorites, []);
+      if (!ids.includes(placeId)) store.set(KEYS.favorites, [...ids, placeId]);
     },
     async remove(placeId) {
-      const ids = readJson<string[]>(KEYS.favorites, []);
-      writeJson(
+      const ids = store.get<string[]>(KEYS.favorites, []);
+      store.set(
         KEYS.favorites,
         ids.filter(id => id !== placeId)
       );
@@ -337,12 +343,12 @@ function createLocalAuthService(): AuthService {
           createdAt: nowIso(),
         },
       };
-      writeJson(KEYS.session, session);
+      store.set(KEYS.session, session);
       notify(session);
       return { sent: true };
     },
     async signOut() {
-      removeKey(KEYS.session);
+      store.remove(KEYS.session);
       notify(null);
     },
     onSessionChange(cb) {
@@ -352,8 +358,8 @@ function createLocalAuthService(): AuthService {
     async requestAccountDeletion() {
       // Localement : purge session + favoris. Côté Supabase : fonction serveur
       // dédiée (suppression compte + anonymisation contributions).
-      removeKey(KEYS.session);
-      removeKey(KEYS.favorites);
+      store.remove(KEYS.session);
+      store.remove(KEYS.favorites);
       notify(null);
     },
   };
@@ -403,9 +409,9 @@ function createNominatimGeocoding(): GeocodingService {
 function createLocalModerationService(): ModerationService {
   return {
     async listOpenReports() {
-      return readJson<Report[]>(KEYS.reports, []).filter(
-        r => r.status === 'open'
-      );
+      return store
+        .get<Report[]>(KEYS.reports, [])
+        .filter(r => r.status === 'open');
     },
     async report(
       targetType: ReportTarget,
@@ -414,8 +420,8 @@ function createLocalModerationService(): ModerationService {
       details: string
     ) {
       const session = requireSession();
-      const reports = readJson<Report[]>(KEYS.reports, []);
-      writeJson(KEYS.reports, [
+      const reports = store.get<Report[]>(KEYS.reports, []);
+      store.set(KEYS.reports, [
         ...reports,
         {
           id: newId(),
@@ -443,8 +449,8 @@ function createLocalModerationService(): ModerationService {
       ) {
         throw new Error('Action réservée à la modération.');
       }
-      const actions = readJson<ModerationAction[]>(KEYS.moderationActions, []);
-      writeJson(KEYS.moderationActions, [
+      const actions = store.get<ModerationAction[]>(KEYS.moderationActions, []);
+      store.set(KEYS.moderationActions, [
         ...actions,
         {
           id: newId(),
@@ -458,8 +464,8 @@ function createLocalModerationService(): ModerationService {
         },
       ]);
       if (reportId) {
-        const reports = readJson<Report[]>(KEYS.reports, []);
-        writeJson(
+        const reports = store.get<Report[]>(KEYS.reports, []);
+        store.set(
           KEYS.reports,
           reports.map(r =>
             r.id === reportId
@@ -474,8 +480,8 @@ function createLocalModerationService(): ModerationService {
       }
       // Application de la décision sur le contenu ciblé.
       if (targetType === 'place') {
-        const places = readJson<Place[]>(KEYS.places, []);
-        writeJson(
+        const places = store.get<Place[]>(KEYS.places, []);
+        store.set(
           KEYS.places,
           places.map(p => {
             if (p.id !== targetId) return p;
@@ -490,7 +496,7 @@ function createLocalModerationService(): ModerationService {
       }
     },
     async history() {
-      return readJson<ModerationAction[]>(KEYS.moderationActions, []);
+      return store.get<ModerationAction[]>(KEYS.moderationActions, []);
     },
   };
 }

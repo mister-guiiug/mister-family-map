@@ -8,18 +8,61 @@ import {
   UserRound,
 } from 'lucide-react';
 import { useOnline } from '@mister-guiiug/dev-wpa-config/react';
+import { prefetch } from '@mister-guiiug/dev-wpa-config/prefetch';
 import { UpdatePromptBanner } from '@mister-guiiug/dev-wpa-config/react/update-prompt-banner';
 import { registerSW } from 'virtual:pwa-register';
 import { useBackend } from '../providers/BackendProvider';
 import { useAuthStore } from '../../features/auth/store';
 import { useFavoritesStore } from '../../features/favorites/store';
 
+/**
+ * Chaque entrée porte le CHARGEUR de sa page, le même `() => import(…)` que le
+ * routeur passe à `lazy()`. Le module n'est donc téléchargé qu'une fois : les
+ * deux références pointent le même chemin, et Vite ne produit qu'un morceau.
+ *
+ * POURQUOI. Le service worker précache tous les morceaux — mais à partir de la
+ * DEUXIÈME visite seulement. À la première, celle qui décide si la famille
+ * revient, ouvrir « Carte » ou « Agenda » attend le réseau derrière un
+ * squelette. Ici on charge le morceau quand le doigt se pose sur l'onglet,
+ * quelques dizaines de millisecondes avant le relâchement.
+ */
 const NAV_ITEMS = [
-  { to: '/', label: 'Explorer', icon: Compass, end: true },
-  { to: '/carte', label: 'Carte', icon: MapIcon, end: false },
-  { to: '/agenda', label: 'Agenda', icon: CalendarDays, end: false },
-  { to: '/favoris', label: 'Favoris', icon: Heart, end: false },
-  { to: '/profil', label: 'Profil', icon: UserRound, end: false },
+  {
+    to: '/',
+    label: 'Explorer',
+    icon: Compass,
+    end: true,
+    load: () => import('../../pages/ExplorePage'),
+  },
+  {
+    to: '/carte',
+    label: 'Carte',
+    icon: MapIcon,
+    end: false,
+    // Le plus lourd de tous : MapLibre GL pèse 989 ko avant compression.
+    load: () => import('../../pages/MapPage'),
+  },
+  {
+    to: '/agenda',
+    label: 'Agenda',
+    icon: CalendarDays,
+    end: false,
+    load: () => import('../../pages/AgendaPage'),
+  },
+  {
+    to: '/favoris',
+    label: 'Favoris',
+    icon: Heart,
+    end: false,
+    load: () => import('../../pages/FavoritesPage'),
+  },
+  {
+    to: '/profil',
+    label: 'Profil',
+    icon: UserRound,
+    end: false,
+    load: () => import('../../pages/ProfilePage'),
+  },
 ] as const;
 
 /**
@@ -72,11 +115,17 @@ export function RootLayout() {
         className="fixed inset-x-0 bottom-0 z-20 border-t border-line bg-surface pb-safe-bottom"
       >
         <ul className="mx-auto flex max-w-xl justify-around">
-          {NAV_ITEMS.map(({ to, label, icon: Icon, end }) => (
+          {NAV_ITEMS.map(({ to, label, icon: Icon, end, load }) => (
             <li key={to} className="flex-1">
               <NavLink
                 to={to}
                 end={end}
+                // Trois évènements, pas un : `focus` pour le clavier, qui
+                // mérite le même confort que la souris. Le socle déduplique et
+                // se coupe seul sur `saveData` et en 2G.
+                onPointerEnter={() => prefetch(load)}
+                onFocus={() => prefetch(load)}
+                onTouchStart={() => prefetch(load)}
                 className={({ isActive }) =>
                   `flex touch-target flex-col items-center gap-0.5 py-2 text-fluid-xs ${
                     isActive ? 'font-semibold text-primary' : 'text-ink-soft'
