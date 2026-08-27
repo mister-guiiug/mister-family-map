@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import type { PlaceDraft } from '../../entities/place/model';
 import { UNKNOWN_FEATURES } from '../../entities/place/model';
-import { readJson, removeKey, writeJson } from '../../shared/api/storage';
+import { store } from '../../shared/api/storage';
 
 /**
  * Parcours de contribution : brouillon persisté LOCALEMENT à chaque étape
@@ -29,7 +29,8 @@ export const WIZARD_STEP_LABELS: Record<WizardStep, string> = {
   regles: 'Règles de contribution',
 };
 
-const DRAFT_KEY = 'mfm_place_wizard_draft';
+/** Sans le préfixe : `store` remet `mfm_`, la clé reste `mfm_place_wizard_draft`. */
+const DRAFT_KEY = 'place_wizard_draft';
 
 export function emptyPlaceDraft(): PlaceDraft {
   return {
@@ -68,25 +69,25 @@ export const usePlaceWizardStore = create<WizardState>((set, get) => ({
   rulesAccepted: false,
   setStep(step) {
     set({ step });
-    writeJson(DRAFT_KEY, { step, draft: get().draft });
+    store.set(DRAFT_KEY, { step, draft: get().draft });
   },
   updateDraft(partial) {
     const draft = { ...get().draft, ...partial };
     set({ draft });
-    writeJson(DRAFT_KEY, { step: get().step, draft });
+    store.set(DRAFT_KEY, { step: get().step, draft });
   },
   setRulesAccepted(rulesAccepted) {
     set({ rulesAccepted });
   },
   restore() {
-    const saved = readJson<{ step: WizardStep; draft: PlaceDraft } | null>(
+    const saved = store.get<{ step: WizardStep; draft: PlaceDraft } | null>(
       DRAFT_KEY,
       null
     );
     if (saved) set({ step: saved.step, draft: saved.draft });
   },
   clear() {
-    removeKey(DRAFT_KEY);
+    store.remove(DRAFT_KEY);
     set({ step: 'position', draft: emptyPlaceDraft(), rulesAccepted: false });
   },
 }));
