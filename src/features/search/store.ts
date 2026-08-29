@@ -3,7 +3,7 @@ import {
   EMPTY_FILTERS,
   type SearchFilters,
 } from '../../shared/schemas/filters';
-import type { Coordinates } from '../../shared/lib/geo';
+import type { Coordinates } from '@mister-guiiug/dev-wpa-config/geo';
 
 /**
  * Filtres de recherche partagés entre Explorer, Carte et Agenda : ils sont

@@ -6,7 +6,7 @@ import {
   isValidCoordinates,
   isValidLatitude,
   isValidLongitude,
-} from './geo';
+} from '@mister-guiiug/dev-wpa-config/geo';
 
 describe('validation des coordonnées', () => {
   it('accepte les bornes exactes', () => {

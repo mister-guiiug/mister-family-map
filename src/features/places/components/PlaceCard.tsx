@@ -3,7 +3,7 @@ import { Heart, MapPin } from 'lucide-react';
 import { Badge, Button } from '@mister-guiiug/dev-wpa-config/react';
 import type { Place } from '../../../entities/place/model';
 import type { Category } from '../../../entities/category/model';
-import { formatDistance } from '../../../shared/lib/geo';
+import { formatDistance } from '@mister-guiiug/dev-wpa-config/geo';
 
 export interface PlaceCardProps {
   place: Place;
