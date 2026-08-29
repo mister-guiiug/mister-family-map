@@ -1,6 +1,9 @@
 import { z } from 'zod';
 import { matchesTriStateFilter } from '../types/tri-state';
-import { distanceKm, type Coordinates } from '../lib/geo';
+import {
+  distanceKm,
+  type Coordinates,
+} from '@mister-guiiug/dev-wpa-config/geo';
 import type { Place } from '../../entities/place/model';
 
 /**

@@ -7,7 +7,7 @@ import {
   clustersToMarkers,
 } from '@mister-guiiug/dev-wpa-config/map';
 import { createMapLibreMapProvider } from '@mister-guiiug/dev-wpa-config/map/maplibre';
-import type { Coordinates } from '../../../shared/lib/geo';
+import type { Coordinates } from '@mister-guiiug/dev-wpa-config/geo';
 import { useGeolocation } from '../../../shared/hooks/useGeolocation';
 import type { MapProviderFactory, MapViewport } from '../map-provider';
 

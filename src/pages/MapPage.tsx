@@ -10,7 +10,10 @@ import { ListFilter } from 'lucide-react';
 import { useBackend } from '../app/providers/BackendProvider';
 import { useAsync } from '../shared/hooks/useAsync';
 import { applyFilters } from '../shared/schemas/filters';
-import { isInBoundingBox, type BoundingBox } from '../shared/lib/geo';
+import {
+  isInBoundingBox,
+  type BoundingBox,
+} from '@mister-guiiug/dev-wpa-config/geo';
 import { useSearchStore } from '../features/search/store';
 import { useFavoritesStore } from '../features/favorites/store';
 import { isClusterId } from '@mister-guiiug/dev-wpa-config/map';
