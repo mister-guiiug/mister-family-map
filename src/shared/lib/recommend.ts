@@ -4,7 +4,11 @@
  * produit son score, affichées telles quelles à l'utilisateur.
  */
 import type { Place } from '../../entities/place/model';
-import { distanceKm, formatDistance, type Coordinates } from './geo';
+import {
+  distanceKm,
+  formatDistance,
+  type Coordinates,
+} from '@mister-guiiug/dev-wpa-config/geo';
 
 export interface RecommendationCriteria {
   origin?: Coordinates;
