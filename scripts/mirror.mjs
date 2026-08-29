@@ -69,6 +69,35 @@ function git(gitArgs, options = {}) {
   }).trim();
 }
 
+/**
+ * Lance `npm run <script>`, y compris sous Windows.
+ *
+ * POURQUOI CE DÉTOUR. Sous Windows, `npm` n'est pas un exécutable mais
+ * `npm.cmd` : `execFileSync('npm', …)` échoue en `ENOENT`, et le viser
+ * directement échoue en `EINVAL` depuis que Node refuse de lancer un `.cmd`
+ * sans shell (CVE-2024-27980).
+ *
+ * On appelle donc le CLI npm AVEC LE MÊME NODE. `npm_execpath` est posé par
+ * npm lui-même, et ce script s'invoque par `npm run mirror` : le chemin est
+ * donc là, et l'on évite le shell — dont Node déprécie l'usage avec des
+ * arguments (DEP0190). Le repli n'existe que pour un `node scripts/mirror.mjs`
+ * lancé à la main.
+ */
+function npmRun(script, options = {}) {
+  const npmCli = process.env.npm_execpath;
+  if (npmCli?.endsWith('.js')) {
+    return execFileSync(process.execPath, [npmCli, 'run', script], {
+      stdio: 'inherit',
+      ...options,
+    });
+  }
+  return execFileSync('npm', ['run', script], {
+    stdio: 'inherit',
+    shell: process.platform === 'win32',
+    ...options,
+  });
+}
+
 function main() {
   const args = parseArgs(process.argv.slice(2));
 
@@ -109,7 +138,7 @@ function main() {
   // Contrôle qualité : remplace la CI (aucun runner privé disponible).
   if (!args.skipVerify) {
     console.log('▶ npm run verify (format · lint · types · tests · build)…');
-    execFileSync('npm', ['run', 'verify'], { stdio: 'inherit' });
+    npmRun('verify');
   } else {
     console.warn('⚠ --skip-verify : publication sans contrôle qualité.');
   }
