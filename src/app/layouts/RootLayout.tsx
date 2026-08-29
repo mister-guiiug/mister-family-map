@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { useOnline } from '@mister-guiiug/dev-wpa-config/react';
 import { prefetch } from '@mister-guiiug/dev-wpa-config/prefetch';
+import { startTabSync } from '../../shared/api/tab-sync';
 import { UpdatePromptBanner } from '@mister-guiiug/dev-wpa-config/react/update-prompt-banner';
 import { registerSW } from 'virtual:pwa-register';
 import { useBackend } from '../providers/BackendProvider';
@@ -79,6 +80,19 @@ export function RootLayout() {
   useEffect(() => {
     void initAuth(backend.auth);
     void loadFavorites(backend.favorites);
+
+    // Deux onglets restent d'accord : quand l'autre annonce une mutation,
+    // celui-ci RECHARGE ses états globaux depuis le stockage partagé. Les
+    // listes chargées à la demande par les pages ne sont pas concernées —
+    // elles relisent à la navigation.
+    return startTabSync(topic => {
+      if (topic === 'favorites') void loadFavorites(backend.favorites);
+      if (topic === 'session') {
+        void backend.auth.getSession().then(session => {
+          useAuthStore.getState().setSession(session);
+        });
+      }
+    });
   }, [backend, initAuth, loadFavorites]);
 
   return (

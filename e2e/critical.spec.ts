@@ -1,4 +1,8 @@
 import { expect, test, type Page } from '@playwright/test';
+import {
+  dumpAppState,
+  rethrowWithState,
+} from '@mister-guiiug/dev-wpa-config/playwright-base';
 
 /**
  * Parcours E2E critiques (tag @critical — exécutés par la CI sur Chromium).
@@ -53,29 +57,26 @@ test('@critical un membre ajoute un lieu et le système propose les doublons', a
   // assertion nue ne dit pas laquelle manque — et ce parcours a échoué sur le
   // runner de CI sans qu'on sache le reproduire ailleurs, trois fois de suite,
   // en ne disant rien d'autre que « element(s) not found ».
+  // Le dump vient désormais du socle (`dumpAppState`) : c'est ce try/catch,
+  // écrit ici à la main, qui a été promu — il avait livré la coordonnée
+  // fautive après trois échecs muets. `evaluate` garde le décompte propre à
+  // l'app, que le dump générique ne peut pas connaître.
   try {
     await expect(
       page.getByTestId('duplicate-suggestion').first()
     ).toBeVisible();
   } catch (error) {
-    const etat = await page.evaluate(() => {
-      const lire = (cle: string) => {
-        try {
-          return localStorage.getItem(cle);
-        } catch {
-          return '<stockage indisponible>';
-        }
-      };
-      const lieux = lire('mfm_places');
-      return {
-        brouillon: lire('mfm_place_wizard_draft'),
-        nbLieux: lieux ? (JSON.parse(lieux) as unknown[]).length : null,
-        clesStockage: Object.keys(localStorage),
-        titreEtape: document.querySelector('h1, h2')?.textContent ?? null,
-      };
-    });
-    throw new Error(
-      `${(error as Error).message}\n\nÉtat au moment de l'échec :\n${JSON.stringify(etat, null, 2)}`
+    rethrowWithState(
+      error,
+      await dumpAppState(page, {
+        keys: ['mfm_place_wizard_draft'],
+        evaluate: () => {
+          const lieux = localStorage.getItem('mfm_places');
+          return {
+            nbLieux: lieux ? (JSON.parse(lieux) as unknown[]).length : null,
+          };
+        },
+      })
     );
   }
 
@@ -279,4 +280,42 @@ test('@critical approcher un onglet précharge sa page', async ({ page }) => {
 
   // Et la page n'a pas changé : on a préchargé, pas navigué.
   await expect(page).toHaveURL(/\/$|\/index\.html$/);
+});
+
+test('@critical deux onglets restent d’accord sur les favoris', async ({
+  page,
+  context,
+}) => {
+  // Deux onglets partagent le localStorage mais pas leurs stores React :
+  // avant le câblage du canal inter-onglets (port temps réel du socle,
+  // transport BroadcastChannel), ajouter un favori dans l'un ne changeait
+  // RIEN dans l'autre avant un rechargement — deux vues de la même donnée,
+  // qui se contredisent en silence.
+  //
+  // C'est aussi le banc d'essai du port : conçu sans usage réel à
+  // généraliser, il est ici éprouvé en conditions réelles — même contrat que
+  // les adaptateurs Supabase et Firestore.
+  const explorateur = page;
+  const favoris = await context.newPage();
+
+  await explorateur.goto('/');
+  await favoris.goto('/favoris');
+  await expect(favoris.getByText('Aucun favori pour l’instant')).toBeVisible();
+
+  // L'onglet A ajoute — l'onglet B doit le voir SANS rechargement.
+  await explorateur
+    .getByRole('button', { name: 'Ajouter Parc de la Tête d’Or aux favoris' })
+    .first()
+    .click();
+
+  await expect(
+    favoris.getByRole('link', { name: 'Parc de la Tête d’Or' }).first()
+  ).toBeVisible();
+
+  // Et le retrait fait le chemin inverse.
+  await explorateur
+    .getByRole('button', { name: 'Retirer Parc de la Tête d’Or des favoris' })
+    .first()
+    .click();
+  await expect(favoris.getByText('Aucun favori pour l’instant')).toBeVisible();
 });

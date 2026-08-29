@@ -22,6 +22,7 @@ import { DEFAULT_CATEGORIES } from '../../constants/default-categories';
 import { newId } from '../../lib/id';
 import { isInBoundingBox } from '../../lib/geo';
 import { store } from '../storage';
+import { announceTabChange } from '../tab-sync';
 import type {
   AnalyticsService,
   AuthService,
@@ -134,6 +135,7 @@ function createLocalPlaceRepository(): PlaceRepository {
         deletedAt: null,
       };
       store.set(KEYS.places, [...places, place]);
+      announceTabChange('places');
       return place;
     },
     async updateOwn(id, draft) {
@@ -153,6 +155,7 @@ function createLocalPlaceRepository(): PlaceRepository {
         KEYS.places,
         places.map(p => (p.id === id ? updated : p))
       );
+      announceTabChange('places');
       return updated;
     },
     async suggestRevision(placeId, draft, note) {
@@ -207,6 +210,7 @@ function createLocalEventRepository(): EventRepository {
         deletedAt: null,
       };
       store.set(KEYS.events, [...events, event]);
+      announceTabChange('events');
       return event;
     },
     async updateOwn(id, draft) {
@@ -225,6 +229,7 @@ function createLocalEventRepository(): EventRepository {
         KEYS.events,
         events.map(e => (e.id === id ? updated : e))
       );
+      announceTabChange('events');
       return updated;
     },
   };
@@ -261,6 +266,7 @@ function createLocalReviewRepository(): ReviewRepository {
         deletedAt: null,
       };
       store.set(KEYS.reviews, [...reviews, review]);
+      announceTabChange('reviews');
       return review;
     },
     async updateOwn(id, draft) {
@@ -274,6 +280,7 @@ function createLocalReviewRepository(): ReviewRepository {
         KEYS.reviews,
         reviews.map(r => (r.id === id ? updated : r))
       );
+      announceTabChange('reviews');
       return updated;
     },
   };
@@ -308,7 +315,10 @@ function createLocalFavoriteRepository(): FavoriteRepository {
     },
     async add(placeId) {
       const ids = store.get<string[]>(KEYS.favorites, []);
-      if (!ids.includes(placeId)) store.set(KEYS.favorites, [...ids, placeId]);
+      if (!ids.includes(placeId)) {
+        store.set(KEYS.favorites, [...ids, placeId]);
+        announceTabChange('favorites');
+      }
     },
     async remove(placeId) {
       const ids = store.get<string[]>(KEYS.favorites, []);
@@ -316,6 +326,7 @@ function createLocalFavoriteRepository(): FavoriteRepository {
         KEYS.favorites,
         ids.filter(id => id !== placeId)
       );
+      announceTabChange('favorites');
     },
   };
 }
@@ -344,11 +355,13 @@ function createLocalAuthService(): AuthService {
         },
       };
       store.set(KEYS.session, session);
+      announceTabChange('session');
       notify(session);
       return { sent: true };
     },
     async signOut() {
       store.remove(KEYS.session);
+      announceTabChange('session');
       notify(null);
     },
     onSessionChange(cb) {
