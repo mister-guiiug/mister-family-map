@@ -15,7 +15,7 @@ import {
   upcomingEvents,
   weekendEvents,
 } from '../entities/event/agenda';
-import { distanceKm } from '../shared/lib/geo';
+import { distanceKm } from '@mister-guiiug/dev-wpa-config/geo';
 import { useSearchStore } from '../features/search/store';
 import { EventCard } from '../features/events/components/EventCard';
 import { PageHeader } from '../shared/components/PageHeader';

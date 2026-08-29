@@ -12,7 +12,7 @@ import { useBackend } from '../app/providers/BackendProvider';
 import { useAsync } from '../shared/hooks/useAsync';
 import { applyFilters, countActiveFilters } from '../shared/schemas/filters';
 import { averageRating } from '../entities/review/model';
-import { distanceKm } from '../shared/lib/geo';
+import { distanceKm } from '@mister-guiiug/dev-wpa-config/geo';
 import { recommendPlaces } from '../shared/lib/recommend';
 import { useSearchStore } from '../features/search/store';
 import { useFavoritesStore } from '../features/favorites/store';

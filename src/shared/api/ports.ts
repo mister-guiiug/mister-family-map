@@ -23,7 +23,10 @@ import type {
   ReportTarget,
 } from '../../entities/moderation/model';
 import type { AuthSession, Role } from '../../entities/user/model';
-import type { BoundingBox, Coordinates } from '../lib/geo';
+import type {
+  BoundingBox,
+  Coordinates,
+} from '@mister-guiiug/dev-wpa-config/geo';
 
 export interface PlaceQuery {
   /** Zone visible de la carte (« rechercher dans cette zone »). */

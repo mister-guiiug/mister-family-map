@@ -20,7 +20,7 @@ import type {
 import type { AuthSession, Role } from '../../../entities/user/model';
 import { DEFAULT_CATEGORIES } from '../../constants/default-categories';
 import { newId } from '../../lib/id';
-import { isInBoundingBox } from '../../lib/geo';
+import { isInBoundingBox } from '@mister-guiiug/dev-wpa-config/geo';
 import { store } from '../storage';
 import { announceTabChange } from '../tab-sync';
 import type {

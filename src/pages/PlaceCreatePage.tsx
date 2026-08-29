@@ -11,7 +11,7 @@ import { useBackend } from '../app/providers/BackendProvider';
 import { useAsync } from '../shared/hooks/useAsync';
 import { placeDraftSchema } from '../entities/place/model';
 import { findPotentialDuplicates } from '../shared/lib/dedupe';
-import { formatDistance } from '../shared/lib/geo';
+import { formatDistance } from '@mister-guiiug/dev-wpa-config/geo';
 import { sanitizeSingleLine, sanitizeUserText } from '../shared/lib/sanitize';
 import { validateImageFile } from '../shared/lib/images';
 import { useAuthStore } from '../features/auth/store';

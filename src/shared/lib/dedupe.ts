@@ -3,7 +3,10 @@
  * géographique + similarité du nom (coefficient de Sørensen–Dice sur bigrammes,
  * robuste aux inversions de mots et aux petites fautes).
  */
-import { distanceKm, type Coordinates } from './geo';
+import {
+  distanceKm,
+  type Coordinates,
+} from '@mister-guiiug/dev-wpa-config/geo';
 
 export function normalizeName(name: string): string {
   return name
