@@ -35,11 +35,11 @@ journal de modération conservés 12 mois (base légale : intérêt légitime).
 
 ## 3. Images
 
-| Menace           | Scénario                          | Mitigations                                                                                                       | Reste à faire                                       |
-| ---------------- | --------------------------------- | ----------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
-| Info. disclosure | EXIF/GPS révèle domicile ou école | Ré-encodage canvas côté client (`stripImageMetadata`) : EXIF supprimé par construction                            | Vérification serveur (re-encodage) en fonction Edge |
-| Spoofing         | SVG piégé, polyglotte             | Types acceptés JPEG/PNG/WebP uniquement, taille ≤ 5 Mo, vérifiés client ET par les règles du bucket               | Vérification du magic number côté serveur           |
-| Info. disclosure | Visages d'enfants                 | Consigne explicite dans le parcours + signalement `privacy` + modération a priori des photos (`status='pending'`) | —                                                   |
+| Menace           | Scénario                          | Mitigations                                                                                                                     | Reste à faire                                                                                                             |
+| ---------------- | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| Info. disclosure | EXIF/GPS révèle domicile ou école | Ré-encodage canvas côté client (`stripImageMetadata` de `@mister-guiiug/dev-wpa-config/image`) : EXIF supprimé par construction | Câbler l'appel au téléversement — aucune photo n'est encore envoyée ; vérification serveur (re-encodage) en fonction Edge |
+| Spoofing         | SVG piégé, polyglotte             | Types acceptés JPEG/PNG/WebP uniquement, taille ≤ 5 Mo, vérifiés client ET par les règles du bucket                             | Vérification du magic number côté serveur                                                                                 |
+| Info. disclosure | Visages d'enfants                 | Consigne explicite dans le parcours + signalement `privacy` + modération a priori des photos (`status='pending'`)               | —                                                                                                                         |
 
 ## 4. Géolocalisation
 
