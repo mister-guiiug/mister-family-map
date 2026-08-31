@@ -7,6 +7,7 @@ import {
   TextAreaField,
   TextField,
 } from '@mister-guiiug/dev-wpa-config/react';
+import { useActionGuard } from '@mister-guiiug/dev-wpa-config/react/use-action-guard';
 import { useBackend } from '../app/providers/BackendProvider';
 import { useAsync } from '../shared/hooks/useAsync';
 import { placeDraftSchema } from '../entities/place/model';
@@ -55,6 +56,40 @@ export default function PlaceCreatePage() {
       placesState.data
     );
   }, [placesState.data, wizard.draft.name, wizard.draft.coordinates]);
+
+  /**
+   * « Envoyer la contribution » était grisé SANS UN MOT quand les règles
+   * n'étaient pas cochées : l'utilisateur voyait un bouton mort au bout de sept
+   * écrans, sans savoir lequel des sept était fautif. Le garde rend le motif
+   * lisible, et il en ajoute un second.
+   *
+   * `online` n'est PAS mis à `true` en dur, et c'est le point. Avec
+   * l'adaptateur local — la configuration livrée aujourd'hui — l'envoi
+   * fonctionne parfaitement hors connexion : bloquer serait mentir. C'est
+   * `requiresNetwork` du dépôt qui décide, donc l'adaptateur réellement
+   * branché (cf. shared/api/ports.ts).
+   *
+   * L'ORDRE COMPTE : hors ligne d'abord. Cocher les règles ne sert à rien si
+   * l'envoi ne peut de toute façon pas partir.
+   *
+   * POURQUOI `disabled` ET NON `guard.disabledProps`. Le garde préfère
+   * `aria-disabled`, pour que le bouton reste focusable. Mais le `<Button>` du
+   * paquet retire `aria-disabled` de ses props ET `components.css` n'habille
+   * que `:disabled` : le bouton aurait l'air actif tout en étant inerte —
+   * pire que grisé. On garde donc `disabled` (le rendu d'avant, inchangé) et
+   * on ajoute ce qui manquait vraiment : LE MOTIF, affiché juste à côté.
+   */
+  const guard = useActionGuard({
+    online: backend.places.requiresNetwork,
+    checks: [
+      {
+        code: 'rules',
+        blocked: !wizard.rulesAccepted,
+        message:
+          'Acceptez les règles de contribution pour envoyer votre proposition.',
+      },
+    ],
+  });
 
   if (!session) {
     return (
@@ -397,9 +432,9 @@ export default function PlaceCreatePage() {
             <Button
               variant="primary"
               block
-              disabled={!wizard.rulesAccepted}
+              disabled={guard.disabled}
               loading={sending}
-              onClick={() => void submit()}
+              onClick={() => void guard.wrap(submit)()}
             >
               Envoyer la contribution
             </Button>
@@ -409,6 +444,14 @@ export default function PlaceCreatePage() {
             </Button>
           )}
         </div>
+
+        {/* Le motif, à côté du bouton qu'il explique. Sans lui, `disabled`
+            n'est qu'un cul-de-sac. */}
+        {guard.reason ? (
+          <p role="status" className="mt-2 text-fluid-sm text-ink-soft">
+            {guard.reason}
+          </p>
+        ) : null}
       </div>
     </div>
   );

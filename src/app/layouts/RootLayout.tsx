@@ -7,7 +7,7 @@ import {
   Map as MapIcon,
   UserRound,
 } from 'lucide-react';
-import { useOnline } from '@mister-guiiug/dev-wpa-config/react';
+import { ConnectionBanner } from '@mister-guiiug/dev-wpa-config/react/connection-banner';
 import { prefetch } from '@mister-guiiug/dev-wpa-config/prefetch';
 import { startTabSync } from '../../shared/api/tab-sync';
 import { UpdatePromptBanner } from '@mister-guiiug/dev-wpa-config/react/update-prompt-banner';
@@ -73,7 +73,6 @@ const NAV_ITEMS = [
  */
 export function RootLayout() {
   const backend = useBackend();
-  const online = useOnline();
   const initAuth = useAuthStore(s => s.init);
   const loadFavorites = useFavoritesStore(s => s.load);
 
@@ -110,15 +109,22 @@ export function RootLayout() {
       */}
       <UpdatePromptBanner registerSW={registerSW} snoozeHours={6} />
 
-      {!online ? (
-        <p
-          role="status"
-          className="bg-surface-2 px-fluid-md py-2 text-center text-fluid-sm"
-        >
-          Hors ligne — vos favoris et les fiches déjà consultées restent
-          disponibles.
-        </p>
-      ) : null}
+      {/*
+        LE DÉFAUT CORRIGÉ ICI. Le bandeau précédent lisait `useOnline` SANS
+        TEMPORISATION : un tunnel, un ascenseur, un changement d'antenne — et
+        il s'allumait puis s'éteignait en une demi-seconde. Un signal qui
+        clignote n'est plus un signal, c'est un parasite : on apprend à ne
+        plus le regarder, et le jour où la coupure est vraie on ne le voit
+        pas non plus. Le composant du paquet attend 1,5 s de coupure CONTINUE
+        avant de parler.
+
+        Le texte reste celui de l'app : « hors ligne » ne dit pas ce qui
+        marche encore, et c'est la seule chose que la famille veut savoir.
+      */}
+      <ConnectionBanner
+        className="mx-fluid-md mt-2"
+        label="Hors ligne — vos favoris et les fiches déjà consultées restent disponibles."
+      />
 
       <main id="contenu" className="flex-1 pb-24">
         <Outlet />

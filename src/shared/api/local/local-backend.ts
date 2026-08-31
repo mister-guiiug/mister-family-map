@@ -101,6 +101,8 @@ function demoRoleForEmail(email: string): Role {
 
 function createLocalPlaceRepository(): PlaceRepository {
   return {
+    // Stockage du navigateur : écrire ne demande jamais le réseau.
+    requiresNetwork: false,
     async list(query: PlaceQuery = {}) {
       const places = loadSeeded(KEYS.places, SEED_PLACES);
       const statuses = query.statuses ?? ['published'];
