@@ -1,23 +1,18 @@
-import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import {
   baseTestOptions,
   coveragePreset,
+  pwaRegisterAlias,
 } from '@mister-guiiug/dev-wpa-config/vitest-base';
 
 export default defineConfig({
   plugins: [react()],
-  resolve: {
-    alias: {
-      // `virtual:pwa-register` n'est fourni que par vite-plugin-pwa, absent
-      // d'ici : sans ce double, tout test qui monte le shell échoue à
-      // l'import, avant d'avoir rien éprouvé.
-      'virtual:pwa-register': fileURLToPath(
-        new URL('./src/test/pwa-register-stub.ts', import.meta.url)
-      ),
-    },
-  },
+  // `virtual:pwa-register` n'est fourni que par vite-plugin-pwa, absent d'ici :
+  // sans ce double, tout test qui le monte échoue à l'import, avant d'avoir
+  // rien éprouvé. Le double du socle est PILOTABLE (`swStub.needRefresh()`),
+  // là où la copie locale était muette.
+  resolve: { alias: { ...pwaRegisterAlias } },
   test: {
     ...baseTestOptions,
     coverage: {
