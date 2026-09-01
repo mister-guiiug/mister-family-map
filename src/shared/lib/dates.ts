@@ -1,35 +1,35 @@
 /**
- * Outils de dates purs. Les événements stockent des instants ISO 8601 AVEC
- * offset + un fuseau IANA ; ces helpers travaillent sur des `Date` déjà
- * résolues et reçoivent toujours `now` en argument (testabilité, pas d'horloge
- * implicite).
+ * Outils de dates. L'arithmétique vient du socle ; ce qui reste ici est ce
+ * qu'aucune autre app n'a : le week-end à venir, et le format d'affichage.
+ *
+ * CE FICHIER EST LA SOURCE DE `@mister-guiiug/dev-wpa-config/dates`. Son
+ * en-tête le dit — « PROMU, PAS INVENTÉ. Trois apps portaient chacune leur
+ * module dates : bac-sable (arithmétique d'intervalles) […] ». L'app qui a
+ * donné le code ne l'avait jamais réadopté, et les deux copies étaient
+ * identiques au caractère près.
+ *
+ * Une façade plutôt qu'un remplacement des appels : les cinq fonctions gardent
+ * leur nom et leur emplacement, `upcomingWeekendRange` reste à côté de ses
+ * aides, et aucun des vingt-cinq sites d'appel ne bouge.
+ *
+ * LE FORMATAGE RESTE LOCAL, et c'est la règle du socle : `dates` est pur,
+ * l'affichage vit dans `format`. `formatDay` compose un jour de semaine, un
+ * quantième et un mois en français — une décision de produit, pas une
+ * primitive.
  */
+export {
+  addDays,
+  endOfDay,
+  isSameDay,
+  rangesOverlap,
+  startOfDay,
+} from '@mister-guiiug/dev-wpa-config/dates';
 
-export function isSameDay(a: Date, b: Date): boolean {
-  return (
-    a.getFullYear() === b.getFullYear() &&
-    a.getMonth() === b.getMonth() &&
-    a.getDate() === b.getDate()
-  );
-}
-
-export function startOfDay(d: Date): Date {
-  const r = new Date(d);
-  r.setHours(0, 0, 0, 0);
-  return r;
-}
-
-export function endOfDay(d: Date): Date {
-  const r = new Date(d);
-  r.setHours(23, 59, 59, 999);
-  return r;
-}
-
-export function addDays(d: Date, days: number): Date {
-  const r = new Date(d);
-  r.setDate(r.getDate() + days);
-  return r;
-}
+import {
+  addDays,
+  endOfDay,
+  startOfDay,
+} from '@mister-guiiug/dev-wpa-config/dates';
 
 /**
  * Prochain week-end (samedi 00:00 → dimanche 23:59) par rapport à `now`.
@@ -43,16 +43,6 @@ export function upcomingWeekendRange(now: Date): { from: Date; to: Date } {
   const daysUntilSaturday = 6 - day;
   const saturday = startOfDay(addDays(now, daysUntilSaturday));
   return { from: saturday, to: endOfDay(addDays(saturday, 1)) };
-}
-
-/** Deux intervalles [aFrom, aTo] et [bFrom, bTo] se recouvrent-ils ? */
-export function rangesOverlap(
-  aFrom: Date,
-  aTo: Date,
-  bFrom: Date,
-  bTo: Date
-): boolean {
-  return aFrom.getTime() <= bTo.getTime() && bFrom.getTime() <= aTo.getTime();
 }
 
 const DAY_FORMAT = new Intl.DateTimeFormat('fr-FR', {

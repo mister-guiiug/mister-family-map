@@ -2,43 +2,45 @@
  * Détection initiale de doublons lors d'une contribution : proximité
  * géographique + similarité du nom (coefficient de Sørensen–Dice sur bigrammes,
  * robuste aux inversions de mots et aux petites fautes).
+ *
+ * CE FICHIER EST LA SOURCE DE `@mister-guiiug/dev-wpa-config/similarity`, dont
+ * l'en-tête le nomme : « PROMU, PAS INVENTÉ. Deux apps, deux domaines sans
+ * rapport, le même problème. mister-family-map/src/shared/lib/dedupe.ts compare
+ * des lieux […] ; miss-lookhouse fait de l'anti-doublons sur des annonces
+ * immobilières. » L'algorithme est parti ; sa copie était restée.
+ *
+ * `normalizeName` et `nameSimilarity` étaient identiques au caractère près —
+ * ils sont désormais réexportés. `findSimilar` généralise
+ * `findPotentialDuplicates` : la distance devient injectable, et le rayon
+ * « très proche » un réglage plutôt qu'un `0.1` en dur.
+ *
+ * CE QUI RESTE ICI EST LA FORME, PAS L'ALGORITHME. `findPotentialDuplicates`
+ * garde son contrat — `{ place, distanceKm, similarity }` — pour que la page
+ * de création et ses tests ne bougent pas. La version publiée rend en plus un
+ * `reason` (`same-name`, `very-close`, `similar-name-nearby`) ; l'exposer à
+ * l'écran est une décision de produit, à prendre à part.
+ *
+ * L'ENSEMBLE APPARIÉ EST LE MÊME, vérifié branche par branche : le `reason`
+ * du socle vaut `gap <= closeEnough || similarity >= minSimilarity`, et sa
+ * branche `same-name` est absorbée par la troisième puisque `1 >= 0.55`. Le
+ * tri est identique — similarité décroissante, puis distance croissante.
+ *
+ * UNE SEULE DIVERGENCE, sur un cas limite : une distance NON FINIE. La copie
+ * locale la laissait passer (`NaN > maxDistance` est faux) et pouvait alors
+ * apparier sur le seul nom ; le socle écarte l'élément. `distanceKm` ne rend
+ * jamais `NaN` sur des coordonnées valides, et le comportement du socle est
+ * le plus prudent des deux.
  */
 import {
   distanceKm,
   type Coordinates,
 } from '@mister-guiiug/dev-wpa-config/geo';
+import { findSimilar } from '@mister-guiiug/dev-wpa-config/similarity';
 
-export function normalizeName(name: string): string {
-  return name
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/\p{Diacritic}/gu, '')
-    .replace(/[^a-z0-9]+/g, ' ')
-    .trim();
-}
-
-function bigrams(s: string): Map<string, number> {
-  const grams = new Map<string, number>();
-  for (let i = 0; i < s.length - 1; i++) {
-    const g = s.slice(i, i + 2);
-    grams.set(g, (grams.get(g) ?? 0) + 1);
-  }
-  return grams;
-}
-
-/** Similarité entre 0 (rien de commun) et 1 (identiques après normalisation). */
-export function nameSimilarity(a: string, b: string): number {
-  const na = normalizeName(a);
-  const nb = normalizeName(b);
-  if (na.length < 2 || nb.length < 2) return na === nb && na.length > 0 ? 1 : 0;
-  const ga = bigrams(na);
-  const gb = bigrams(nb);
-  let intersection = 0;
-  for (const [gram, count] of ga) {
-    intersection += Math.min(count, gb.get(gram) ?? 0);
-  }
-  return (2 * intersection) / (na.length - 1 + (nb.length - 1));
-}
+export {
+  nameSimilarity,
+  normalizeName,
+} from '@mister-guiiug/dev-wpa-config/similarity';
 
 export interface DuplicateCandidate {
   id: string;
@@ -70,16 +72,21 @@ export function findPotentialDuplicates<T extends DuplicateCandidate>(
   options: DuplicateOptions = {}
 ): Array<DuplicateMatch<T>> {
   const { maxDistanceKm = 0.5, minSimilarity = 0.55 } = options;
-  const matches: Array<DuplicateMatch<T>> = [];
-  for (const place of existing) {
-    const d = distanceKm(candidate.coordinates, place.coordinates);
-    if (d > maxDistanceKm) continue;
-    const similarity = nameSimilarity(candidate.name, place.name);
-    if (d <= 0.1 || similarity >= minSimilarity) {
-      matches.push({ place, distanceKm: d, similarity });
+
+  return findSimilar<T, Coordinates>(
+    { name: candidate.name, at: candidate.coordinates },
+    existing,
+    {
+      distance: distanceKm,
+      maxDistance: maxDistanceKm,
+      closeEnough: 0.1,
+      minSimilarity,
+      atOf: place => place.coordinates,
     }
-  }
-  return matches.sort(
-    (a, b) => b.similarity - a.similarity || a.distanceKm - b.distanceKm
-  );
+  ).map(match => ({
+    place: match.item,
+    // `distance` n'est `null` que sans fonction de distance ; il y en a une.
+    distanceKm: match.distance ?? 0,
+    similarity: match.similarity,
+  }));
 }
