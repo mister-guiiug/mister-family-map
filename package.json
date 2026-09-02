@@ -9,7 +9,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && pwa-bundle-budget",
     "preview": "vite preview",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
@@ -25,6 +25,9 @@
     "verify": "npm run format:check && npm run lint && npm run type-check && npm run test && npm run build",
     "mirror": "node scripts/mirror.mjs",
     "mirror:snapshot": "node scripts/mirror.mjs --mode snapshot"
+  },
+  "bundleBudget": {
+    "totalGzipKb": 675
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.112.3",
