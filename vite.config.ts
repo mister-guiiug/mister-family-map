@@ -27,6 +27,9 @@ export default defineConfig(({ command }) => ({
     react(),
     tailwindcss(),
     pwaSeoPlugin({
+      // Deux <meta name="theme-color"> par schéma : la barre du navigateur suit
+      // le mode sombre dès le premier rendu (relevé du 02/09/2026 : 5 apps sur 16).
+      themeColor: { light: '#fefcf6', dark: '#161c18' },
       siteName: 'Mister Family Map',
     }),
     // La version du package.json arrive dans le bundle, sur
@@ -62,6 +65,7 @@ export default defineConfig(({ command }) => ({
       registerType: 'prompt',
       includeAssets: ['favicon.svg', 'icon-*.png'],
       manifest: {
+        id: process.env.VITE_BASE_PATH ?? '/',
         name: 'Mister Family Map',
         short_name: 'FamilyMap',
         description:

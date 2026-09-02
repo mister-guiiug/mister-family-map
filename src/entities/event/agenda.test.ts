@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
+import { icalDate } from '@mister-guiiug/dev-wpa-config/ical';
 import type { FamilyEvent } from './model';
 import {
   displayStatus,
+  eventToIcal,
   eventsOnDay,
   expandOccurrences,
   sortByStart,
@@ -142,5 +144,53 @@ describe('expandOccurrences', () => {
       },
     });
     expect(expandOccurrences(e, 10)).toHaveLength(10);
+  });
+});
+
+/**
+ * Le FORMAT `.ics` est testé dans le socle ; ici on ne teste que les décisions
+ * de l'app — la nature de la date et le jour civil d'une journée entière, qui
+ * sont les deux endroits où un export juste et un export faux se ressemblent.
+ */
+describe('eventToIcal', () => {
+  it('une sortie datée est un INSTANT, pas une heure flottante', () => {
+    const ical = eventToIcal(makeEvent({}));
+    // 14 h à Paris, c'est 12 h UTC : le `Z` dit que l'heure est ancrée.
+    expect(icalDate(ical.start)).toBe('20260919T120000Z');
+    expect(icalDate(ical.end)).toBe('20260919T150000Z');
+    expect(ical.allDay).toBeUndefined();
+  });
+
+  it('journée entière : le jour de l’événement, pas son jour UTC', () => {
+    const ical = eventToIcal(
+      makeEvent({
+        allDay: true,
+        // Minuit à Paris, donc la VEILLE à 22 h UTC.
+        startsAt: '2026-09-19T00:00:00+02:00',
+        endsAt: '2026-09-20T23:59:00+02:00',
+      })
+    );
+    expect(icalDate(ical.start)).toBe('20260919');
+    // `DTEND` est EXCLUSIF : les 19 et 20 se terminent le 21.
+    expect(icalDate(ical.end)).toBe('20260921');
+  });
+
+  it('un fuseau illisible ne casse pas le bouton d’export', () => {
+    expect(() =>
+      eventToIcal(makeEvent({ allDay: true, timezone: 'Mars/Olympus' }))
+    ).not.toThrow();
+  });
+
+  it('un événement annulé part au calendrier, marqué annulé', () => {
+    expect(eventToIcal(makeEvent({ status: 'cancelled' })).status).toBe(
+      'CANCELLED'
+    );
+    expect(eventToIcal(makeEvent({})).status).toBe('CONFIRMED');
+  });
+
+  it('le `UID` reste l’identifiant du domaine — réimporter met à jour', () => {
+    expect(eventToIcal(makeEvent({ id: 'seed-evt-fete-parc' })).uid).toBe(
+      'seed-evt-fete-parc'
+    );
   });
 });

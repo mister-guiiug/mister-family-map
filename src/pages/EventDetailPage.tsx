@@ -7,12 +7,16 @@ import {
   ErrorBanner,
   SkeletonGroup,
 } from '@mister-guiiug/dev-wpa-config/react';
+import { ICAL_MIME, toIcalendar } from '@mister-guiiug/dev-wpa-config/ical';
 import { CalendarPlus } from 'lucide-react';
 import { useBackend } from '../app/providers/BackendProvider';
 import { useAsync } from '../shared/hooks/useAsync';
-import { displayStatus, expandOccurrences } from '../entities/event/agenda';
+import {
+  displayStatus,
+  eventToIcal,
+  expandOccurrences,
+} from '../entities/event/agenda';
 import { EVENT_STATUS_LABELS } from '../entities/event/model';
-import { buildIcsCalendar } from '../shared/lib/ics';
 import { formatDayTime } from '../shared/lib/dates';
 
 export default function EventDetailPage() {
@@ -53,19 +57,13 @@ export default function EventDetailPage() {
   const occurrences = expandOccurrences(event, 8);
 
   const exportIcs = () => {
-    const ics = buildIcsCalendar([
-      {
-        uid: event.id,
-        title: event.title,
-        description: event.description,
-        location: event.address,
-        ...(event.websiteUrl ? { url: event.websiteUrl } : {}),
-        start: new Date(event.startsAt),
-        end: new Date(event.endsAt),
-        allDay: event.allDay,
-      },
-    ]);
-    const blob = new Blob([ics], { type: 'text/calendar' });
+    // `uidDomain` et `prodId` reproduisent l'export d'avant le socle : un `UID`
+    // qui change ferait DOUBLONNER l'événement au lieu de le mettre à jour.
+    const ics = toIcalendar([eventToIcal(event)], {
+      prodId: '-//mister-family-map//FR',
+      uidDomain: 'mister-family-map',
+    });
+    const blob = new Blob([ics], { type: ICAL_MIME });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     a.download = `${event.title.replace(/\W+/g, '-')}.ics`;

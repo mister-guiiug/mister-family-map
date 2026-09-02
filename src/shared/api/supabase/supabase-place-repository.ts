@@ -115,6 +115,9 @@ export function createSupabasePlaceRepository(
   client: SupabaseClient
 ): PlaceRepository {
   return {
+    // PostgREST : aucune écriture n'aboutit sans réseau, et rien ne les met en
+    // attente. L'IHM le lit pour prévenir AVANT le clic (cf. ports.ts).
+    requiresNetwork: true,
     async list(query: PlaceQuery = {}) {
       let req = client.from('places').select('*').is('deleted_at', null);
       const statuses = query.statuses ?? ['published'];

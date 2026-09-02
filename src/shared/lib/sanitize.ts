@@ -5,36 +5,19 @@
  * échappe le texte, aucun `dangerouslySetInnerHTML`). L'assainissement côté
  * client normalise donc le texte (caractères de contrôle, longueurs) ; la
  * validation d'autorité reste côté serveur (contraintes SQL + RLS).
+ *
+ * LES TROIS FONCTIONS VIENNENT DU SOCLE depuis aujourd'hui. Elles y étaient
+ * déjà, à l'identique — l'en-tête de `security.js` raconte la promotion :
+ * « Trois apps portaient un utilitaire de sécurité, dont DEUX IDENTIQUES À
+ * L'OCTET, et dont l'en-tête disait déjà littéralement “Utilitaires de
+ * sécurité pour tous les projets”. »
+ *
+ * La version publiée ajoute un `String(raw ?? '')` en entrée. Sans effet ici —
+ * TypeScript garantit déjà une chaîne aux sites d'appel — mais elle protège
+ * du `undefined` venu d'un JSON, ce que la copie locale ne faisait pas.
  */
-
-// Contrôles C0/C1 (sauf \n et \t) + caractères de direction invisibles
-// (spoofing bidi). Construit depuis les code points pour rester lisible.
-const CONTROL_CHARS = new RegExp(
-  '[\\u0000-\\u0008\\u000B\\u000C\\u000E-\\u001F\\u007F-\\u009F' +
-    '\\u200E\\u200F\\u202A-\\u202E]',
-  'g'
-);
-
-export function sanitizeUserText(raw: string, maxLength: number): string {
-  return raw
-    .replace(CONTROL_CHARS, '')
-    .replace(/\r\n/g, '\n')
-    .replace(/[ \t]+\n/g, '\n')
-    .trim()
-    .slice(0, maxLength);
-}
-
-/** Une seule ligne, espaces normalisés (noms, communes, titres). */
-export function sanitizeSingleLine(raw: string, maxLength: number): string {
-  return sanitizeUserText(raw, maxLength).replace(/\s+/g, ' ');
-}
-
-/** Une URL « publiable » : http(s) uniquement, jamais javascript: ni data:. */
-export function isSafeHttpUrl(raw: string): boolean {
-  try {
-    const url = new URL(raw);
-    return url.protocol === 'https:' || url.protocol === 'http:';
-  } catch {
-    return false;
-  }
-}
+export {
+  isSafeHttpUrl,
+  sanitizeSingleLine,
+  sanitizeUserText,
+} from '@mister-guiiug/dev-wpa-config/security';

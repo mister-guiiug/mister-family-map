@@ -37,6 +37,17 @@ export interface PlaceQuery {
 }
 
 export interface PlaceRepository {
+  /**
+   * Les écritures de ce dépôt passent-elles par le réseau ?
+   *
+   * POURQUOI CE DRAPEAU EXISTE. L'adaptateur local écrit dans le stockage du
+   * navigateur : hors connexion, `create` réussit, et griser « Envoyer » y
+   * serait un MENSONGE. L'adaptateur Supabase, lui, ne peut pas aboutir sans
+   * réseau. L'interface est la même des deux côtés — la seule différence est
+   * celle-ci, et l'IHM doit pouvoir la lire pour ne prévenir que quand c'est
+   * vrai. Sans elle, on choisit entre bloquer à tort et échouer sans un mot.
+   */
+  readonly requiresNetwork: boolean;
   list(query?: PlaceQuery): Promise<Place[]>;
   getById(id: string): Promise<Place | null>;
   /** Crée en statut `pending` (ou `draft`), au nom de l'utilisateur courant. */

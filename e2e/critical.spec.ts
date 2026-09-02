@@ -183,6 +183,9 @@ test('@critical hors ligne : l’app reste utilisable sur les données locales',
   ).toBeVisible();
 
   // Coupure réseau : bannière hors-ligne + navigation SPA + données locales.
+  // Le bandeau attend 1,5 s de coupure CONTINUE avant de parler (il ne doit
+  // pas clignoter sur une micro-coupure) : l'attente d'assertion, à 10 s, le
+  // couvre largement.
   await context.setOffline(true);
   await expect(page.getByText(/Hors ligne —/)).toBeVisible();
   await page.getByRole('link', { name: 'Explorer' }).click();
