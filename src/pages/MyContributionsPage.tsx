@@ -12,6 +12,7 @@ import {
   PUBLICATION_STATUSES,
 } from '../entities/place/model';
 import { PageHeader } from '../shared/components/PageHeader';
+import { getDefaultLocale } from '@mister-guiiug/dev-wpa-config/format';
 
 /** Suivi des contributions de l'utilisateur, avec leur statut de validation. */
 export default function MyContributionsPage() {
@@ -113,7 +114,9 @@ export default function MyContributionsPage() {
                 >
                   <Link to={`/lieux/${review.placeId}`} className="underline">
                     Visite du{' '}
-                    {new Date(review.visitedOn).toLocaleDateString('fr-FR')}
+                    {new Date(review.visitedOn).toLocaleDateString(
+                      getDefaultLocale()
+                    )}
                   </Link>{' '}
                   — {review.rating}/5
                 </li>

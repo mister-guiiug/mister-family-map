@@ -30,6 +30,7 @@ import {
   endOfDay,
   startOfDay,
 } from '@mister-guiiug/dev-wpa-config/dates';
+import { getDefaultLocale } from '@mister-guiiug/dev-wpa-config/format';
 
 /**
  * Prochain week-end (samedi 00:00 → dimanche 23:59) par rapport à `now`.
@@ -45,13 +46,13 @@ export function upcomingWeekendRange(now: Date): { from: Date; to: Date } {
   return { from: saturday, to: endOfDay(addDays(saturday, 1)) };
 }
 
-const DAY_FORMAT = new Intl.DateTimeFormat('fr-FR', {
+const DAY_FORMAT = new Intl.DateTimeFormat(getDefaultLocale(), {
   weekday: 'long',
   day: 'numeric',
   month: 'long',
 });
 
-const TIME_FORMAT = new Intl.DateTimeFormat('fr-FR', {
+const TIME_FORMAT = new Intl.DateTimeFormat(getDefaultLocale(), {
   hour: '2-digit',
   minute: '2-digit',
 });

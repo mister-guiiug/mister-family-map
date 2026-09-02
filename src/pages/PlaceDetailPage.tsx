@@ -25,6 +25,7 @@ import { useFavoritesStore } from '../features/favorites/store';
 import { TriStateChip } from '../features/places/components/TriStateChip';
 import { RatingStars } from '../features/reviews/components/RatingStars';
 import { ReviewForm } from '../features/reviews/components/ReviewForm';
+import { getDefaultLocale } from '@mister-guiiug/dev-wpa-config/format';
 
 function priceLabel(place: {
   price: { kind: string; minEuros?: number; maxEuros?: number };
@@ -117,7 +118,9 @@ export default function PlaceDetailPage() {
           ) : (
             <span>
               Vérifié le{' '}
-              {new Date(place.lastVerifiedAt).toLocaleDateString('fr-FR')}
+              {new Date(place.lastVerifiedAt).toLocaleDateString(
+                getDefaultLocale()
+              )}
             </span>
           )}
         </p>
@@ -240,7 +243,9 @@ export default function PlaceDetailPage() {
                   <RatingStars rating={r.rating} />
                   <span className="text-ink-soft">
                     Visite le{' '}
-                    {new Date(r.visitedOn).toLocaleDateString('fr-FR')}
+                    {new Date(r.visitedOn).toLocaleDateString(
+                      getDefaultLocale()
+                    )}
                     {r.ageBrackets.length > 0
                       ? ` · enfants ${r.ageBrackets.join(', ')} ans`
                       : ''}
