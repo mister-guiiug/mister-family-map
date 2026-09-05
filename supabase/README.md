@@ -12,7 +12,7 @@
    ```
 
    En CI, réutiliser la composite action famille
-   `mister-guiiug/dev-wpa-config/.github/actions/supabase-migrate@v3`
+   `mister-guiiug/dev-pwa-config/.github/actions/supabase-migrate@v4`
    (secrets requis : `SUPABASE_ACCESS_TOKEN`, `SUPABASE_DB_PASSWORD`,
    `SUPABASE_PROJECT_REF`).
 
@@ -29,7 +29,7 @@
    build — uniquement dans des fonctions serveur.
 
 5. Anti-pause plan Free : appliquer
-   `dev-wpa-config/templates/supabase/keep-alive.sql` puis copier le workflow
+   `dev-pwa-config/templates/supabase/keep-alive.sql` puis copier le workflow
    `templates/github-workflows/supabase-keepalive.yml` (cf. README du paquet
    partagé).
 

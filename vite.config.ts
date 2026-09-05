@@ -2,14 +2,14 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { VitePWA } from 'vite-plugin-pwa';
-import { pwaSeoPlugin } from '@mister-guiiug/dev-wpa-config/vite-pwa-base';
-import { cspPlugin } from '@mister-guiiug/dev-wpa-config/vite-csp';
-import { versionPlugin } from '@mister-guiiug/dev-wpa-config/vite-version';
+import { pwaSeoPlugin } from '@mister-guiiug/dev-pwa-config/vite-pwa-base';
+import { cspPlugin } from '@mister-guiiug/dev-pwa-config/vite-csp';
+import { versionPlugin } from '@mister-guiiug/dev-pwa-config/vite-version';
 import {
   mapCspDirectives,
   mapTileRuntimeCaching,
   osmRasterTiles,
-} from '@mister-guiiug/dev-wpa-config/map';
+} from '@mister-guiiug/dev-pwa-config/map';
 
 // Source de tuiles : décrite UNE fois, puis dérivée en CSP et en cache — plus
 // d'hôtes recopiés à la main entre le plugin CSP et workbox.

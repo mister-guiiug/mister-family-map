@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import type { Coordinates } from '@mister-guiiug/dev-wpa-config/geo';
+import type { Coordinates } from '@mister-guiiug/dev-pwa-config/geo';
 
 /**
  * Géolocalisation UNIQUEMENT à la demande : le navigateur n'est interrogé

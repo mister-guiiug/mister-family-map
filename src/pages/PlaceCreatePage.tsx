@@ -6,15 +6,15 @@ import {
   SelectField,
   TextAreaField,
   TextField,
-} from '@mister-guiiug/dev-wpa-config/react';
-import { useActionGuard } from '@mister-guiiug/dev-wpa-config/react/use-action-guard';
+} from '@mister-guiiug/dev-pwa-config/react';
+import { useActionGuard } from '@mister-guiiug/dev-pwa-config/react/use-action-guard';
 import { useBackend } from '../app/providers/BackendProvider';
 import { useAsync } from '../shared/hooks/useAsync';
 import { placeDraftSchema } from '../entities/place/model';
 import { findPotentialDuplicates } from '../shared/lib/dedupe';
-import { formatDistance } from '@mister-guiiug/dev-wpa-config/geo';
+import { formatDistance } from '@mister-guiiug/dev-pwa-config/geo';
 import { sanitizeSingleLine, sanitizeUserText } from '../shared/lib/sanitize';
-import { validateImageFile } from '@mister-guiiug/dev-wpa-config/image';
+import { validateImageFile } from '@mister-guiiug/dev-pwa-config/image';
 import { useAuthStore } from '../features/auth/store';
 import {
   usePlaceWizardStore,

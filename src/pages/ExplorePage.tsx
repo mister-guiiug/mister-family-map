@@ -7,12 +7,12 @@ import {
   ErrorBanner,
   SkeletonGroup,
   TextField,
-} from '@mister-guiiug/dev-wpa-config/react';
+} from '@mister-guiiug/dev-pwa-config/react';
 import { useBackend } from '../app/providers/BackendProvider';
 import { useAsync } from '../shared/hooks/useAsync';
 import { applyFilters, countActiveFilters } from '../shared/schemas/filters';
 import { averageRating } from '../entities/review/model';
-import { distanceKm } from '@mister-guiiug/dev-wpa-config/geo';
+import { distanceKm } from '@mister-guiiug/dev-pwa-config/geo';
 import { recommendPlaces } from '../shared/lib/recommend';
 import { useSearchStore } from '../features/search/store';
 import { useFavoritesStore } from '../features/favorites/store';

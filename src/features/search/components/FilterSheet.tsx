@@ -3,7 +3,7 @@ import {
   SelectField,
   Sheet,
   TextField,
-} from '@mister-guiiug/dev-wpa-config/react';
+} from '@mister-guiiug/dev-pwa-config/react';
 import type { Category } from '../../../entities/category/model';
 import type { SearchFilters } from '../../../shared/schemas/filters';
 import { useSearchStore } from '../store';

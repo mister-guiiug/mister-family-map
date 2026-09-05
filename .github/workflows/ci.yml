@@ -1,4 +1,4 @@
-# CI famille : délégué au reusable workflow pwa-ci.yml@v3 de dev-wpa-config
+# CI famille : délégué au reusable workflow pwa-ci.yml@v4 de dev-pwa-config
 # (format · lint · type-check · test · build · verify-lockfile · E2E · audit).
 #
 # 💰 Coût zéro : ce workflow ne s'exécute QUE sur le dépôt PUBLIC
@@ -10,7 +10,7 @@
 #
 # ⚠️ Permissions déclarées ICI (niveau caller) : les reusable workflows
 # héritent des permissions du caller (intersection uniquement).
-# `packages: read` est requis pour installer @mister-guiiug/dev-wpa-config
+# `packages: read` est requis pour installer @mister-guiiug/dev-pwa-config
 # depuis GitHub Packages (même owner que le dépôt public → GITHUB_TOKEN
 # suffit).
 name: CI
@@ -27,11 +27,11 @@ jobs:
   ci:
     # Exécution réservée au miroir public — cf. commentaire d'en-tête.
     if: github.repository == 'mister-guiiug/mister-family-map'
-    uses: mister-guiiug/dev-wpa-config/.github/workflows/pwa-ci.yml@v3
+    uses: mister-guiiug/dev-pwa-config/.github/workflows/pwa-ci.yml@v4
     secrets: inherit
     with:
       # TODO(bootstrap) : le lockfile a été généré sans accès authentifié à
-      # GitHub Packages — l'entrée @mister-guiiug/dev-wpa-config n'a donc ni
+      # GitHub Packages — l'entrée @mister-guiiug/dev-pwa-config n'a donc ni
       # `resolved` ni `integrity` (npm les complète au premier `npm install`
       # authentifié). Étapes : `npm install` en local, committer le lockfile
       # mis à jour, puis repasser verify-lockfile à true.

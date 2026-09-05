@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router';
-import { Button, EmptyState } from '@mister-guiiug/dev-wpa-config/react';
+import { Button, EmptyState } from '@mister-guiiug/dev-pwa-config/react';
 import { PageHeader } from '../shared/components/PageHeader';
 
 export default function NotFoundPage() {

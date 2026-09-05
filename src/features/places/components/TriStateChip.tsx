@@ -1,4 +1,4 @@
-import { Badge } from '@mister-guiiug/dev-wpa-config/react';
+import { Badge } from '@mister-guiiug/dev-pwa-config/react';
 import type { TriState } from '../../../shared/types/tri-state';
 import { TRI_STATE_LABELS } from '../../../shared/types/tri-state';
 

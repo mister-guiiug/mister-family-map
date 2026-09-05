@@ -1,11 +1,11 @@
 # AUDIT DE COMPATIBILITÉ DEV-WPA-CONFIG
 
-Audit réalisé le 2026-08-21 sur l'état du dépôt `mister-guiiug/dev-wpa-config`
+Audit réalisé le 2026-08-21 sur l'état du dépôt `mister-guiiug/dev-pwa-config`
 (source de vérité : `package.json` + exports réellement présents).
 
 ## Version du paquet partagé
 
-`@mister-guiiug/dev-wpa-config` **3.10.1** (npm.pkg.github.com, scope
+`@mister-guiiug/dev-pwa-config` **3.10.1** (npm.pkg.github.com, scope
 `@mister-guiiug`). Dépendance déclarée : `^3.10.1`.
 
 ## Exports réellement disponibles (tous vérifiés présents)
@@ -65,15 +65,15 @@ ESLint en 10.x en « latest » — le projet **respecte les ranges famille**
 
 ## Workflows / actions réutilisables retenus
 
-- `ci.yml` → **`pwa-ci.yml@v3`** (`secrets: inherit`, permissions caller
+- `ci.yml` → **`pwa-ci.yml@v4`** (`secrets: inherit`, permissions caller
   `contents: read` + `packages: read`, `run-e2e: true` grep `@critical`,
   `run-npm-audit: true`).
-- `deploy.yml` → **`pwa-deploy.yml@v3`** (`pages/id-token: write` au caller ;
+- `deploy.yml` → **`pwa-deploy.yml@v4`** (`pages/id-token: write` au caller ;
   **pas** de `concurrency: pages` côté caller — interblocage documenté).
-- `lighthouse.yml` → **`pwa-lighthouse.yml@v3`** + `.lighthouserc.json`.
-- Composite `setup-pwa@v3` utilisée via les reusables (auth GitHub Packages
+- `lighthouse.yml` → **`pwa-lighthouse.yml@v4`** + `.lighthouserc.json`.
+- Composite `setup-pwa@v4` utilisée via les reusables (auth GitHub Packages
   par `NODE_AUTH_TOKEN` = `secrets.GITHUB_TOKEN`).
-- Prévu à l'activation de Supabase : `supabase-migrate@v3` +
+- Prévu à l'activation de Supabase : `supabase-migrate@v4` +
   `pwa-supabase-keepalive.yml` (templates keep-alive).
 
 ## Écarts documentation / réalité constatés
@@ -91,7 +91,7 @@ ESLint en 10.x en « latest » — le projet **respecte les ranges famille**
    registre exige une authentification même pour les paquets publics et le
    jeton de session (app installation) est refusé (401). Conséquence : le
    `package-lock.json` livré est complet et cohérent pour tout npmjs, mais
-   l'entrée `@mister-guiiug/dev-wpa-config` est **sans `resolved` ni
+   l'entrée `@mister-guiiug/dev-pwa-config` est **sans `resolved` ni
    `integrity`** (npm les complètera au premier `npm install` authentifié —
    `npm ci` fonctionne en l'état). Le caller CI passe `verify-lockfile: false`
    avec un TODO : régénérer le lock authentifié, committer, repasser à `true`.

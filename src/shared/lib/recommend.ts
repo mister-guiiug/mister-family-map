@@ -8,7 +8,7 @@ import {
   distanceKm,
   formatDistance,
   type Coordinates,
-} from '@mister-guiiug/dev-wpa-config/geo';
+} from '@mister-guiiug/dev-pwa-config/geo';
 
 export interface RecommendationCriteria {
   origin?: Coordinates;

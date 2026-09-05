@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { icalDate } from '@mister-guiiug/dev-wpa-config/ical';
+import { icalDate } from '@mister-guiiug/dev-pwa-config/ical';
 import type { FamilyEvent } from './model';
 import {
   displayStatus,

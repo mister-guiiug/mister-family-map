@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
-import { IMAGE_MAX_BYTES } from '@mister-guiiug/dev-wpa-config/image';
+import { IMAGE_MAX_BYTES } from '@mister-guiiug/dev-pwa-config/image';
 import { BackendProvider } from '../app/providers/BackendProvider';
 import { createLocalBackend } from '../shared/api/local/local-backend';
 import { useAuthStore } from '../features/auth/store';
@@ -10,7 +10,7 @@ import PlaceCreatePage from './PlaceCreatePage';
 
 /**
  * L'étape « photos » est le seul appelant de `validateImageFile`, désormais
- * importé de `@mister-guiiug/dev-wpa-config/image`. Le socle éprouve la
+ * importé de `@mister-guiiug/dev-pwa-config/image`. Le socle éprouve la
  * MÉCANIQUE du validateur chez lui (`test/promotions.test.mjs`) ; ces tests-ci
  * éprouvent le CÂBLAGE, que le socle ne peut pas voir : que l'écran appelle
  * vraiment le validateur, et traduise chaque refus dans le message que

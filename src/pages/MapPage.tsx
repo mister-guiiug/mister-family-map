@@ -5,7 +5,7 @@ import {
   EmptyState,
   ErrorBanner,
   SkeletonGroup,
-} from '@mister-guiiug/dev-wpa-config/react';
+} from '@mister-guiiug/dev-pwa-config/react';
 import { ListFilter } from 'lucide-react';
 import { useBackend } from '../app/providers/BackendProvider';
 import { useAsync } from '../shared/hooks/useAsync';
@@ -13,10 +13,10 @@ import { applyFilters } from '../shared/schemas/filters';
 import {
   isInBoundingBox,
   type BoundingBox,
-} from '@mister-guiiug/dev-wpa-config/geo';
+} from '@mister-guiiug/dev-pwa-config/geo';
 import { useSearchStore } from '../features/search/store';
 import { useFavoritesStore } from '../features/favorites/store';
-import { isClusterId } from '@mister-guiiug/dev-wpa-config/map';
+import { isClusterId } from '@mister-guiiug/dev-pwa-config/map';
 import { MapView } from '../features/map/components/MapView';
 import { FilterSheet } from '../features/search/components/FilterSheet';
 import { PlaceCard } from '../features/places/components/PlaceCard';

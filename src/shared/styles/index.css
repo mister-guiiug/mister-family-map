@@ -1,6 +1,6 @@
 @import 'tailwindcss';
-@import '@mister-guiiug/dev-wpa-config/tailwind-preset.css';
-@import '@mister-guiiug/dev-wpa-config/components.css';
+@import '@mister-guiiug/dev-pwa-config/tailwind-preset.css';
+@import '@mister-guiiug/dev-pwa-config/components.css';
 @import 'maplibre-gl/dist/maplibre-gl.css';
 
 /* Tokens de l'app — thème clair. Palette « nature rassurante », sobre. */

@@ -1,6 +1,6 @@
 import { Link } from 'react-router';
 import { CalendarDays, MapPin } from 'lucide-react';
-import { Badge } from '@mister-guiiug/dev-wpa-config/react';
+import { Badge } from '@mister-guiiug/dev-pwa-config/react';
 import type { FamilyEvent } from '../../../entities/event/model';
 import { EVENT_STATUS_LABELS } from '../../../entities/event/model';
 import { displayStatus } from '../../../entities/event/agenda';

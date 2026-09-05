@@ -7,10 +7,10 @@ import {
   Map as MapIcon,
   UserRound,
 } from 'lucide-react';
-import { ConnectionBanner } from '@mister-guiiug/dev-wpa-config/react/connection-banner';
-import { prefetch } from '@mister-guiiug/dev-wpa-config/prefetch';
+import { ConnectionBanner } from '@mister-guiiug/dev-pwa-config/react/connection-banner';
+import { prefetch } from '@mister-guiiug/dev-pwa-config/prefetch';
 import { startTabSync } from '../../shared/api/tab-sync';
-import { UpdatePromptBanner } from '@mister-guiiug/dev-wpa-config/react/update-prompt-banner';
+import { UpdatePromptBanner } from '@mister-guiiug/dev-pwa-config/react/update-prompt-banner';
 import { registerSW } from 'virtual:pwa-register';
 import { useBackend } from '../providers/BackendProvider';
 import { useAuthStore } from '../../features/auth/store';

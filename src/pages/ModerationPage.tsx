@@ -4,14 +4,14 @@ import {
   Button,
   EmptyState,
   SkeletonGroup,
-} from '@mister-guiiug/dev-wpa-config/react';
+} from '@mister-guiiug/dev-pwa-config/react';
 import { useBackend } from '../app/providers/BackendProvider';
 import { useAsync } from '../shared/hooks/useAsync';
 import { useCurrentRole } from '../features/auth/store';
 import { can } from '../entities/user/permissions';
 import { REPORT_REASON_LABELS } from '../entities/moderation/model';
 import { PageHeader } from '../shared/components/PageHeader';
-import { getDefaultLocale } from '@mister-guiiug/dev-wpa-config/format';
+import { getDefaultLocale } from '@mister-guiiug/dev-pwa-config/format';
 
 /** File de modération : signalements ouverts + historique des décisions. */
 export default function ModerationPage() {

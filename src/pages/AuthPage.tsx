@@ -4,7 +4,7 @@ import {
   Button,
   ErrorBanner,
   TextField,
-} from '@mister-guiiug/dev-wpa-config/react';
+} from '@mister-guiiug/dev-pwa-config/react';
 import { useBackend } from '../app/providers/BackendProvider';
 import { PageHeader } from '../shared/components/PageHeader';
 

@@ -6,7 +6,7 @@ import {
   ErrorBanner,
   SkeletonGroup,
   TextField,
-} from '@mister-guiiug/dev-wpa-config/react';
+} from '@mister-guiiug/dev-pwa-config/react';
 import { Plus } from 'lucide-react';
 import { useBackend } from '../app/providers/BackendProvider';
 import { useAsync } from '../shared/hooks/useAsync';
@@ -15,7 +15,7 @@ import {
   upcomingEvents,
   weekendEvents,
 } from '../entities/event/agenda';
-import { distanceKm } from '@mister-guiiug/dev-wpa-config/geo';
+import { distanceKm } from '@mister-guiiug/dev-pwa-config/geo';
 import { useSearchStore } from '../features/search/store';
 import { EventCard } from '../features/events/components/EventCard';
 import { PageHeader } from '../shared/components/PageHeader';

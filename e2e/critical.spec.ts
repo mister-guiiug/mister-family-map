@@ -2,7 +2,7 @@ import { expect, test, type Page } from '@playwright/test';
 import {
   dumpAppState,
   rethrowWithState,
-} from '@mister-guiiug/dev-wpa-config/playwright-base';
+} from '@mister-guiiug/dev-pwa-config/playwright-base';
 
 /**
  * Parcours E2E critiques (tag @critical — exécutés par la CI sur Chromium).

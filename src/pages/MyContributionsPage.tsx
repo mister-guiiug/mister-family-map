@@ -3,7 +3,7 @@ import {
   Badge,
   EmptyState,
   SkeletonGroup,
-} from '@mister-guiiug/dev-wpa-config/react';
+} from '@mister-guiiug/dev-pwa-config/react';
 import { useBackend } from '../app/providers/BackendProvider';
 import { useAsync } from '../shared/hooks/useAsync';
 import { useAuthStore } from '../features/auth/store';
@@ -12,7 +12,7 @@ import {
   PUBLICATION_STATUSES,
 } from '../entities/place/model';
 import { PageHeader } from '../shared/components/PageHeader';
-import { getDefaultLocale } from '@mister-guiiug/dev-wpa-config/format';
+import { getDefaultLocale } from '@mister-guiiug/dev-pwa-config/format';
 
 /** Suivi des contributions de l'utilisateur, avec leur statut de validation. */
 export default function MyContributionsPage() {

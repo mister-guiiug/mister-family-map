@@ -6,7 +6,7 @@ import {
   SelectField,
   TextAreaField,
   TextField,
-} from '@mister-guiiug/dev-wpa-config/react';
+} from '@mister-guiiug/dev-pwa-config/react';
 import { useBackend } from '../app/providers/BackendProvider';
 import { useAsync } from '../shared/hooks/useAsync';
 import { eventDraftSchema } from '../entities/event/model';

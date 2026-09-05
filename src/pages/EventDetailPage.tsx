@@ -6,8 +6,8 @@ import {
   EmptyState,
   ErrorBanner,
   SkeletonGroup,
-} from '@mister-guiiug/dev-wpa-config/react';
-import { ICAL_MIME, toIcalendar } from '@mister-guiiug/dev-wpa-config/ical';
+} from '@mister-guiiug/dev-pwa-config/react';
+import { ICAL_MIME, toIcalendar } from '@mister-guiiug/dev-pwa-config/ical';
 import { CalendarPlus } from 'lucide-react';
 import { useBackend } from '../app/providers/BackendProvider';
 import { useAsync } from '../shared/hooks/useAsync';
@@ -18,7 +18,7 @@ import {
 } from '../entities/event/agenda';
 import { EVENT_STATUS_LABELS } from '../entities/event/model';
 import { formatDayTime } from '../shared/lib/dates';
-import { getDefaultLocale } from '@mister-guiiug/dev-wpa-config/format';
+import { getDefaultLocale } from '@mister-guiiug/dev-pwa-config/format';
 
 export default function EventDetailPage() {
   const { id = '' } = useParams();

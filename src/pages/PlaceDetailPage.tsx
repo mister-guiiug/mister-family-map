@@ -9,7 +9,7 @@ import {
   SkeletonGroup,
   TextAreaField,
   SelectField,
-} from '@mister-guiiug/dev-wpa-config/react';
+} from '@mister-guiiug/dev-pwa-config/react';
 import { Flag, Heart, Share2 } from 'lucide-react';
 import { useBackend } from '../app/providers/BackendProvider';
 import { useAsync } from '../shared/hooks/useAsync';
@@ -25,7 +25,7 @@ import { useFavoritesStore } from '../features/favorites/store';
 import { TriStateChip } from '../features/places/components/TriStateChip';
 import { RatingStars } from '../features/reviews/components/RatingStars';
 import { ReviewForm } from '../features/reviews/components/ReviewForm';
-import { getDefaultLocale } from '@mister-guiiug/dev-wpa-config/format';
+import { getDefaultLocale } from '@mister-guiiug/dev-pwa-config/format';
 
 function priceLabel(place: {
   price: { kind: string; minEuros?: number; maxEuros?: number };
