@@ -26,7 +26,7 @@ import type { AuthSession, Role } from '../../entities/user/model';
 import type {
   BoundingBox,
   Coordinates,
-} from '@mister-guiiug/dev-wpa-config/geo';
+} from '@mister-guiiug/dev-pwa-config/geo';
 
 export interface PlaceQuery {
   /** Zone visible de la carte (« rechercher dans cette zone »). */

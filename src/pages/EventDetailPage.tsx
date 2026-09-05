@@ -6,8 +6,8 @@ import {
   EmptyState,
   ErrorBanner,
   SkeletonGroup,
-} from '@mister-guiiug/dev-wpa-config/react';
-import { ICAL_MIME, toIcalendar } from '@mister-guiiug/dev-wpa-config/ical';
+} from '@mister-guiiug/dev-pwa-config/react';
+import { ICAL_MIME, toIcalendar } from '@mister-guiiug/dev-pwa-config/ical';
 import { CalendarPlus } from 'lucide-react';
 import { useBackend } from '../app/providers/BackendProvider';
 import { useAsync } from '../shared/hooks/useAsync';
@@ -18,6 +18,7 @@ import {
 } from '../entities/event/agenda';
 import { EVENT_STATUS_LABELS } from '../entities/event/model';
 import { formatDayTime } from '../shared/lib/dates';
+import { getDefaultLocale } from '@mister-guiiug/dev-pwa-config/format';
 
 export default function EventDetailPage() {
   const { id = '' } = useParams();
@@ -106,7 +107,7 @@ export default function EventDetailPage() {
           {occurrences.map(occ => (
             <li key={occ.startsAt.toISOString()}>
               {event.allDay
-                ? occ.startsAt.toLocaleDateString('fr-FR', {
+                ? occ.startsAt.toLocaleDateString(getDefaultLocale(), {
                     weekday: 'long',
                     day: 'numeric',
                     month: 'long',
@@ -118,7 +119,10 @@ export default function EventDetailPage() {
         {event.registrationDeadline ? (
           <p className="mt-1 text-fluid-sm text-ink-soft">
             Inscription avant le{' '}
-            {new Date(event.registrationDeadline).toLocaleDateString('fr-FR')}.
+            {new Date(event.registrationDeadline).toLocaleDateString(
+              getDefaultLocale()
+            )}
+            .
           </p>
         ) : null}
         <Button

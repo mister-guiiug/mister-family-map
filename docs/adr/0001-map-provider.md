@@ -8,7 +8,7 @@ remonté dans le paquet partagé)
 
 La carte est centrale mais ne doit pas contaminer le domaine : l'app dépend du
 port `MapProvider`, réexporté par `src/features/map/map-provider.ts` depuis
-**`@mister-guiiug/dev-wpa-config/map`** — l'app n'implémente plus d'adaptateur.
+**`@mister-guiiug/dev-pwa-config/map`** — l'app n'implémente plus d'adaptateur.
 
 Candidats évalués : Leaflet (raster), MapLibre GL (WebGL), fournisseurs
 commerciaux (Mapbox, Google Maps).

@@ -1,6 +1,6 @@
 import { lazy, Suspense, type ReactNode } from 'react';
 import { createBrowserRouter } from 'react-router';
-import { SkeletonGroup } from '@mister-guiiug/dev-wpa-config/react';
+import { SkeletonGroup } from '@mister-guiiug/dev-pwa-config/react';
 import { RootLayout } from '../layouts/RootLayout';
 
 /** Pages en lazy-loading : le shell reste léger, la carte (MapLibre GL) n'est chargée qu'à l'usage. */

@@ -2,14 +2,14 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { VitePWA } from 'vite-plugin-pwa';
-import { pwaSeoPlugin } from '@mister-guiiug/dev-wpa-config/vite-pwa-base';
-import { cspPlugin } from '@mister-guiiug/dev-wpa-config/vite-csp';
-import { versionPlugin } from '@mister-guiiug/dev-wpa-config/vite-version';
+import { pwaSeoPlugin } from '@mister-guiiug/dev-pwa-config/vite-pwa-base';
+import { cspPlugin } from '@mister-guiiug/dev-pwa-config/vite-csp';
+import { versionPlugin } from '@mister-guiiug/dev-pwa-config/vite-version';
 import {
   mapCspDirectives,
   mapTileRuntimeCaching,
   osmRasterTiles,
-} from '@mister-guiiug/dev-wpa-config/map';
+} from '@mister-guiiug/dev-pwa-config/map';
 
 // Source de tuiles : décrite UNE fois, puis dérivée en CSP et en cache — plus
 // d'hôtes recopiés à la main entre le plugin CSP et workbox.
@@ -27,6 +27,9 @@ export default defineConfig(({ command }) => ({
     react(),
     tailwindcss(),
     pwaSeoPlugin({
+      // Deux <meta name="theme-color"> par schéma : la barre du navigateur suit
+      // le mode sombre dès le premier rendu (relevé du 02/09/2026 : 5 apps sur 16).
+      themeColor: { light: '#fefcf6', dark: '#161c18' },
       siteName: 'Mister Family Map',
     }),
     // La version du package.json arrive dans le bundle, sur
@@ -62,6 +65,7 @@ export default defineConfig(({ command }) => ({
       registerType: 'prompt',
       includeAssets: ['favicon.svg', 'icon-*.png'],
       manifest: {
+        id: process.env.VITE_BASE_PATH ?? '/',
         name: 'Mister Family Map',
         short_name: 'FamilyMap',
         description:

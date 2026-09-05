@@ -1,6 +1,6 @@
 /**
  * Port MapProvider — désormais **porté par le paquet partagé**
- * (`@mister-guiiug/dev-wpa-config/map`), promu depuis cette app.
+ * (`@mister-guiiug/dev-pwa-config/map`), promu depuis cette app.
  *
  * Ce fichier reste le point d'entrée interne : les écrans continuent
  * d'importer `../map-provider`, sans connaître ni le paquet ni le moteur.
@@ -13,4 +13,4 @@ export type {
   MapProviderFactory,
   MapProviderOptions,
   MapViewport,
-} from '@mister-guiiug/dev-wpa-config/map';
+} from '@mister-guiiug/dev-pwa-config/map';

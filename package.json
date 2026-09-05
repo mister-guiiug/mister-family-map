@@ -9,7 +9,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && pwa-bundle-budget",
     "preview": "vite preview",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
@@ -26,6 +26,9 @@
     "mirror": "node scripts/mirror.mjs",
     "mirror:snapshot": "node scripts/mirror.mjs --mode snapshot"
   },
+  "bundleBudget": {
+    "totalGzipKb": 675
+  },
   "dependencies": {
     "@supabase/supabase-js": "^2.112.3",
     "lucide-react": "^1.33.0",
@@ -39,7 +42,7 @@
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",
     "@eslint/js": "^9.39.4",
-    "@mister-guiiug/dev-wpa-config": "^3.32.1",
+    "@mister-guiiug/dev-pwa-config": "^4.0.0",
     "@playwright/test": "^1.62.1",
     "@tailwindcss/vite": "^4.3.3",
     "@testing-library/jest-dom": "^6.0.0",

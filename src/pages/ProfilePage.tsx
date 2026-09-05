@@ -4,9 +4,9 @@ import {
   Button,
   FamilyApps,
   UpdateButton,
-} from '@mister-guiiug/dev-wpa-config/react';
-import { AppVersion } from '@mister-guiiug/dev-wpa-config/react/app-version';
-import { ShareButton } from '@mister-guiiug/dev-wpa-config/react/share-button';
+} from '@mister-guiiug/dev-pwa-config/react';
+import { AppVersion } from '@mister-guiiug/dev-pwa-config/react/app-version';
+import { ShareButton } from '@mister-guiiug/dev-pwa-config/react/share-button';
 import { useBackend } from '../app/providers/BackendProvider';
 import { useAuthStore, useCurrentRole } from '../features/auth/store';
 import { ROLE_LABELS } from '../entities/user/model';

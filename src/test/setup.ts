@@ -1,1 +1,1 @@
-import '@mister-guiiug/dev-wpa-config/vitest-setup';
+import '@mister-guiiug/dev-pwa-config/vitest-setup';

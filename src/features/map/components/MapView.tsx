@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
-import { Button, ErrorBanner } from '@mister-guiiug/dev-wpa-config/react';
+import { Button, ErrorBanner } from '@mister-guiiug/dev-pwa-config/react';
 import { LocateFixed } from 'lucide-react';
 import type { Place } from '../../../entities/place/model';
 import {
   clusterByGrid,
   clustersToMarkers,
-} from '@mister-guiiug/dev-wpa-config/map';
-import { createMapLibreMapProvider } from '@mister-guiiug/dev-wpa-config/map/maplibre';
-import type { Coordinates } from '@mister-guiiug/dev-wpa-config/geo';
+} from '@mister-guiiug/dev-pwa-config/map';
+import { createMapLibreMapProvider } from '@mister-guiiug/dev-pwa-config/map/maplibre';
+import type { Coordinates } from '@mister-guiiug/dev-pwa-config/geo';
 import { useGeolocation } from '../../../shared/hooks/useGeolocation';
 import type { MapProviderFactory, MapViewport } from '../map-provider';
 

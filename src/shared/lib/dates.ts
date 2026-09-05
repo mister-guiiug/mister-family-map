@@ -2,7 +2,7 @@
  * Outils de dates. L'arithmétique vient du socle ; ce qui reste ici est ce
  * qu'aucune autre app n'a : le week-end à venir, et le format d'affichage.
  *
- * CE FICHIER EST LA SOURCE DE `@mister-guiiug/dev-wpa-config/dates`. Son
+ * CE FICHIER EST LA SOURCE DE `@mister-guiiug/dev-pwa-config/dates`. Son
  * en-tête le dit — « PROMU, PAS INVENTÉ. Trois apps portaient chacune leur
  * module dates : bac-sable (arithmétique d'intervalles) […] ». L'app qui a
  * donné le code ne l'avait jamais réadopté, et les deux copies étaient
@@ -23,13 +23,14 @@ export {
   isSameDay,
   rangesOverlap,
   startOfDay,
-} from '@mister-guiiug/dev-wpa-config/dates';
+} from '@mister-guiiug/dev-pwa-config/dates';
 
 import {
   addDays,
   endOfDay,
   startOfDay,
-} from '@mister-guiiug/dev-wpa-config/dates';
+} from '@mister-guiiug/dev-pwa-config/dates';
+import { getDefaultLocale } from '@mister-guiiug/dev-pwa-config/format';
 
 /**
  * Prochain week-end (samedi 00:00 → dimanche 23:59) par rapport à `now`.
@@ -45,13 +46,13 @@ export function upcomingWeekendRange(now: Date): { from: Date; to: Date } {
   return { from: saturday, to: endOfDay(addDays(saturday, 1)) };
 }
 
-const DAY_FORMAT = new Intl.DateTimeFormat('fr-FR', {
+const DAY_FORMAT = new Intl.DateTimeFormat(getDefaultLocale(), {
   weekday: 'long',
   day: 'numeric',
   month: 'long',
 });
 
-const TIME_FORMAT = new Intl.DateTimeFormat('fr-FR', {
+const TIME_FORMAT = new Intl.DateTimeFormat(getDefaultLocale(), {
   hour: '2-digit',
   minute: '2-digit',
 });

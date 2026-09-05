@@ -4,13 +4,14 @@ import {
   Button,
   EmptyState,
   SkeletonGroup,
-} from '@mister-guiiug/dev-wpa-config/react';
+} from '@mister-guiiug/dev-pwa-config/react';
 import { useBackend } from '../app/providers/BackendProvider';
 import { useAsync } from '../shared/hooks/useAsync';
 import { useCurrentRole } from '../features/auth/store';
 import { can } from '../entities/user/permissions';
 import { REPORT_REASON_LABELS } from '../entities/moderation/model';
 import { PageHeader } from '../shared/components/PageHeader';
+import { getDefaultLocale } from '@mister-guiiug/dev-pwa-config/format';
 
 /** File de modération : signalements ouverts + historique des décisions. */
 export default function ModerationPage() {
@@ -82,7 +83,9 @@ export default function ModerationPage() {
                     </Badge>
                     <span className="text-ink-soft">
                       {report.targetType} ·{' '}
-                      {new Date(report.createdAt).toLocaleDateString('fr-FR')}
+                      {new Date(report.createdAt).toLocaleDateString(
+                        getDefaultLocale()
+                      )}
                     </span>
                   </p>
                   {report.details ? (
@@ -160,8 +163,10 @@ export default function ModerationPage() {
             <ul className="flex flex-col gap-1 text-fluid-sm">
               {historyState.data?.map(action => (
                 <li key={action.id}>
-                  {new Date(action.createdAt).toLocaleString('fr-FR')} —{' '}
-                  <strong>{action.decision}</strong> sur {action.targetType}{' '}
+                  {new Date(action.createdAt).toLocaleString(
+                    getDefaultLocale()
+                  )}{' '}
+                  — <strong>{action.decision}</strong> sur {action.targetType}{' '}
                   {action.reason ? `(${action.reason})` : ''}
                 </li>
               ))}

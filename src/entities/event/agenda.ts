@@ -1,4 +1,4 @@
-import { addDays, type IcalEvent } from '@mister-guiiug/dev-wpa-config/ical';
+import { addDays, type IcalEvent } from '@mister-guiiug/dev-pwa-config/ical';
 import {
   endOfDay,
   rangesOverlap,
@@ -126,7 +126,7 @@ const ICAL_STATUS: Record<FamilyEvent['status'], IcalEvent['status']> = {
 
 /**
  * Traduit un événement du domaine en `VEVENT` pour
- * `@mister-guiiug/dev-wpa-config/ical`.
+ * `@mister-guiiug/dev-pwa-config/ical`.
  *
  * NATURE DE LA DATE — le choix n'est pas cosmétique. Une sortie en famille est
  * un INSTANT, pas une heure flottante : elle a lieu à un endroit précis, et

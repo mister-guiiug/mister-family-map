@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { createLogger } from '@mister-guiiug/dev-wpa-config/logger';
+import { createLogger } from '@mister-guiiug/dev-pwa-config/logger';
 
 /** Journal nommé : cet avertissement finit dans le fil d'Ariane des erreurs,
  *  au lieu de disparaître dans la console de l'utilisateur. */

@@ -1,4 +1,4 @@
-# Déploiement GitHub Pages : délégué au reusable pwa-deploy.yml@v3.
+# Déploiement GitHub Pages : délégué au reusable pwa-deploy.yml@v4.
 #
 # 💰 Coût zéro : ne s'exécute QUE sur le dépôt PUBLIC
 # mister-guiiug/mister-family-map (Pages + minutes gratuites), après chaque
@@ -8,7 +8,7 @@
 #
 # ⚠️ Permissions au niveau caller (héritage par intersection) :
 #   - pages: write + id-token: write → déploiement Pages ;
-#   - packages: read → installation de @mister-guiiug/dev-wpa-config.
+#   - packages: read → installation de @mister-guiiug/dev-pwa-config.
 # ⚠️ Ne PAS déclarer `concurrency: pages` ici : le reusable le déclare déjà
 # (un doublon caller/reusable provoque un interblocage documenté).
 name: Deploy
@@ -27,7 +27,7 @@ jobs:
   deploy:
     # Exécution réservée au miroir public — cf. commentaire d'en-tête.
     if: github.repository == 'mister-guiiug/mister-family-map'
-    uses: mister-guiiug/dev-wpa-config/.github/workflows/pwa-deploy.yml@v3
+    uses: mister-guiiug/dev-pwa-config/.github/workflows/pwa-deploy.yml@v4
     secrets: inherit
     with:
       use-base-path: true

@@ -19,8 +19,8 @@
  * les pages qui chargent leurs listes à la demande réagiront quand elles
  * auront un cache à invalider — les annonces, elles, sont déjà là.
  */
-import { createChannel } from '@mister-guiiug/dev-wpa-config/realtime';
-import { localRealtimeTransport } from '@mister-guiiug/dev-wpa-config/realtime/local';
+import { createChannel } from '@mister-guiiug/dev-pwa-config/realtime';
+import { localRealtimeTransport } from '@mister-guiiug/dev-pwa-config/realtime/local';
 
 export type TabSyncTopic =
   'favorites' | 'places' | 'events' | 'reviews' | 'session';

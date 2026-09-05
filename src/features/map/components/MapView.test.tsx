@@ -135,7 +135,7 @@ describe('MapView', () => {
    * 46.6 / 2.4, le milieu de la France — écrasait les coordonnées tapées. La
    * détection de doublons cherchait alors à 400 km du lieu visé.
    *
-   * Depuis dev-wpa-config 3.15, la vue initiale passe par `onReady`. Elle sert
+   * Depuis dev-pwa-config 3.15, la vue initiale passe par `onReady`. Elle sert
    * ici à amorcer le zoom du regroupement, et ne remonte PAS à l'appelant.
    */
   it('n’annonce pas la vue initiale comme un déplacement', async () => {

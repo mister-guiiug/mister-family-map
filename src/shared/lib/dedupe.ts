@@ -3,7 +3,7 @@
  * géographique + similarité du nom (coefficient de Sørensen–Dice sur bigrammes,
  * robuste aux inversions de mots et aux petites fautes).
  *
- * CE FICHIER EST LA SOURCE DE `@mister-guiiug/dev-wpa-config/similarity`, dont
+ * CE FICHIER EST LA SOURCE DE `@mister-guiiug/dev-pwa-config/similarity`, dont
  * l'en-tête le nomme : « PROMU, PAS INVENTÉ. Deux apps, deux domaines sans
  * rapport, le même problème. mister-family-map/src/shared/lib/dedupe.ts compare
  * des lieux […] ; miss-lookhouse fait de l'anti-doublons sur des annonces
@@ -34,13 +34,13 @@
 import {
   distanceKm,
   type Coordinates,
-} from '@mister-guiiug/dev-wpa-config/geo';
-import { findSimilar } from '@mister-guiiug/dev-wpa-config/similarity';
+} from '@mister-guiiug/dev-pwa-config/geo';
+import { findSimilar } from '@mister-guiiug/dev-pwa-config/similarity';
 
 export {
   nameSimilarity,
   normalizeName,
-} from '@mister-guiiug/dev-wpa-config/similarity';
+} from '@mister-guiiug/dev-pwa-config/similarity';
 
 export interface DuplicateCandidate {
   id: string;

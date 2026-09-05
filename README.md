@@ -5,13 +5,13 @@ d'événements et retours d'expérience **réellement utiles** (pas de descripti
 promotionnelles). PWA mobile-first, hors-ligne raisonné, privacy by design.
 
 > Squelette applicatif exécutable — construit sur les configurations partagées
-> [`@mister-guiiug/dev-wpa-config`](https://github.com/mister-guiiug/dev-wpa-config) v3.10.1.
+> [`@mister-guiiug/dev-pwa-config`](https://github.com/mister-guiiug/dev-pwa-config) v3.10.1.
 > Audit de compatibilité : [docs/AUDIT-DEV-WPA-CONFIG.md](./docs/AUDIT-DEV-WPA-CONFIG.md).
 
 ## Démarrage
 
 Prérequis : Node ≥ 22 (`.nvmrc`) et un accès GitHub Packages pour le scope
-`@mister-guiiug` (PAT `read:packages`, cf. [README du paquet partagé](https://github.com/mister-guiiug/dev-wpa-config#installation-github-packages)) :
+`@mister-guiiug` (PAT `read:packages`, cf. [README du paquet partagé](https://github.com/mister-guiiug/dev-pwa-config#installation-github-packages)) :
 
 ```bash
 npm login --scope=@mister-guiiug --auth-type=legacy --registry=https://npm.pkg.github.com
@@ -68,7 +68,7 @@ composants) ; les écrans ne dépendent que des **ports** (`shared/api/ports.ts`
 un seul fichier importe supabase-js. La carte n'est plus implémentée ici : le
 port `MapProvider`, l'adaptateur MapLibre, le regroupement de marqueurs et les
 helpers CSP/cache viennent de
-[`@mister-guiiug/dev-wpa-config/map`](https://github.com/mister-guiiug/dev-wpa-config#carte-mister-guiiugdev-wpa-configmap).
+[`@mister-guiiug/dev-pwa-config/map`](https://github.com/mister-guiiug/dev-pwa-config#carte-mister-guiiugdev-pwa-configmap).
 
 Décisions documentées : [ADR-0001 carte](./docs/adr/0001-map-provider.md) ·
 [ADR-0002 backend](./docs/adr/0002-backend.md) ·
@@ -116,16 +116,16 @@ l'automatisation s'exécute **gratuitement sur le miroir public**
 Reusable workflows famille (permissions minimales au niveau caller), tous
 gardés par `if: github.repository == 'mister-guiiug/mister-family-map'` —
 `skipped` ici (0 minute, 0 rouge), exécutés sur le public :
-`ci.yml` → `pwa-ci.yml@v3` (format · lint · type · test · build · audit npm ·
-E2E `@critical`), `deploy.yml` → `pwa-deploy.yml@v3` (GitHub Pages publiques),
-`lighthouse.yml` → `pwa-lighthouse.yml@v3`.
+`ci.yml` → `pwa-ci.yml@v4` (format · lint · type · test · build · audit npm ·
+E2E `@critical`), `deploy.yml` → `pwa-deploy.yml@v4` (GitHub Pages publiques),
+`lighthouse.yml` → `pwa-lighthouse.yml@v4`.
 
 Côté privé, le portail qualité est **`npm run verify`**, exigé par le script
 de publication avant tout push (et exécutable à tout moment, y compris par
 les hooks git optionnels ci-dessous).
 
 ⚠️ Bootstrap lockfile : le `package-lock.json` a été généré sans accès
-authentifié à GitHub Packages — l'entrée `@mister-guiiug/dev-wpa-config` est
+authentifié à GitHub Packages — l'entrée `@mister-guiiug/dev-pwa-config` est
 volontairement sans `resolved`/`integrity` (`npm ci` fonctionne). Premier
 contributeur : lancer `npm install` avec un accès au registre, committer le
 lockfile complété, puis passer `verify-lockfile: true` dans `ci.yml`.
@@ -149,7 +149,7 @@ exigé avant chaque publication. Détails : [docs/MIRRORING.md](./docs/MIRRORING
 ```bash
 npm i -D husky @commitlint/cli @commitlint/config-conventional lint-staged
 npx husky init
-# puis copier dev-wpa-config/templates/husky/{pre-commit,commit-msg}
+# puis copier dev-pwa-config/templates/husky/{pre-commit,commit-msg}
 ```
 
 ## Restes à faire connus

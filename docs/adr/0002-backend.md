@@ -6,9 +6,9 @@ Statut : accepté · Date : 2026-08-21
 
 Le cahier des charges impose des comptes, des rôles, de la modération, du
 stockage de photos et une autorité serveur (aucune confiance dans le client).
-La stack famille (dev-wpa-config) documente déjà Supabase comme backend de
+La stack famille (dev-pwa-config) documente déjà Supabase comme backend de
 référence (miss-carbook, mister-doc, mister-footcoach, miss-supaboss…) avec
-outillage partagé (composite action `supabase-migrate@v3`, keep-alive Free).
+outillage partagé (composite action `supabase-migrate@v4`, keep-alive Free).
 
 ## Comparaison factuelle
 

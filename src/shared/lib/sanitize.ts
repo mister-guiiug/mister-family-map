@@ -20,4 +20,4 @@ export {
   isSafeHttpUrl,
   sanitizeSingleLine,
   sanitizeUserText,
-} from '@mister-guiiug/dev-wpa-config/security';
+} from '@mister-guiiug/dev-pwa-config/security';
