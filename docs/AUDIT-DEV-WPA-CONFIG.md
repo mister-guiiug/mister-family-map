@@ -1,11 +1,17 @@
 # AUDIT DE COMPATIBILITÉ DEV-WPA-CONFIG
 
-Audit réalisé le 2026-08-21 sur l'état du dépôt `mister-guiiug/dev-pwa-config`
+Audit réalisé le 2026-08-21 sur l'état du dépôt `mister-guiiug/dev-wpa-config`
 (source de vérité : `package.json` + exports réellement présents).
+
+> **Le socle a été renommé depuis.** Il s'appelle `dev-pwa-config`
+> (paquet `@mister-guiiug/dev-pwa-config`, majeure **4.0.0**) depuis le
+> 05/09/2026 ; l'ancien nom reste publié en 3.34.0 et n'évolue plus. Ce
+> document garde le nom en vigueur à la date de l'audit : le réécrire lui
+> ferait affirmer ce qui était faux ce jour-là.
 
 ## Version du paquet partagé
 
-`@mister-guiiug/dev-pwa-config` **3.10.1** (npm.pkg.github.com, scope
+`@mister-guiiug/dev-wpa-config` **3.10.1** (npm.pkg.github.com, scope
 `@mister-guiiug`). Dépendance déclarée : `^3.10.1`.
 
 ## Exports réellement disponibles (tous vérifiés présents)
@@ -91,7 +97,7 @@ ESLint en 10.x en « latest » — le projet **respecte les ranges famille**
    registre exige une authentification même pour les paquets publics et le
    jeton de session (app installation) est refusé (401). Conséquence : le
    `package-lock.json` livré est complet et cohérent pour tout npmjs, mais
-   l'entrée `@mister-guiiug/dev-pwa-config` est **sans `resolved` ni
+   l'entrée `@mister-guiiug/dev-wpa-config` est **sans `resolved` ni
    `integrity`** (npm les complètera au premier `npm install` authentifié —
    `npm ci` fonctionne en l'état). Le caller CI passe `verify-lockfile: false`
    avec un TODO : régénérer le lock authentifié, committer, repasser à `true`.

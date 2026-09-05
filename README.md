@@ -5,7 +5,7 @@ d'événements et retours d'expérience **réellement utiles** (pas de descripti
 promotionnelles). PWA mobile-first, hors-ligne raisonné, privacy by design.
 
 > Squelette applicatif exécutable — construit sur les configurations partagées
-> [`@mister-guiiug/dev-pwa-config`](https://github.com/mister-guiiug/dev-pwa-config) v3.10.1.
+> [`@mister-guiiug/dev-pwa-config`](https://github.com/mister-guiiug/dev-pwa-config) v4.0.0.
 > Audit de compatibilité : [docs/AUDIT-DEV-WPA-CONFIG.md](./docs/AUDIT-DEV-WPA-CONFIG.md).
 
 ## Démarrage
