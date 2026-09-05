@@ -1,6 +1,7 @@
 {
   "name": "mister-family-map",
   "private": true,
+  "license": "MIT",
   "version": "0.1.0",
   "type": "module",
   "description": "Carte collaborative d'idées de sorties en famille : lieux, événements et retours d'expérience réellement utiles.",
