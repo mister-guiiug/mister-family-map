@@ -1,4 +1,6 @@
 # CI famille : délégué au reusable workflow pwa-ci.yml@v4 de dev-pwa-config
+with:
+  run-doctor: true # la checklist du parc, lue sur le dépôt et sur dist/ (AMELIORATIONS.md, T2)
 # (format · lint · type-check · test · build · verify-lockfile · E2E · audit).
 #
 # 💰 Coût zéro : ce workflow ne s'exécute QUE sur le dépôt PUBLIC
