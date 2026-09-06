@@ -13,7 +13,11 @@ règles transverses ; en cas d'écart, la migration fait foi.
 - **Traçabilité** : `author_id` posé par le serveur (`auth.uid()`),
   `moderation_actions` + `audit_logs` en append-only.
 - **Suppression logique** : `deleted_at` sur les contenus collaboratifs
-  (places, events, reviews) ; pas de politique DELETE en RLS.
+  (places, events, reviews) ; pas de politique DELETE en RLS. C'est un
+  `UPDATE`, donc la politique `…_update_own_or_mod` suffit ; et
+  `places_select_public` portant `or author_id = auth.uid()`, **l'auteur voit
+  déjà ses lignes supprimées** — la corbeille de « Mes contributions » et sa
+  restauration n'ont demandé aucune politique nouvelle (ADR-0005).
 - **Enfants** : aucune donnée nominative — uniquement des tranches d'âge
   anonymes (`age_brackets` texte, `age_min`/`age_max`).
 - **Coordonnées** : contraintes SQL `lat ∈ [-90,90]`, `lng ∈ [-180,180]`,

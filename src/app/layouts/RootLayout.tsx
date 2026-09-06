@@ -76,24 +76,29 @@ export function RootLayout() {
   const backend = useBackend();
   const initAuth = useAuthStore(s => s.init);
   const loadFavorites = useFavoritesStore(s => s.load);
+  const setFavoriteIds = useFavoritesStore(s => s.setIds);
 
   useEffect(() => {
     void initAuth(backend.auth);
     void loadFavorites(backend.favorites);
 
     // Deux onglets restent d'accord : quand l'autre annonce une mutation,
-    // celui-ci RECHARGE ses états globaux depuis le stockage partagé. Les
-    // listes chargées à la demande par les pages ne sont pas concernées —
+    // celui-ci pose la valeur PORTÉE PAR LE MESSAGE dans ses états globaux.
+    //
+    // Il RELISAIT le stockage partagé, et c'était faux : rien n'ordonne
+    // l'écriture de l'autre onglet et l'arrivée du message ici. Sondé, cet
+    // onglet lisait la clé ABSENTE au moment même où il traitait l'annonce —
+    // une fois sur deux (en-tête de `tab-sync.ts`, ADR-0007).
+    //
+    // Les listes chargées à la demande par les pages ne sont pas concernées —
     // elles relisent à la navigation.
-    return startTabSync(topic => {
-      if (topic === 'favorites') void loadFavorites(backend.favorites);
-      if (topic === 'session') {
-        void backend.auth.getSession().then(session => {
-          useAuthStore.getState().setSession(session);
-        });
+    return startTabSync(message => {
+      if (message.topic === 'favorites') setFavoriteIds(message.ids);
+      if (message.topic === 'session') {
+        useAuthStore.getState().setSession(message.session);
       }
     });
-  }, [backend, initAuth, loadFavorites]);
+  }, [backend, initAuth, loadFavorites, setFavoriteIds]);
 
   return (
     <div className="flex min-h-dvh flex-col">

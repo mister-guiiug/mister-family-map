@@ -73,8 +73,16 @@ helpers CSP/cache viennent de
 Décisions documentées : [ADR-0001 carte](./docs/adr/0001-map-provider.md) ·
 [ADR-0002 backend](./docs/adr/0002-backend.md) ·
 [ADR-0003 export ICS](./docs/adr/0003-export-calendrier.md) ·
+[ADR-0004 magasin versionné](./docs/adr/0004-magasin-versionne.md) ·
+[ADR-0005 annuler plutôt que confirmer](./docs/adr/0005-annuler-plutot-que-confirmer.md) ·
+[ADR-0006 export des contributions](./docs/adr/0006-export-des-contributions.md) ·
+[ADR-0007 le message porte la valeur](./docs/adr/0007-le-message-porte-la-valeur.md) ·
 [modèle de données](./docs/DATA-MODEL.md) ·
 [modèle de menaces](./docs/THREAT-MODEL.md).
+
+L'état local vit sous **une clé versionnée** (`mfm_data`), pas sous les neuf
+clés `mfm_*` d'avant : une évolution du modèle ne vide plus l'application, et
+la migration `0 → 1` relit les anciennes clés sans rien perdre (ADR-0004).
 
 ## Observabilité
 
@@ -104,6 +112,12 @@ d'Ariane joint aux erreurs.
   contrôlés, modération a priori.
 - CSP durcie à la build (hash SHA-256, hôtes explicites), aucun secret dans le
   code — la clé anon Supabase est publique par conception.
+- Portabilité : « Exporter mes contributions » (Profil) écrit un JSON de tout
+  ce que l'utilisateur a saisi, supprimé compris (ADR-0006) — c'est la
+  promesse de la page « Mentions », désormais tenue.
+- Suppression **logique** et réversible : « Annuler » huit secondes après le
+  geste, puis une corbeille dans « Mes contributions » (ADR-0005). Aucune
+  politique DELETE en base, aucune migration ajoutée.
 
 Détails, menaces et restes à faire : [docs/THREAT-MODEL.md](./docs/THREAT-MODEL.md).
 
@@ -155,6 +169,16 @@ npx husky init
 ## Restes à faire connus
 
 - Adaptateurs Supabase des ports restants (patron : `supabase-place-repository.ts`).
+  Un seul port sur onze est branché : en mode `supabase`, tout le reste — dont
+  les contributions saisies — vit encore dans le navigateur.
+- Restaurer un lieu **publié** depuis la corbeille le renvoie en file de
+  validation : le trigger `reset_place_status_on_author_update` repasse en
+  `pending` toute écriture d'un non-modérateur, `deleted_at` compris. L'exempter
+  demanderait une migration — à rouvrir avec les ports Supabase manquants
+  (ADR-0005).
+- Réimport du fichier d'export (l'export seul est promis par la page
+  « Mentions » ; `createVersionedStore` fournit déjà `import()` si le besoin
+  vient — ADR-0006).
 - Limitation de débit côté serveur avant ouverture publique (cf. THREAT-MODEL).
 - Icônes définitives (les icônes actuelles sont un pictogramme provisoire).
 - Textes légaux définitifs (pages actuelles marquées « provisoires »).

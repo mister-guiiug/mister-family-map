@@ -34,6 +34,16 @@ export interface PlaceQuery {
   /** Statuts demandés — par défaut, seuls les lieux publiés sont servis. */
   statuses?: readonly PublicationStatus[];
   authorId?: string;
+  /**
+   * Servir AUSSI les contributions supprimées (`deletedAt` non nul).
+   *
+   * Par défaut `false` : la carte, l'agenda et les fiches ne montrent jamais
+   * ce qui a été supprimé. Le seul écran qui passe `true` est la corbeille de
+   * « Mes contributions » — la suppression étant LOGIQUE, la donnée est
+   * toujours là, et la cacher à son propre auteur serait la lui faire perdre
+   * pour de bon.
+   */
+  includeDeleted?: boolean;
 }
 
 export interface PlaceRepository {
@@ -63,6 +73,19 @@ export interface PlaceRepository {
     draft: PlaceDraft,
     note: string
   ): Promise<void>;
+  /**
+   * Suppression LOGIQUE par l'auteur : pose `deletedAt`, ne détruit rien.
+   *
+   * POURQUOI CE PORT EXISTE. Le modèle porte `deletedAt` depuis le premier
+   * jour, les lectures le filtrent partout, la base n'a AUCUNE politique
+   * DELETE — et pourtant rien, nulle part, ne le posait : l'auteur d'un lieu
+   * saisi par erreur n'avait aucun moyen de le retirer. Le mécanisme existait
+   * sans son geste. Réversible par `restoreOwn` (cf.
+   * docs/adr/0005-annuler-plutot-que-confirmer.md).
+   */
+  deleteOwn(id: string): Promise<void>;
+  /** Remet en ligne une contribution supprimée par son auteur. */
+  restoreOwn(id: string): Promise<void>;
 }
 
 export interface EventQuery {
@@ -71,6 +94,8 @@ export interface EventQuery {
   statuses?: readonly FamilyEvent['status'][];
   placeId?: string;
   authorId?: string;
+  /** Cf. `PlaceQuery.includeDeleted` — la corbeille, et elle seule. */
+  includeDeleted?: boolean;
 }
 
 export interface EventRepository {
@@ -78,13 +103,22 @@ export interface EventRepository {
   getById(id: string): Promise<FamilyEvent | null>;
   create(draft: EventDraft): Promise<FamilyEvent>;
   updateOwn(id: string, draft: EventDraft): Promise<FamilyEvent>;
+  /** Suppression logique par l'auteur — cf. `PlaceRepository.deleteOwn`. */
+  deleteOwn(id: string): Promise<void>;
+  restoreOwn(id: string): Promise<void>;
 }
 
 export interface ReviewRepository {
   listForPlace(placeId: string): Promise<Review[]>;
-  listByAuthor(authorId: string): Promise<Review[]>;
+  listByAuthor(
+    authorId: string,
+    options?: { includeDeleted?: boolean }
+  ): Promise<Review[]>;
   create(draft: ReviewDraft): Promise<Review>;
   updateOwn(id: string, draft: ReviewDraft): Promise<Review>;
+  /** Suppression logique par l'auteur — cf. `PlaceRepository.deleteOwn`. */
+  deleteOwn(id: string): Promise<void>;
+  restoreOwn(id: string): Promise<void>;
 }
 
 export interface CategoryRepository {

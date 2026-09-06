@@ -46,6 +46,20 @@ export default function LegalPage() {
               supprimer votre compte et exporter vos contributions depuis le
               profil.
             </li>
+            {/*
+              CE QUE CETTE PAGE NE DISAIT PAS. Supprimer une contribution la
+              retire de la carte mais ne l'efface pas : c'est ce qui rend la
+              corbeille et « Annuler » possibles (ADR-0005). Un utilisateur qui
+              croit avoir effacé une donnée conservée n'a pas été informé — et
+              c'est exactement le genre d'écart entre la page et le
+              comportement réel que ce chantier corrige, pas qu'il crée.
+            */}
+            <li>
+              Supprimer une contribution la retire de la carte et de l’agenda,
+              mais la conserve : vous pouvez la restaurer depuis « Mes
+              contributions ». Supprimer votre compte retire votre accès et
+              anonymise vos contributions publiées — il ne les efface pas.
+            </li>
             <li>
               Durées de conservation, sous-traitants et bases légales seront
               détaillés ici (cf. docs/THREAT-MODEL.md du projet).

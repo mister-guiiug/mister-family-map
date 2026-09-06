@@ -7,11 +7,13 @@ import {
 } from '@mister-guiiug/dev-pwa-config/react';
 import { AppVersion } from '@mister-guiiug/dev-pwa-config/react/app-version';
 import { ShareButton } from '@mister-guiiug/dev-pwa-config/react/share-button';
+import { ThemeToggle } from '@mister-guiiug/dev-pwa-config/react/theme-toggle';
 import { useBackend } from '../app/providers/BackendProvider';
 import { useAuthStore, useCurrentRole } from '../features/auth/store';
 import { ROLE_LABELS } from '../entities/user/model';
 import { can } from '../entities/user/permissions';
 import { PageHeader } from '../shared/components/PageHeader';
+import { ExportContributionsButton } from '../features/contributions/ExportContributionsButton';
 
 export default function ProfilePage() {
   const backend = useBackend();
@@ -46,6 +48,22 @@ export default function ProfilePage() {
                 </Link>
               ) : null}
             </nav>
+
+            {/*
+              LA PROMESSE DE LA PAGE « MENTIONS », TENUE. Elle dit depuis le
+              premier jour : « Vous pouvez supprimer votre compte et exporter
+              vos contributions depuis le profil. » La suppression était là,
+              l'export nulle part. Il est ici, à côté d'elle : les deux moitiés
+              d'une même phrase, au même endroit — et l'ordre compte, on
+              emporte ses données AVANT de fermer son compte.
+            */}
+            <div className="flex flex-wrap gap-2">
+              <ExportContributionsButton session={session} />
+            </div>
+            <p className="-mt-2 text-fluid-sm text-ink-soft">
+              Un fichier JSON : vos lieux, vos événements, vos retours et vos
+              favoris, y compris ce que vous avez supprimé.
+            </p>
 
             <div className="flex flex-wrap gap-2">
               <Button
@@ -83,6 +101,34 @@ export default function ProfilePage() {
             </Button>
           </>
         )}
+
+        {/*
+          LA BASCULE DE THÈME, ENFIN ATTEIGNABLE. Les jetons sombres existaient
+          dans `styles/index.css` et le script anti-FOUC d'`index.html` lisait
+          déjà `dwc_theme` — mais aucun écran n'écrivait cette clé : lire la
+          carte le soir supposait de basculer TOUT le système d'exploitation.
+          Trois états, pas deux : « Système » reste le défaut, et c'est lui qui
+          suit le coucher du soleil sans qu'on y pense.
+
+          Hors du bloc `session` : le thème n'a rien à voir avec le fait
+          d'avoir un compte, et un visiteur consulte la carte le soir comme un
+          autre.
+        */}
+        <section
+          aria-label="Apparence"
+          className="mt-4 border-t border-line pt-4"
+        >
+          <h2 className="text-fluid-lg font-semibold">Apparence</h2>
+          <div className="mt-2 flex items-center justify-between gap-2">
+            <p className="text-fluid-sm text-ink-soft">
+              Clair, sombre, ou selon votre appareil.
+            </p>
+            <ThemeToggle
+              className="touch-target rounded-(--radius-card) border border-line px-fluid-sm py-2 text-fluid-sm"
+              showLabel
+            />
+          </div>
+        </section>
 
         <section
           aria-label="À propos"

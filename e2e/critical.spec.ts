@@ -1,8 +1,10 @@
+import { readFile } from 'node:fs/promises';
 import { expect, test, type Page } from '@playwright/test';
 import {
   dumpAppState,
   rethrowWithState,
 } from '@mister-guiiug/dev-pwa-config/playwright-base';
+import type { ContributionsExport } from '../src/features/contributions/export';
 
 /**
  * Parcours E2E critiques (tag @critical — exécutés par la CI sur Chromium).
@@ -321,4 +323,156 @@ test('@critical deux onglets restent d’accord sur les favoris', async ({
     .first()
     .click();
   await expect(favoris.getByText('Aucun favori pour l’instant')).toBeVisible();
+});
+
+/* ── Ce que la page « Mentions » promet, et ce qu'un regret coûte ────────── */
+
+test('@critical un membre exporte ses contributions, et le fichier les contient', async ({
+  page,
+}) => {
+  // La promesse écrite en page « Mentions » : « Vous pouvez supprimer votre
+  // compte et exporter vos contributions depuis le profil. » Ce parcours est
+  // la seule chose qui la vérifie de bout en bout : un test unitaire prouve le
+  // CONTENU du fichier, pas qu'un fichier sorte du navigateur.
+  await signIn(page, 'famille@exemple.fr');
+
+  // Une contribution repérable, pour que le fichier ait quelque chose à dire.
+  await page.goto('/agenda/nouveau');
+  await page.getByLabel('Titre').fill('Atelier cerfs-volants');
+  await page
+    .getByLabel('Catégorie')
+    .selectOption({ label: 'Événement ponctuel' });
+  await page.getByLabel('Début').fill('2027-06-12T14:00');
+  await page.getByRole('button', { name: 'Envoyer la proposition' }).click();
+  await expect(
+    page.getByRole('heading', { level: 1, name: 'Atelier cerfs-volants' })
+  ).toBeVisible();
+
+  await page.goto('/profil');
+  const telechargement = page.waitForEvent('download');
+  await page
+    .getByRole('button', { name: 'Exporter mes contributions' })
+    .click();
+  const fichier = await telechargement;
+
+  // Le nom porte la date du jour — on n'affirme que la forme, la date étant
+  // celle de la machine qui joue le test.
+  expect(fichier.suggestedFilename()).toMatch(
+    /^mister-family-map-contributions-\d{4}-\d{2}-\d{2}\.json$/
+  );
+
+  // Et le fichier est du JSON qui contient bien la contribution.
+  const chemin = await fichier.path();
+  const contenu = JSON.parse(
+    await readFile(chemin, 'utf8')
+  ) as ContributionsExport;
+  expect(contenu.app).toBe('mister-family-map');
+  expect(contenu.events.map(e => e.title)).toContain('Atelier cerfs-volants');
+});
+
+test('@critical supprimer une contribution, l’annuler, la retrouver', async ({
+  page,
+}) => {
+  await signIn(page, 'famille@exemple.fr');
+  await page.goto('/agenda/nouveau');
+  await page.getByLabel('Titre').fill('Balade contée au crépuscule');
+  await page
+    .getByLabel('Catégorie')
+    .selectOption({ label: 'Événement ponctuel' });
+  await page.getByLabel('Début').fill('2027-07-03T20:00');
+  await page.getByRole('button', { name: 'Envoyer la proposition' }).click();
+
+  await page.goto('/profil/contributions');
+  const ligne = page.getByRole('link', {
+    name: 'Balade contée au crépuscule',
+  });
+  await expect(ligne).toBeVisible();
+
+  // 1. Supprimer : la ligne part, ET l'annulation est proposée — sans qu'aucun
+  //    dialogue de confirmation n'ait été affiché avant le geste.
+  await page
+    .getByRole('button', { name: 'Supprimer l’événement Balade contée' })
+    .click();
+  await expect(ligne).toBeHidden();
+  const annuler = page.getByRole('button', { name: 'Annuler' });
+  await expect(annuler).toBeVisible();
+
+  // 2. Annuler : la contribution revient.
+  await annuler.click();
+  await expect(ligne).toBeVisible();
+});
+
+test('@critical supprimer sans annuler : la corbeille rattrape, et restaure', async ({
+  page,
+}) => {
+  // Le second filet, celui qui compte quand la notification est passée
+  // inaperçue — téléphone rangé, onglet fermé, regret du lendemain.
+  await signIn(page, 'famille@exemple.fr');
+  await page.goto('/agenda/nouveau');
+  await page.getByLabel('Titre').fill('Pique-nique des voisins');
+  await page
+    .getByLabel('Catégorie')
+    .selectOption({ label: 'Événement ponctuel' });
+  await page.getByLabel('Début').fill('2027-08-21T12:00');
+  await page.getByRole('button', { name: 'Envoyer la proposition' }).click();
+
+  await page.goto('/profil/contributions');
+  // La corbeille n'existe pas tant qu'elle est vide : c'est délibéré, une
+  // section vide en permanence s'apprend à ne plus être regardée.
+  await expect(page.getByRole('region', { name: 'Corbeille' })).toBeHidden();
+
+  await page
+    .getByRole('button', { name: 'Supprimer l’événement Pique-nique' })
+    .click();
+
+  // On IGNORE la notification et on recharge : le délai de huit secondes est
+  // passé, du point de vue de l'utilisateur la suppression est acquise.
+  await page.reload();
+  const corbeille = page.getByRole('region', { name: 'Corbeille' });
+  await expect(corbeille).toBeVisible();
+  await expect(corbeille.getByText('Pique-nique des voisins')).toBeVisible();
+
+  await corbeille
+    .getByRole('button', { name: 'Restaurer Pique-nique des voisins' })
+    .click();
+
+  // Restauré : de retour dans la liste, et la corbeille redevient invisible.
+  await expect(
+    page.getByRole('link', { name: 'Pique-nique des voisins' })
+  ).toBeVisible();
+  await expect(corbeille).toBeHidden();
+});
+
+test('@critical la carte se lit la nuit : la bascule de thème agit', async ({
+  page,
+}) => {
+  // Les jetons `[data-theme='dark']` étaient dans le CSS depuis le premier
+  // jour, sans aucun fournisseur monté : personne ne pouvait les atteindre.
+  //
+  // Ce test lit des ATTRIBUTS (`data-theme`, `data-theme-state`) et non le
+  // libellé du bouton : ce libellé vient des traductions du socle, et Chromium
+  // se présente en `en-US` — une assertion sur « Thème sombre » échouerait
+  // ici pour une raison qui n'a rien à voir avec le thème.
+  await page.goto('/profil');
+  const bascule = page.locator('[data-dwc="theme-toggle"]');
+  await expect(bascule).toBeVisible();
+
+  const racine = page.locator('html');
+  // Trois états, `system` en tête : c'est lui le défaut, et c'est lui qui suit
+  // le coucher du soleil sans qu'on y pense.
+  await expect(bascule).toHaveAttribute('data-theme-state', 'system');
+
+  await bascule.click();
+  await expect(bascule).toHaveAttribute('data-theme-state', 'light');
+  await expect(racine).toHaveAttribute('data-theme', 'light');
+
+  await bascule.click();
+  await expect(bascule).toHaveAttribute('data-theme-state', 'dark');
+  await expect(racine).toHaveAttribute('data-theme', 'dark');
+
+  // Et le choix TIENT au rechargement — c'est le script anti-FOUC
+  // d'`index.html` qui relit `dwc_theme`, écrite pour la première fois par ce
+  // fournisseur.
+  await page.reload();
+  await expect(racine).toHaveAttribute('data-theme', 'dark');
 });

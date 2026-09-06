@@ -119,7 +119,10 @@ export function createSupabasePlaceRepository(
     // attente. L'IHM le lit pour prévenir AVANT le clic (cf. ports.ts).
     requiresNetwork: true,
     async list(query: PlaceQuery = {}) {
-      let req = client.from('places').select('*').is('deleted_at', null);
+      let req = client.from('places').select('*');
+      // `places_select_public` laisse l'auteur voir SES lignes supprimées :
+      // la corbeille n'a donc besoin d'aucune politique nouvelle.
+      if (!query.includeDeleted) req = req.is('deleted_at', null);
       const statuses = query.statuses ?? ['published'];
       req = req.in('status', [...statuses]);
       if (query.authorId) req = req.eq('author_id', query.authorId);
@@ -175,6 +178,37 @@ export function createSupabasePlaceRepository(
         payload: draft,
         note,
       });
+      if (error) throw new Error(error.message);
+    },
+
+    /**
+     * Suppression LOGIQUE : un UPDATE de `deleted_at`, jamais un DELETE — la
+     * table n'a aucune politique DELETE, et c'est voulu (0001_initial_schema :
+     * « Pas de DELETE : suppression logique »). La politique
+     * `places_update_own_or_mod` suffit donc, sans migration.
+     *
+     * CONSÉQUENCE À CONNAÎTRE. Le déclencheur
+     * `reset_place_status_on_author_update` repasse en `pending` TOUTE mise à
+     * jour faite par un non-modérateur. Supprimer puis restaurer un lieu
+     * publié le renvoie donc en file de validation. C'est une décision du
+     * serveur, pas de l'IHM : la changer demanderait une migration qui
+     * exempte les écritures ne touchant que `deleted_at`, et le backend
+     * Supabase n'a encore qu'un port sur onze branché
+     * (docs/adr/0005-annuler-plutot-que-confirmer.md).
+     */
+    async deleteOwn(id) {
+      const { error } = await client
+        .from('places')
+        .update({ deleted_at: new Date().toISOString() })
+        .eq('id', id);
+      if (error) throw new Error(error.message);
+    },
+
+    async restoreOwn(id) {
+      const { error } = await client
+        .from('places')
+        .update({ deleted_at: null })
+        .eq('id', id);
       if (error) throw new Error(error.message);
     },
   };
