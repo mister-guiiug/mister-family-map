@@ -1,6 +1,4 @@
 # CI famille : délégué au reusable workflow pwa-ci.yml@v4 de dev-pwa-config
-with:
-  run-doctor: true # la checklist du parc, lue sur le dépôt et sur dist/ (AMELIORATIONS.md, T2)
 # (format · lint · type-check · test · build · verify-lockfile · E2E · audit).
 #
 # 💰 Coût zéro : ce workflow ne s'exécute QUE sur le dépôt PUBLIC
@@ -38,8 +36,13 @@ jobs:
       # authentifié). Étapes : `npm install` en local, committer le lockfile
       # mis à jour, puis repasser verify-lockfile à true.
       verify-lockfile: false
+      # La checklist du parc, lue sur le dépôt et sur dist/ (AMELIORATIONS.md, T2).
+      run-doctor: true
       # Audit SCA des dépendances de production (seuil : high).
       run-npm-audit: true
-      # E2E critiques (Chromium). Les specs sont taguées @critical.
+      # E2E (Chromium). Le filtre doit couvrir TOUTES les specs du dossier :
+      # Playwright rend « No tests found » avec un code 0 pour une spec qu'il
+      # ignore. `@critical` seul écartait `e2e/a11y.spec.ts` (axe-core sur
+      # chaque route), jamais jouée depuis son ajout.
       run-e2e: true
-      e2e-grep: '@critical'
+      e2e-grep: '@critical|@a11y'
