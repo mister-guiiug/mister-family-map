@@ -31,6 +31,10 @@ export default defineConfig(({ command }) => ({
       // le mode sombre dès le premier rendu (relevé du 02/09/2026 : 5 apps sur 16).
       themeColor: { light: '#fefcf6', dark: '#161c18' },
       siteName: 'Mister Family Map',
+      // Sans `logoPath`, le plugin ne calcule pas `logoUrl` et n'écrit donc
+      // aucun `og:image` : un lien partagé sort sans vignette. Relevé par
+      // probe-sites le 07/09/2026 — seule app du parc dans ce cas.
+      logoPath: '/icon-192.png',
     }),
     // La version du package.json arrive dans le bundle, sur
     // `globalThis.__DWC_BUILD__` dans le `<head>`, et dans `dist/version.json`.
@@ -85,6 +89,27 @@ export default defineConfig(({ command }) => ({
             sizes: '512x512',
             type: 'image/png',
             purpose: 'maskable',
+          },
+        ],
+        // Sans ces captures, Chrome propose une installation minimale — une
+        // ligne et un bouton ; avec, il ouvre une fiche qui montre l'app.
+        // Prises par `pwa-screenshots` sur le site publié, aux deux tailles
+        // que Chrome attend pour ne pas recadrer. Cette app écrit son
+        // manifeste à la main : `pwaBaseOptions` les déclarerait seul.
+        screenshots: [
+          {
+            src: 'screenshots/narrow.png',
+            sizes: '540x1170',
+            type: 'image/png',
+            form_factor: 'narrow',
+            label: 'L’application, sur téléphone',
+          },
+          {
+            src: 'screenshots/wide.png',
+            sizes: '1280x720',
+            type: 'image/png',
+            form_factor: 'wide',
+            label: 'L’application, sur ordinateur',
           },
         ],
       },
