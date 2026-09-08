@@ -66,8 +66,8 @@ export default defineConfig(({ command }) => ({
       includeAssets: ['favicon.svg', 'icon-*.png'],
       manifest: {
         id: process.env.VITE_BASE_PATH ?? '/',
-        name: 'Mister Family Map',
-        short_name: 'FamilyMap',
+        name: 'Mister FamilyMap',
+        short_name: 'Mister FamilyMap',
         description:
           'Idées de sorties en famille : carte collaborative, agenda et retours d’expérience.',
         lang: 'fr',
