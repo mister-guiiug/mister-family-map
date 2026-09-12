@@ -1,13 +1,12 @@
 # Synchronisation TIRÉE depuis le dépôt privé elowner-ax/bac-sable.
 #
 # Ce workflow s'exécute sur le dépôt PUBLIC mister-guiiug/mister-family-map
-# (minutes Actions gratuites et illimitées) : il récupère la branche main du
-# dépôt privé et la publie à l'identique sur le dépôt public, avec les tags
-# v* atteignables depuis main. Déclenchement MANUEL uniquement (bouton
-# « Run workflow » sur le dépôt public, ou API workflow_dispatch).
+# (minutes Actions gratuites et illimitées) : il récupère une branche du dépôt
+# privé et la publie à l'identique sur le dépôt public, avec les tags v*
+# atteignables depuis elle. Déclenchement MANUEL uniquement.
 #
-# C'est l'alternative « sans terminal » à `npm run mirror` : tout se pilote
-# depuis l'interface web GitHub. Les deux mécanismes coexistent sans conflit.
+# C'est l'alternative « sans terminal » à `npm run mirror`. Les deux
+# mécanismes coexistent sans conflit.
 #
 # Secret requis (sur le dépôt PUBLIC : Settings → Secrets and variables →
 # Actions) : PRIVATE_READ_TOKEN — PAT **classique** (scope `repo`) d'un compte
@@ -15,12 +14,33 @@
 # pas : elowner-ax est un compte personnel tiers, hors de son périmètre.)
 # Le workflow ne pousse jamais vers le dépôt privé.
 #
+# DEUX GARDES, parce que la publication est un `push --force` :
+#
+#   1. La branche source n'est plus codée en dur. Elle était fixée à `main`,
+#      alors que la branche PAR DÉFAUT du dépôt privé est
+#      `claude/mister-family-map-skeleton-mvd0kt` : le workflow publiait donc
+#      une branche qui n'est pas celle où l'on travaille.
+#   2. Il refuse de publier quand le miroir porte des commits que la source
+#      n'a pas. Sans cette garde, un simple « Run workflow » aurait effacé
+#      les 8 commits accumulés sur le public depuis le 06/09/2026 — le
+#      développement est passé du privé au public sans que le miroir suive.
+#      `forcer` lève la garde, en connaissance de cause.
+#
 # Ce fichier est versionné dans le dépôt privé pour SURVIVRE aux
-# synchronisations (chaque sync remplace le main public par le main privé).
+# synchronisations (chaque sync remplace la branche publique par la privée).
 name: Sync depuis le dépôt privé
 
 on:
   workflow_dispatch:
+    inputs:
+      branche:
+        description: 'Branche du dépôt privé à publier (vide = sa branche par défaut)'
+        required: false
+        default: ''
+      forcer:
+        description: 'Publier même si le miroir porte des commits absents de la source (DESTRUCTIF)'
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -50,20 +70,95 @@ jobs:
           # persist-credentials (défaut) : le push vers origin utilise le
           # GITHUB_TOKEN du job (permissions contents: write ci-dessus).
 
-      - name: Publier main et les tags v* du dépôt privé
+      - name: Résoudre les deux branches
+        id: source
         env:
           TOKEN: ${{ secrets.PRIVATE_READ_TOKEN }}
+          DEMANDEE: ${{ inputs.branche }}
+          DEFAUT_PUBLIC: ${{ github.event.repository.default_branch }}
         run: |
           set -euo pipefail
+          # repli : ne pas parier sur la présence de `repository` dans la
+          # charge d'un workflow_dispatch — la branche courante fait l'affaire
+          PUBLIQUE="${DEFAUT_PUBLIC:-}"
+          if [ -z "$PUBLIQUE" ]; then PUBLIQUE=$(git rev-parse --abbrev-ref HEAD); fi
+          echo "Branche publique visée : $PUBLIQUE"
+          echo "publique=$PUBLIQUE" >> "$GITHUB_OUTPUT"
+          if [ -n "$DEMANDEE" ]; then
+            BRANCHE="$DEMANDEE"
+            echo "Branche demandée explicitement : $BRANCHE"
+          else
+            # la branche par défaut du privé, lue à l'exécution : la coder en
+            # dur avait fait publier `main` alors que le travail est ailleurs.
+            # `gh` est préinstallé sur les runners — plus sûr qu'un JSON
+            # découpé à la sed, qui irait chercher le mauvais `default_branch`
+            # si la réponse en contenait un imbriqué.
+            BRANCHE=$(GH_TOKEN="$TOKEN" gh api repos/elowner-ax/bac-sable --jq .default_branch)
+            if [ -z "$BRANCHE" ]; then
+              echo "::error::Impossible de lire la branche par défaut de elowner-ax/bac-sable — jeton invalide ou sans accès ?"
+              exit 1
+            fi
+            echo "Branche par défaut du dépôt privé : $BRANCHE"
+          fi
+          echo "branche=$BRANCHE" >> "$GITHUB_OUTPUT"
+
+      - name: Récupérer la source
+        env:
+          TOKEN: ${{ secrets.PRIVATE_READ_TOKEN }}
+          BRANCHE: ${{ steps.source.outputs.branche }}
+        run: |
+          set -uo pipefail
           PRIVATE_URL="https://x-access-token:${TOKEN}@github.com/elowner-ax/bac-sable.git"
-          git fetch "$PRIVATE_URL" \
-            "+refs/heads/main:refs/remotes/private/main" \
-            "+refs/tags/v*:refs/tags/v*"
-          git push --force origin refs/remotes/private/main:refs/heads/main
-          # Tags v* atteignables depuis main uniquement — jamais une autre branche.
+          if ! git fetch "$PRIVATE_URL" \
+            "+refs/heads/${BRANCHE}:refs/remotes/private/source" \
+            "+refs/tags/v*:refs/tags/v*" 2> /tmp/fetch.err; then
+            cat /tmp/fetch.err
+            # L'étape précédente a LU le dépôt via l'API : le jeton porte donc
+            # la permission « Metadata ». Si git répond quand même « Repository
+            # not found », il lui manque « Contents » — c'est la signature d'un
+            # PAT fine-grained, que ce workflow ne peut pas utiliser (voir
+            # l'en-tête : elowner-ax est un compte personnel tiers).
+            if grep -qi "not found" /tmp/fetch.err; then
+              echo "::error::PRIVATE_READ_TOKEN lit les métadonnées du dépôt privé (l'API a répondu) mais pas son CONTENU (git répond « Repository not found »). C'est la signature d'un PAT fine-grained, ou d'un PAT classique sans le scope 'repo'. Remplacer le secret par un PAT CLASSIQUE avec le scope 'repo' complet."
+            else
+              echo "::error::Échec de la récupération depuis elowner-ax/bac-sable — voir le message de git ci-dessus."
+            fi
+            exit 1
+          fi
+          echo "Source : $(git rev-parse --short refs/remotes/private/source) — $(git log -1 --format=%s refs/remotes/private/source)"
+
+      - name: Refuser une publication qui effacerait du travail
+        env:
+          FORCER: ${{ inputs.forcer }}
+          PUBLIQUE: ${{ steps.source.outputs.publique }}
+        run: |
+          set -euo pipefail
+          PERDUS=$(git rev-list --count "refs/remotes/private/source..origin/${PUBLIQUE}")
+          APPORTES=$(git rev-list --count "origin/${PUBLIQUE}..refs/remotes/private/source")
+          echo "Le miroir apporterait $APPORTES commit(s) et en perdrait $PERDUS."
+          if [ "$PERDUS" -eq 0 ]; then
+            echo "::notice::Publication sans perte : le miroir est un ancêtre de la source."
+            exit 0
+          fi
+          echo "Commits présents sur le miroir et ABSENTS de la source :"
+          git log --oneline "refs/remotes/private/source..origin/${PUBLIQUE}"
+          if [ "$FORCER" = "true" ]; then
+            echo "::warning::$PERDUS commit(s) du miroir vont être effacés — forcer=true assumé."
+            exit 0
+          fi
+          echo "::error::Publication refusée — elle effacerait $PERDUS commit(s) du miroir. Reporter d'abord ce travail dans le dépôt privé, ou relancer avec forcer=true en connaissance de cause."
+          exit 1
+
+      - name: Publier la branche et les tags v*
+        env:
+          PUBLIQUE: ${{ steps.source.outputs.publique }}
+        run: |
+          set -euo pipefail
+          git push --force origin "refs/remotes/private/source:refs/heads/${PUBLIQUE}"
+          # Tags v* atteignables depuis la source uniquement — jamais une autre branche.
           for tag in $(git tag --list 'v*'); do
-            if git merge-base --is-ancestor "refs/tags/$tag" refs/remotes/private/main; then
+            if git merge-base --is-ancestor "refs/tags/$tag" refs/remotes/private/source; then
               git push --force origin "refs/tags/$tag:refs/tags/$tag"
             fi
           done
-          echo "✔ Publié : $(git rev-parse refs/remotes/private/main)"
+          echo "✔ Publié : $(git rev-parse refs/remotes/private/source)"
