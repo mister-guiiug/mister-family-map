@@ -22,7 +22,8 @@
     "test:e2e": "playwright test",
     "test:e2e:critical": "playwright test --grep @critical",
     "test:e2e:a11y": "playwright test --grep @a11y",
-    "icons": "pwa-icons --source public/favicon.svg --out public --maskable",
+    "icons": "pwa-icons --source public/favicon.svg --out public",
+    "icons:maskable": "node scripts/generate-maskable.mjs",
     "verify": "npm run format:check && npm run lint && npm run type-check && npm run test && npm run build",
     "mirror": "node scripts/mirror.mjs",
     "mirror:snapshot": "node scripts/mirror.mjs --mode snapshot"
@@ -43,7 +44,7 @@
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",
     "@eslint/js": "^9.39.4",
-    "@mister-guiiug/dev-pwa-config": "^4.3.1",
+    "@mister-guiiug/dev-pwa-config": "^4.7.0",
     "@playwright/test": "^1.62.1",
     "@tailwindcss/vite": "^4.3.3",
     "@testing-library/jest-dom": "^6.0.0",
