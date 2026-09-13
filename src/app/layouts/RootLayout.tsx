@@ -113,7 +113,11 @@ export function RootLayout() {
         module `virtual:pwa-register` n'existe que dans un build Vite, d'où
         l'injection plutôt qu'un import en dur côté paquet.
       */}
-      <UpdatePromptBanner registerSW={registerSW} snoozeHours={6} />
+      <UpdatePromptBanner
+        checkEvery="1h"
+        registerSW={registerSW}
+        snoozeHours={6}
+      />
 
       {/*
         LE DÉFAUT CORRIGÉ ICI. Le bandeau précédent lisait `useOnline` SANS
