@@ -20,6 +20,12 @@
 #      alors que la branche PAR DÉFAUT du dépôt privé est
 #      `claude/mister-family-map-skeleton-mvd0kt` : le workflow publiait donc
 #      une branche qui n'est pas celle où l'on travaille.
+#      `scripts/mirror.mjs` faisait la MÊME erreur, et personne ne l'avait vu
+#      parce que c'est la voie manuelle qui sert vraiment (ce workflow étant
+#      en panne de jeton). Corrigé le 13/09/2026 après trois semaines de
+#      dérive — 27 paquets de retard sur le miroir public. Les deux lisent
+#      désormais la branche par défaut à l'exécution : peu importe laquelle
+#      c'est, et peu importe si elle change.
 #   2. Il refuse de publier quand le miroir porte des commits que la source
 #      n'a pas. Sans cette garde, un simple « Run workflow » aurait effacé
 #      les 8 commits accumulés sur le public depuis le 06/09/2026 — le

@@ -47,12 +47,25 @@ npm run mirror -- --remote git@github.com:mister-guiiug/mister-family-map.git
 
 Le script (`scripts/mirror.mjs`, Node ≥ 22, zéro dépendance) :
 
-- refuse un arbre de travail sale, un `main` en retard sur `origin/main`, un
-  tag non `v*` ou non atteignable depuis `main` ;
+- publie la **branche par défaut de ce dépôt**, lue à l'exécution, vers la
+  branche `main` du miroir public ;
+- refuse un arbre de travail sale, une branche source en retard sur son
+  `origin/`, un tag non `v*` ou non atteignable depuis elle ;
+- **refuse de publier quand le miroir porte des commits que la source n'a
+  pas** : il les compte, les LISTE et s'arrête (`--forcer` lève la garde, en
+  connaissance de cause) ;
 - exécute **`npm run verify`** (format · lint · types · tests · build) avant
   tout push — c'est le portail qualité qui remplace la CI privée
   (`--skip-verify` existe mais est déconseillé) ;
-- ne pousse **que** `main` (et le tag demandé), jamais une autre branche.
+- ne pousse **que** cette branche (et le tag demandé), jamais une autre.
+
+> **La branche source n'est plus `main` codé en dur.** Elle l'a été, et ça a
+> coûté trois semaines de dérive : la branche par défaut de ce dépôt n'est pas
+> `main`, les PR atterrissaient donc ailleurs, `main` ne bougeait plus, et le
+> miroir public publiait fidèlement une branche morte — **27 paquets de retard**
+> sans que rien ne le signale. `sync-from-private.yml` lisait déjà la branche
+> par défaut à l'exécution ; le script fait désormais pareil, et les deux
+> mécanismes désignent enfin la même chose.
 
 Chaque publication sur le `main` public déclenche gratuitement, côté public :
 la CI complète (dont E2E `@critical`), Lighthouse, et le déploiement Pages →
@@ -112,11 +125,15 @@ gh release create vX.Y.Z --repo mister-guiiug/mister-family-map --generate-notes
 ## Limites connues
 
 - La synchronisation est **manuelle par conception** (c'est ce qui la rend
-  gratuite) : penser à `npm run mirror` après un merge sur `main`. Un oubli ne
-  casse rien — le public est simplement en retard.
-- En mode `mirror`, une réécriture d'historique du `main` privé est propagée
-  au public (push `--force`) — comportement de miroir assumé ; les clones
-  publics existants devront se rebaser.
+  gratuite) : penser à `npm run mirror` après chaque série de PR. Un oubli ne
+  casse rien — le public est simplement en retard. Mais il peut l'être
+  longtemps sans que personne le voie : le 13/09/2026, l'oubli avait atteint
+  **27 paquets et quatre versions du socle**.
+- En mode `mirror`, une réécriture d'historique de la branche source est
+  propagée au public (push `--force`) — comportement de miroir assumé ; les
+  clones publics existants devront se rebaser. La garde décrite plus haut
+  n'empêche pas cela : elle empêche seulement d'effacer des commits que le
+  MIROIR est seul à porter.
 - La CI publique valide le commit **publié** ; en mode `snapshot`, c'est bien
   l'arbre filtré qui est testé (mêmes sources applicatives).
 - Passer de `mirror` à `snapshot` ne retire pas l'historique déjà publié : le
