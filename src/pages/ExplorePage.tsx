@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { ListFilter, Plus } from 'lucide-react';
+import { PwaInstallPrompt } from '@mister-guiiug/dev-pwa-config/react/pwa-install-prompt';
 import {
   Button,
   EmptyState,
@@ -184,6 +185,16 @@ export default function ExplorePage() {
         onClose={() => setFiltersOpen(false)}
         categories={categories}
       />
+
+      {/* SUR L'EXPLORATION, ET PAS DANS `RootLayout` : la coquille porte la
+          navigation et les bandeaux de connexion et de mise à jour, mais une
+          invite d'installation y paraîtrait par-dessus la fiche d'un lieu ou
+          la saisie d'un événement. Ici, l'utilisateur est au repos.
+          Ne rend rien tant qu'une installation n'est pas possible, ni une fois
+          l'application installée — et sur iOS, où l'événement natif n'existe
+          pas, donne la marche à suivre. Cadence du socle : au premier
+          lancement, puis une fois par mois, trois fois. */}
+      <PwaInstallPrompt />
     </div>
   );
 }
