@@ -46,6 +46,11 @@ export default defineConfig(({ command }) => ({
     // Après pwaSeoPlugin (ordre requis : les hash sont calculés sur le HTML final).
     cspPlugin({
       dev: command === 'serve',
+      // Ouvre les hôtes de Google Tag Manager et de GA4. Sans cette option, le
+      // script que `ConsentBanner` injecte APRÈS l'accord serait refusé par la
+      // politique — et l'échec ne se verrait qu'en console, sur le site
+      // déployé, une fois le consentement donné.
+      analytics: true,
       // `mapCspDirectives` place les hôtes de tuiles dans connect-src ET
       // img-src : MapLibre charge par `fetch`, Leaflet et le repli des
       // navigateurs sans `createImageBitmap` par <img>.

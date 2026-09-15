@@ -1,5 +1,7 @@
 import { useEffect } from 'react';
-import { NavLink, Outlet, ScrollRestoration } from 'react-router';
+import { NavLink, Outlet, ScrollRestoration, useLocation } from 'react-router';
+import { ConsentBanner } from '@mister-guiiug/dev-pwa-config/react/consent-banner';
+import { usePageViews } from '@mister-guiiug/dev-pwa-config/react/use-page-views';
 import {
   CalendarDays,
   Compass,
@@ -74,6 +76,17 @@ const NAV_ITEMS = [
  */
 export function RootLayout() {
   const backend = useBackend();
+  const { pathname } = useLocation();
+
+  /*
+   * UNE VUE DE PAGE PAR NAVIGATION. GA4 n'en envoie qu'une par chargement de
+   * document, et `initAnalytics` pose en plus `send_page_view: false` pour que
+   * la première passe par ce hook comme les autres — sinon l'écran d'entrée
+   * serait compté deux fois. Sans lui, toute la navigation serait invisible.
+   *
+   * Ne fait rien tant que le consentement n'est pas accordé.
+   */
+  usePageViews(pathname);
   const initAuth = useAuthStore(s => s.init);
   const loadFavorites = useFavoritesStore(s => s.load);
   const setFavoriteIds = useFavoritesStore(s => s.setIds);
@@ -149,6 +162,14 @@ export function RootLayout() {
           le `pb-24` qui lui réserve sa place. Posé après `</main>`, ce pied de
           page passerait dessous.
         */}
+        {/* Une `region`, pas une boîte modale : elle ne recouvre rien et ne
+            piège pas le focus. Ne rend RIEN tant que
+            `VITE_GA_MEASUREMENT_ID` n'est pas posée — sans identifiant, il
+            n'y a rien à mesurer, donc rien à demander. */}
+        <ConsentBanner
+          gaMeasurementId={import.meta.env.VITE_GA_MEASUREMENT_ID}
+          className="mt-8 px-fluid-md"
+        />
         <AppFooter
           className="mt-8 justify-center px-fluid-md text-fluid-sm"
           repoUrl="https://github.com/mister-guiiug/mister-family-map"

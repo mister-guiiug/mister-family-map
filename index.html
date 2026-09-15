@@ -32,7 +32,19 @@
     </script>
 
     <!-- Analytics (GTM/GA4) injecté par pwaSeoPlugin() si configuré. -->
-    __ANALYTICS_HEAD__
+    <!--
+      LES MARQUEURS `__ANALYTICS_*__` ONT ÉTÉ RETIRÉS.
+
+      `pwaSeoPlugin` les remplaçait AU BUILD par le tag de Google dès qu'un
+      identifiant était posé — précédé d'un `consent default` tout refusé, donc
+      sans collecte, mais le script partait quand même au chargement de la
+      page.
+
+      `ConsentBanner` fait le même travail autrement : il n'injecte RIEN avant
+      l'accord. Garder les deux chemins ferait partir DEUX tags le jour où la
+      variable serait posée — le socle porte deux réponses à la même question,
+      et cette app n'en garde qu'une.
+    -->
 
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
     <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
@@ -60,7 +72,6 @@
     <title>Mister FamilyMap</title>
   </head>
   <body>
-    __ANALYTICS_BODY__
     <div id="app"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
