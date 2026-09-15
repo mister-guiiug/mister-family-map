@@ -9,10 +9,27 @@
 # mécanismes coexistent sans conflit.
 #
 # Secret requis (sur le dépôt PUBLIC : Settings → Secrets and variables →
-# Actions) : PRIVATE_READ_TOKEN — PAT **classique** (scope `repo`) d'un compte
-# ayant la lecture sur elowner-ax/bac-sable. (Un PAT fine-grained ne convient
-# pas : elowner-ax est un compte personnel tiers, hors de son périmètre.)
-# Le workflow ne pousse jamais vers le dépôt privé.
+# Actions) : PRIVATE_READ_TOKEN — un jeton qui LIT elowner-ax/bac-sable. Le
+# workflow ne pousse jamais vers le dépôt privé.
+#
+# UN PAT FINE-GRAINED SUFFIT, ET C'EST LE BON CHOIX. Émis par elowner-ax — le
+# compte qui POSSÈDE le dépôt privé, et non celui qui héberge le miroir — avec
+# `bac-sable` pour seul périmètre et la permission « Contents : Read-only ».
+#
+# Cet en-tête a longtemps affirmé le contraire (« un PAT fine-grained ne
+# convient pas »), et l'échec du 12/09/2026 l'a démenti : le jeton en place
+# lisait déjà les MÉTADONNÉES du dépôt privé — l'étape « Résoudre les deux
+# branches » a interrogé l'API et en a reçu la branche par défaut — mais git
+# répondait « Repository not found » à l'étape suivante. Or un PAT classique
+# sans le scope `repo` aurait échoué DÈS l'appel à l'API : d'un dépôt privé,
+# il ne voit rien du tout, pas même son existence. C'est donc bien un
+# fine-grained qui atteint déjà le dépôt, et il ne lui manque que « Contents »
+# — une case à cocher, pas un autre type de jeton.
+#
+# Un PAT classique (scope `repo`) fonctionnerait aussi, mais il donne la
+# lecture ET L'ÉCRITURE sur TOUS les dépôts de son émetteur. C'est beaucoup de
+# pouvoir pour un secret rangé dans un dépôt PUBLIC, quand une permission de
+# lecture sur un seul dépôt fait le même travail.
 #
 # DEUX GARDES, parce que la publication est un `push --force` :
 #
@@ -66,7 +83,7 @@ jobs:
           TOKEN: ${{ secrets.PRIVATE_READ_TOKEN }}
         run: |
           if [ -z "$TOKEN" ]; then
-            echo "::error::Secret PRIVATE_READ_TOKEN absent — créer un PAT classique (scope repo) d'un compte ayant la lecture sur elowner-ax/bac-sable, puis l'ajouter aux secrets Actions de ce dépôt."
+            echo "::error::Secret PRIVATE_READ_TOKEN absent — créer sur le compte elowner-ax un PAT fine-grained limité au dépôt bac-sable, permission « Contents : Read-only », puis l'ajouter aux secrets Actions de ce dépôt."
             exit 1
           fi
 
@@ -120,12 +137,11 @@ jobs:
             "+refs/tags/v*:refs/tags/v*" 2> /tmp/fetch.err; then
             cat /tmp/fetch.err
             # L'étape précédente a LU le dépôt via l'API : le jeton porte donc
-            # la permission « Metadata ». Si git répond quand même « Repository
-            # not found », il lui manque « Contents » — c'est la signature d'un
-            # PAT fine-grained, que ce workflow ne peut pas utiliser (voir
-            # l'en-tête : elowner-ax est un compte personnel tiers).
+            # « Metadata ». Si git répond quand même « Repository not found »,
+            # il ne lui manque que « Contents » — une permission à ajouter, pas
+            # un jeton à remplacer (voir l'en-tête).
             if grep -qi "not found" /tmp/fetch.err; then
-              echo "::error::PRIVATE_READ_TOKEN lit les métadonnées du dépôt privé (l'API a répondu) mais pas son CONTENU (git répond « Repository not found »). C'est la signature d'un PAT fine-grained, ou d'un PAT classique sans le scope 'repo'. Remplacer le secret par un PAT CLASSIQUE avec le scope 'repo' complet."
+              echo "::error::PRIVATE_READ_TOKEN lit les métadonnées du dépôt privé (l'API a répondu) mais pas son CONTENU (git répond « Repository not found »). Il ne lui manque que « Contents : Read-only » : ajouter cette permission au PAT fine-grained, sur le dépôt elowner-ax/bac-sable."
             else
               echo "::error::Échec de la récupération depuis elowner-ax/bac-sable — voir le message de git ci-dessus."
             fi
