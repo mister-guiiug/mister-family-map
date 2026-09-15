@@ -37,6 +37,12 @@ jobs:
       # Variables de build applicatives (aucun secret ici — la clé anon
       # Supabase est publique par conception, mais elle vit dans les secrets
       # du dépôt pour rester hors du code source) :
-      # build-env: |
       #   VITE_SUPABASE_URL=...
       #   VITE_SUPABASE_ANON_KEY=...
+      #
+      # LA VARIABLE SE POSE SUR LE MIROIR, PAS ICI : ce job ne tourne que
+      # sur `mister-guiiug/mister-family-map` (le `if:` ci-dessus), et `vars`
+      # est lu dans le dépôt qui EXÉCUTE. Absente, la ligne vaut la chaîne
+      # vide et rien n'est mesuré.
+      build-env: |
+        VITE_GA_MEASUREMENT_ID=${{ vars.VITE_GA_MEASUREMENT_ID }}
