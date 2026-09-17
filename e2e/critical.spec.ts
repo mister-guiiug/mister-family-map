@@ -197,28 +197,20 @@ test('@critical hors ligne : l’app reste utilisable sur les données locales',
   await context.setOffline(false);
 });
 
-test('@critical la version de l’app est lisible dans « À propos »', async ({
+test('@critical « À propos » n’affiche AUCUN numéro de version', async ({
   page,
 }) => {
-  // Le numéro doit être ATTEIGNABLE par un utilisateur qui remplit un rapport
-  // de bug — pas seulement présent dans le bundle. La première mise en place
-  // câblait `versionPlugin()` sans rien afficher : la version existait dans
-  // `globalThis.__DWC_BUILD__` et dans le contexte d'erreur, et restait
-  // invisible à l'écran.
+  // Ce test vérifiait l'inverse, et c'est lui qui verrouillait le défaut : le
+  // numéro menait à `…/releases/tag/vX.Y.Z`, or aucune app du parc ne pose de
+  // tag git ni n'a de workflow de release. Le lien répondait 404 — un test
+  // vert sur un lien mort.
+  //
+  // La version n'a pas disparu du canal qui en a besoin : `issue-report` la
+  // préremplit dans le rapport de bug, avec le commit, l'écran et le
+  // navigateur. Elle n'est simplement plus MONTRÉE.
   await page.goto('/profil');
 
-  const version = page.locator('[data-dwc="app-version"]');
-  await expect(version).toBeVisible();
-
-  // Un numéro, pas un « v » orphelin ni « undefined ».
-  await expect(version.locator('[data-dwc="app-version-value"]')).toHaveText(
-    /^\d+\.\d+\.\d+/
-  );
-
-  // Et il mène à la release correspondante.
-  await expect(
-    version.locator('a[data-dwc="app-version-value"]')
-  ).toHaveAttribute('href', /\/releases\/tag\/v\d+\.\d+\.\d+$/);
+  await expect(page.locator('[data-dwc="app-version"]')).toHaveCount(0);
 });
 
 test('@critical le profil offre la mise à jour forcée, le code source, le café et les autres apps', async ({

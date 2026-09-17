@@ -5,7 +5,6 @@ import {
   FamilyApps,
   UpdateButton,
 } from '@mister-guiiug/dev-pwa-config/react';
-import { AppVersion } from '@mister-guiiug/dev-pwa-config/react/app-version';
 import { ShareButton } from '@mister-guiiug/dev-pwa-config/react/share-button';
 import { ThemeToggle } from '@mister-guiiug/dev-pwa-config/react/theme-toggle';
 import { useBackend } from '../app/providers/BackendProvider';
@@ -147,16 +146,12 @@ export default function ProfilePage() {
           </ul>
 
           {/*
-            Le numéro de version, là où on le cherche quand on remplit un
-            rapport de bug : dans « À propos », pas dans une console. `details`
-            ajoute la date de compilation et le commit court — les deux autres
-            informations qu'un rapport utile porte.
+            PLUS DE NUMÉRO DE VERSION. Il portait un lien vers
+            `…/releases/tag/vX.Y.Z` : aucune app du parc ne pose de tag git ni
+            n'a de workflow de release, ce lien répondait donc 404. Ce qu'un
+            rapport de bug utile porte — version, commit, écran, navigateur —
+            y entre toujours, prérempli par `issue-report`.
           */}
-          <AppVersion
-            className="mt-3"
-            details
-            repoUrl="https://github.com/mister-guiiug/mister-family-map"
-          />
 
           {/*
             « Forcer la mise à jour » : le bandeau de `UpdatePromptBanner` ne
