@@ -79,10 +79,11 @@ export function RootLayout() {
   const { pathname } = useLocation();
 
   /*
-   * UNE VUE DE PAGE PAR NAVIGATION. GA4 n'en envoie qu'une par chargement de
-   * document, et `initAnalytics` pose en plus `send_page_view: false` pour que
-   * la première passe par ce hook comme les autres — sinon l'écran d'entrée
-   * serait compté deux fois. Sans lui, toute la navigation serait invisible.
+   * UNE VUE DE PAGE PAR NAVIGATION — ni zéro, ni deux. `initAnalytics` pose
+   * `capture_pageview: false` pour que toutes passent par ce hook, la première
+   * comprise : laissé à lui-même, PostHog en envoie une au chargement ET à
+   * chaque changement d'historique, et l'écran d'entrée serait compté deux
+   * fois. Sans le hook, à l'inverse, toute la navigation serait invisible.
    *
    * Ne fait rien tant que le consentement n'est pas accordé.
    */
@@ -164,10 +165,11 @@ export function RootLayout() {
         */}
         {/* Une `region`, pas une boîte modale : elle ne recouvre rien et ne
             piège pas le focus. Ne rend RIEN tant que
-            `VITE_GA_MEASUREMENT_ID` n'est pas posée — sans identifiant, il
+            `VITE_POSTHOG_KEY` n'est pas posée — sans identifiant, il
             n'y a rien à mesurer, donc rien à demander. */}
         <ConsentBanner
-          gaMeasurementId={import.meta.env.VITE_GA_MEASUREMENT_ID}
+          posthogKey={import.meta.env.VITE_POSTHOG_KEY}
+          loader={() => import('posthog-js/dist/module.slim.js')}
           className="mt-8 px-fluid-md"
         />
         <AppFooter

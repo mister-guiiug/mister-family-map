@@ -553,7 +553,8 @@ function createLocalModerationService(): ModerationService {
 
 const noopAnalytics: AnalyticsService = {
   track() {
-    // Local : aucun envoi. Adaptateur GA4/GTM branchable via vite-pwa-base.
+    // Local : aucun envoi. `trackEvent` du socle est branchable ici si un jour
+    // ce backend doit remonter quelque chose — il respecte le consentement.
   },
 };
 
