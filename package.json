@@ -29,7 +29,8 @@
     "mirror:snapshot": "node scripts/mirror.mjs --mode snapshot"
   },
   "bundleBudget": {
-    "totalGzipKb": 750
+    "totalGzipKb": 809,
+    "_pourquoi": "RELEVÉ DE 750 À 809 LE 19/09/2026, APRÈS la bascule PostHog (ADR 0012). Le plafond tenait sans rien toucher — 734,6 kB pour 750 — et c'est justement le piège : 15,4 kB de marge, soit 2 %, là où la convention du parc en laisse 10 %. Un budget qu'on ne relève pas parce qu'il passe DE JUSTESSE casse au commit suivant, sur un changement sans rapport. 809 = mesure + 10 %. ET ICI LA MARGE COMPTE DOUBLE : ce dépôt privé n'a pas de minutes Actions, sa CI est sautée, et c'est le MIROIR public qui construit — une borne trop serrée s'y découvrirait après publication, pas avant."
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.116.0",
