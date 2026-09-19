@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { GESTES, trackEvent } from '@mister-guiiug/dev-pwa-config/analytics';
 import { Link, useNavigate } from 'react-router';
 import {
   Button,
@@ -134,6 +135,18 @@ export default function PlaceCreatePage() {
     setSending(true);
     try {
       const place = await backend.places.create(parsed.data);
+      /*
+       * LE LIEU, UNE FOIS QU'IL EXISTE VRAIMENT — après `create`, qui lève sur
+       * un refus du backend. Compter la soumission enregistrerait aussi les
+       * échecs, et gonflerait la seule mesure qui dise si cette carte
+       * collaborative se remplit.
+       *
+       * NI LE NOM, NI L'ADRESSE, NI LES COORDONNÉES. Un lieu ajouté par une
+       * famille désigne un endroit réel où elle va : c'est la donnée la plus
+       * sensible de l'app. Savoir COMBIEN de lieux sont proposés suffit à
+       * savoir si elle vit.
+       */
+      trackEvent(GESTES.CREATION, { objet: 'lieu' });
       wizard.clear();
       navigate(`/lieux/${place.id}`, {
         state: { justCreated: true },

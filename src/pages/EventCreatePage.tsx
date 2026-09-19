@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { GESTES, trackEvent } from '@mister-guiiug/dev-pwa-config/analytics';
 import { Link, useNavigate } from 'react-router';
 import {
   Button,
@@ -95,6 +96,9 @@ export default function EventCreatePage() {
     setSaving(true);
     try {
       const event = await backend.events.create(parsed.data);
+      // Après `create` : un refus du backend lève, et ne doit pas compter.
+      // Ni le titre, ni la date, ni le lieu — voir `PlaceCreatePage`.
+      trackEvent(GESTES.CREATION, { objet: 'evenement' });
       navigate(`/agenda/${event.id}`);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Envoi impossible.');
