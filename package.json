@@ -6,7 +6,7 @@
   "type": "module",
   "description": "Carte collaborative d'idées de sorties en famille : lieux, événements et retours d'expérience réellement utiles.",
   "engines": {
-    "node": ">=22.23.2"
+    "node": ">=24.21.0"
   },
   "scripts": {
     "dev": "vite",
