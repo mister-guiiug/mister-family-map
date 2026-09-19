@@ -40,12 +40,17 @@ jobs:
       verify-lockfile: false
       # La checklist du parc, lue sur le dépôt et sur dist/ (AMELIORATIONS.md, T2).
       run-doctor: true
-      # `--strict` : une dette suffit désormais à faire échouer le job. Relevé
-      # du 19/09/2026 : les dix-huit dépôts du parc qui lancent le docteur
-      # étaient tous à zéro défaut ET zéro dette, et AUCUN en mode strict — le
-      # docteur parlait, rien ne l'écoutait. Gratuit aujourd'hui, il interdit la
-      # prochaine régression.
-      doctor-strict: true
+      # `doctor-strict` reste à `false`, et voici pourquoi. La PR précédente l'a
+      # passé à `true` sur une mesure FAUSSE de ma part : mon extracteur prenait
+      # `tail -1` sur les lignes de bilan du docteur, or il en écrit DEUX par
+      # exécution (le dépôt, puis `dist/`), et la seconde est presque toujours
+      # « 0 dette ». Le relevé refait, sur le dernier run du miroir : 0 défaut,
+      # mais TROIS dettes — et `--strict` échoue sur une dette
+      # (pwa-doctor.mjs:1631). Publié tel quel, le miroir serait rouge.
+      #   · Supabase sans keep-alive : le projet Free se met en pause après 7 jours
+      #   · code source + soutien sur tous les écrans, rendus par la coquille
+      #   · pas de og:image
+      # Le mode strict s'active quand cette liste est vide. Pas avant.
       # E2E (Chromium). Le filtre doit couvrir TOUTES les specs du dossier :
       # Playwright rend « No tests found » avec un code 0 pour une spec qu'il
       # ignore. `@critical` seul écartait `e2e/a11y.spec.ts` (axe-core sur
