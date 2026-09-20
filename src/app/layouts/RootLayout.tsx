@@ -1,11 +1,23 @@
-import { useEffect } from 'react';
-import { NavLink, Outlet, ScrollRestoration, useLocation } from 'react-router';
+import {
+  useEffect,
+  useState,
+  useTransition,
+  type MouseEvent as ReactMouseEvent,
+} from 'react';
+import {
+  NavLink,
+  Outlet,
+  ScrollRestoration,
+  useLocation,
+  useNavigate,
+} from 'react-router';
 import { ConsentBanner } from '@mister-guiiug/dev-pwa-config/react/consent-banner';
 import { usePageViews } from '@mister-guiiug/dev-pwa-config/react/use-page-views';
 import {
   CalendarDays,
   Compass,
   Heart,
+  LoaderCircle,
   Map as MapIcon,
   UserRound,
 } from 'lucide-react';
@@ -77,6 +89,49 @@ const NAV_ITEMS = [
 export function RootLayout() {
   const backend = useBackend();
   const { pathname } = useLocation();
+  const navigate = useNavigate();
+
+  /*
+   * LE PRÉCHARGEMENT NE SUFFIT PAS, ET C'EST MESURÉ.
+   *
+   * Les trois écouteurs d'intention posés sur chaque onglet — `pointerenter`,
+   * `focus`, `touchstart` — donnent de l'avance quand il y en a une à prendre. Mais un doigt qui se pose et relâche aussitôt, ou un
+   * lien à 280 ko compressés — MapLibre GL — ne laissent pas ce répit. Le clic
+   * restait alors MUET : relevé le 20/09/2026 sur cette application, à 8 ms
+   * l'adresse disait déjà `/agenda` pendant que l'écran affichait encore
+   * « Explorer », et le `SkeletonGroup` « Chargement de la page » du routeur
+   * n'est JAMAIS apparu — le nombre de zones vives n'a pas bougé de 1.
+   *
+   * Il ne pouvait pas. react-router enveloppe tout changement d'URL dans
+   * `startTransition`, et React 19 garde délibérément l'écran déjà affiché
+   * plutôt que de le remplacer par un repli. La frontière `Suspense` que pose
+   * `page()` est RÉUTILISÉE d'une route à l'autre, jamais remontée : son
+   * squelette ne se voit donc que sur un atterrissage direct.
+   *
+   * En pilotant `navigate` depuis notre propre transition, `enCours` reste vrai
+   * tant que le morceau n'est pas là — la seule information qui manquait pour
+   * répondre au doigt.
+   */
+  const [enCours, demarre] = useTransition();
+  const [cible, setCible] = useState<string | null>(null);
+
+  const versLOnglet = (e: ReactMouseEvent<HTMLAnchorElement>, to: string) => {
+    // On laisse le navigateur faire son travail quand on le lui demande :
+    // nouvel onglet, nouvelle fenêtre, enregistrement de la cible.
+    if (
+      e.defaultPrevented ||
+      e.button !== 0 ||
+      e.metaKey ||
+      e.ctrlKey ||
+      e.shiftKey ||
+      e.altKey
+    ) {
+      return;
+    }
+    e.preventDefault();
+    setCible(to);
+    demarre(() => navigate(to));
+  };
 
   /*
    * UNE VUE DE PAGE PAR NAVIGATION — ni zéro, ni deux. `initAnalytics` pose
@@ -183,37 +238,61 @@ export function RootLayout() {
         className="fixed inset-x-0 bottom-0 z-20 border-t border-line bg-surface pb-safe-bottom"
       >
         <ul className="mx-auto flex max-w-xl justify-around">
-          {NAV_ITEMS.map(({ to, label, icon: Icon, end, load }) => (
-            <li key={to} className="flex-1">
-              <NavLink
-                to={to}
-                end={end}
-                // Trois évènements, pas un : `focus` pour le clavier, qui
-                // mérite le même confort que la souris. Le socle déduplique et
-                // se coupe seul sur `saveData` et en 2G.
-                onPointerEnter={() => prefetch(load)}
-                onFocus={() => prefetch(load)}
-                onTouchStart={() => prefetch(load)}
-                className={({ isActive }) =>
-                  `flex touch-target flex-col items-center gap-0.5 py-2 text-fluid-xs ${
-                    isActive ? 'font-semibold text-primary' : 'text-ink-soft'
-                  }`
-                }
-              >
-                {({ isActive }) => (
-                  <>
-                    <Icon
-                      size={22}
-                      aria-hidden="true"
-                      strokeWidth={isActive ? 2.4 : 1.8}
-                    />
-                    {label}
-                  </>
-                )}
-              </NavLink>
-            </li>
-          ))}
+          {NAV_ITEMS.map(({ to, label, icon: Icon, end, load }) => {
+            const charge = enCours && cible === to;
+            return (
+              <li key={to} className="flex-1">
+                <NavLink
+                  to={to}
+                  end={end}
+                  onClick={e => versLOnglet(e, to)}
+                  aria-busy={charge || undefined}
+                  // Trois évènements, pas un : `focus` pour le clavier, qui
+                  // mérite le même confort que la souris. Le socle déduplique et
+                  // se coupe seul sur `saveData` et en 2G.
+                  onPointerEnter={() => prefetch(load)}
+                  onFocus={() => prefetch(load)}
+                  onTouchStart={() => prefetch(load)}
+                  className={({ isActive }) =>
+                    `flex touch-target flex-col items-center gap-0.5 py-2 text-fluid-xs ${
+                      isActive ? 'font-semibold text-primary' : 'text-ink-soft'
+                    }`
+                  }
+                >
+                  {({ isActive }) => (
+                    <>
+                      {/* L'onglet touché tourne le temps que son morceau
+                        arrive. C'est le seul retour possible : le repli du
+                        routeur ne paraîtra pas, React 19 gardant l'écran
+                        courant pendant la transition. */}
+                      {charge ? (
+                        <LoaderCircle
+                          size={22}
+                          aria-hidden="true"
+                          strokeWidth={2.4}
+                          className="animate-spin"
+                        />
+                      ) : (
+                        <Icon
+                          size={22}
+                          aria-hidden="true"
+                          strokeWidth={isActive ? 2.4 : 1.8}
+                        />
+                      )}
+                      {label}
+                    </>
+                  )}
+                </NavLink>
+              </li>
+            );
+          })}
         </ul>
+
+        {/* HORS des liens, pour ne pas changer leur nom accessible en cours de
+            route : qui ne voit pas la pastille tourner l'entend. */}
+        <span className="sr-only" role="status" aria-live="polite">
+          {enCours ? 'Chargement de la page…' : ''}
+        </span>
       </nav>
       <ScrollRestoration />
     </div>
