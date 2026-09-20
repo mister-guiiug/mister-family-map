@@ -12,7 +12,7 @@ import {
 } from '@mister-guiiug/dev-pwa-config/react';
 import { Flag, Heart, Share2 } from 'lucide-react';
 import { useBackend } from '../app/providers/BackendProvider';
-import { useAsync } from '../shared/hooks/useAsync';
+import { useAsync } from '@mister-guiiug/dev-pwa-config/react/use-async';
 import { averageRating } from '../entities/review/model';
 import { PUBLICATION_STATUS_LABELS } from '../entities/place/model';
 import {
@@ -62,7 +62,10 @@ export default function PlaceDetailPage() {
   if (placeState.error)
     return (
       <div className="p-fluid-md">
-        <ErrorBanner message={placeState.error} onRetry={placeState.reload} />
+        <ErrorBanner
+          message={placeState.error.message}
+          onRetry={placeState.reload}
+        />
       </div>
     );
   const place = placeState.data;

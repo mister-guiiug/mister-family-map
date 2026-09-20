@@ -10,7 +10,7 @@ import {
   TextField,
 } from '@mister-guiiug/dev-pwa-config/react';
 import { useBackend } from '../app/providers/BackendProvider';
-import { useAsync } from '../shared/hooks/useAsync';
+import { useAsync } from '@mister-guiiug/dev-pwa-config/react/use-async';
 import { applyFilters, countActiveFilters } from '../shared/schemas/filters';
 import { averageRating } from '../entities/review/model';
 import { distanceKm } from '@mister-guiiug/dev-pwa-config/geo';
@@ -121,7 +121,7 @@ export default function ExplorePage() {
           <SkeletonGroup label="Chargement des lieux" lines={4} />
         ) : placesState.error ? (
           <ErrorBanner
-            message={placesState.error}
+            message={placesState.error.message}
             onRetry={placesState.reload}
           />
         ) : filtered.length === 0 ? (

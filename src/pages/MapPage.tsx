@@ -8,7 +8,7 @@ import {
 } from '@mister-guiiug/dev-pwa-config/react';
 import { ListFilter } from 'lucide-react';
 import { useBackend } from '../app/providers/BackendProvider';
-import { useAsync } from '../shared/hooks/useAsync';
+import { useAsync } from '@mister-guiiug/dev-pwa-config/react/use-async';
 import { applyFilters } from '../shared/schemas/filters';
 import {
   isInBoundingBox,
@@ -77,7 +77,7 @@ export default function MapPage() {
       <div className="px-fluid-md">
         {placesState.error ? (
           <ErrorBanner
-            message={placesState.error}
+            message={placesState.error.message}
             onRetry={placesState.reload}
           />
         ) : (

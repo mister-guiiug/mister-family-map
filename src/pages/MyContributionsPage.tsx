@@ -7,7 +7,7 @@ import {
 } from '@mister-guiiug/dev-pwa-config/react';
 import { ErrorBanner } from '@mister-guiiug/dev-pwa-config/react/error-banner';
 import { useBackend } from '../app/providers/BackendProvider';
-import { useAsync } from '../shared/hooks/useAsync';
+import { useAsync } from '@mister-guiiug/dev-pwa-config/react/use-async';
 import { useUndoToast } from '../shared/hooks/useUndoToast';
 import { useAuthStore } from '../features/auth/store';
 import {
@@ -171,7 +171,9 @@ export default function MyContributionsPage() {
         subtitle="Lieux proposés, événements et retours publiés"
       />
       <div className="flex flex-col gap-5 px-fluid-md pb-8">
-        {erreur ? <ErrorBanner message={erreur} onRetry={reloadAll} /> : null}
+        {erreur ? (
+          <ErrorBanner message={erreur.message} onRetry={reloadAll} />
+        ) : null}
 
         <section aria-label="Mes lieux">
           <h2 className="mb-2 text-fluid-lg font-semibold">Lieux proposés</h2>

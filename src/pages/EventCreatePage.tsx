@@ -9,7 +9,7 @@ import {
   TextField,
 } from '@mister-guiiug/dev-pwa-config/react';
 import { useBackend } from '../app/providers/BackendProvider';
-import { useAsync } from '../shared/hooks/useAsync';
+import { useAsync } from '@mister-guiiug/dev-pwa-config/react/use-async';
 import { eventDraftSchema } from '../entities/event/model';
 import { sanitizeSingleLine, sanitizeUserText } from '../shared/lib/sanitize';
 import { useAuthStore } from '../features/auth/store';

@@ -10,7 +10,7 @@ import {
 import { ICAL_MIME, toIcalendar } from '@mister-guiiug/dev-pwa-config/ical';
 import { CalendarPlus } from 'lucide-react';
 import { useBackend } from '../app/providers/BackendProvider';
-import { useAsync } from '../shared/hooks/useAsync';
+import { useAsync } from '@mister-guiiug/dev-pwa-config/react/use-async';
 import {
   displayStatus,
   eventToIcal,
@@ -35,7 +35,10 @@ export default function EventDetailPage() {
   if (eventState.error)
     return (
       <div className="p-fluid-md">
-        <ErrorBanner message={eventState.error} onRetry={eventState.reload} />
+        <ErrorBanner
+          message={eventState.error.message}
+          onRetry={eventState.reload}
+        />
       </div>
     );
   const event = eventState.data;

@@ -6,7 +6,7 @@ import {
   SkeletonGroup,
 } from '@mister-guiiug/dev-pwa-config/react';
 import { useBackend } from '../app/providers/BackendProvider';
-import { useAsync } from '../shared/hooks/useAsync';
+import { useAsync } from '@mister-guiiug/dev-pwa-config/react/use-async';
 import { useFavoritesStore } from '../features/favorites/store';
 import { PlaceCard } from '../features/places/components/PlaceCard';
 import { PageHeader } from '../shared/components/PageHeader';

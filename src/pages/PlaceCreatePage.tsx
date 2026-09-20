@@ -10,7 +10,7 @@ import {
 } from '@mister-guiiug/dev-pwa-config/react';
 import { useActionGuard } from '@mister-guiiug/dev-pwa-config/react/use-action-guard';
 import { useBackend } from '../app/providers/BackendProvider';
-import { useAsync } from '../shared/hooks/useAsync';
+import { useAsync } from '@mister-guiiug/dev-pwa-config/react/use-async';
 import { placeDraftSchema } from '../entities/place/model';
 import { findPotentialDuplicates } from '../shared/lib/dedupe';
 import { formatDistance } from '@mister-guiiug/dev-pwa-config/geo';

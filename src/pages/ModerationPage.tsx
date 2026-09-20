@@ -6,7 +6,7 @@ import {
   SkeletonGroup,
 } from '@mister-guiiug/dev-pwa-config/react';
 import { useBackend } from '../app/providers/BackendProvider';
-import { useAsync } from '../shared/hooks/useAsync';
+import { useAsync } from '@mister-guiiug/dev-pwa-config/react/use-async';
 import { useCurrentRole } from '../features/auth/store';
 import { can } from '../entities/user/permissions';
 import { REPORT_REASON_LABELS } from '../entities/moderation/model';
