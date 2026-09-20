@@ -2,24 +2,27 @@ import { lazy, Suspense, type ReactNode } from 'react';
 import { createBrowserRouter } from 'react-router';
 import { SkeletonGroup } from '@mister-guiiug/dev-pwa-config/react';
 import { RootLayout } from '../layouts/RootLayout';
+import { chargeurs } from './chargeurs';
 
-/** Pages en lazy-loading : le shell reste léger, la carte (MapLibre GL) n'est chargée qu'à l'usage. */
-const ExplorePage = lazy(() => import('../../pages/ExplorePage'));
-const MapPage = lazy(() => import('../../pages/MapPage'));
-const PlaceDetailPage = lazy(() => import('../../pages/PlaceDetailPage'));
-const PlaceCreatePage = lazy(() => import('../../pages/PlaceCreatePage'));
-const AgendaPage = lazy(() => import('../../pages/AgendaPage'));
-const EventDetailPage = lazy(() => import('../../pages/EventDetailPage'));
-const EventCreatePage = lazy(() => import('../../pages/EventCreatePage'));
-const FavoritesPage = lazy(() => import('../../pages/FavoritesPage'));
-const AuthPage = lazy(() => import('../../pages/AuthPage'));
-const ProfilePage = lazy(() => import('../../pages/ProfilePage'));
-const MyContributionsPage = lazy(
-  () => import('../../pages/MyContributionsPage')
-);
-const ModerationPage = lazy(() => import('../../pages/ModerationPage'));
-const LegalPage = lazy(() => import('../../pages/LegalPage'));
-const NotFoundPage = lazy(() => import('../../pages/NotFoundPage'));
+/**
+ * Pages en lazy-loading : le shell reste léger, la carte (MapLibre GL) n'est
+ * chargée qu'à l'usage. Les chargeurs viennent de `chargeurs.ts` : ce sont LES
+ * MÊMES objets que la barre basse tend à `prefetch()`.
+ */
+const ExplorePage = lazy(chargeurs.ExplorePage);
+const MapPage = lazy(chargeurs.MapPage);
+const PlaceDetailPage = lazy(chargeurs.PlaceDetailPage);
+const PlaceCreatePage = lazy(chargeurs.PlaceCreatePage);
+const AgendaPage = lazy(chargeurs.AgendaPage);
+const EventDetailPage = lazy(chargeurs.EventDetailPage);
+const EventCreatePage = lazy(chargeurs.EventCreatePage);
+const FavoritesPage = lazy(chargeurs.FavoritesPage);
+const AuthPage = lazy(chargeurs.AuthPage);
+const ProfilePage = lazy(chargeurs.ProfilePage);
+const MyContributionsPage = lazy(chargeurs.MyContributionsPage);
+const ModerationPage = lazy(chargeurs.ModerationPage);
+const LegalPage = lazy(chargeurs.LegalPage);
+const NotFoundPage = lazy(chargeurs.NotFoundPage);
 
 function page(node: ReactNode) {
   return (

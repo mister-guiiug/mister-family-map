@@ -30,11 +30,14 @@ import { registerSW } from 'virtual:pwa-register';
 import { useBackend } from '../providers/BackendProvider';
 import { useAuthStore } from '../../features/auth/store';
 import { useFavoritesStore } from '../../features/favorites/store';
+import { chargeurs } from '../router/chargeurs';
 
 /**
- * Chaque entrée porte le CHARGEUR de sa page, le même `() => import(…)` que le
- * routeur passe à `lazy()`. Le module n'est donc téléchargé qu'une fois : les
- * deux références pointent le même chemin, et Vite ne produit qu'un morceau.
+ * Chaque entrée porte le CHARGEUR de sa page — LE MÊME objet que le routeur
+ * passe à `lazy()`, pris dans `router/chargeurs.ts`. Pas une copie du même
+ * `() => import(…)` : le `WeakSet` de `prefetch()` ne relierait pas deux
+ * fonctions distinctes, et une page renommée d'un seul côté préchargerait la
+ * mauvaise sans qu'aucun test ne le voie. `chargeurs.test.tsx` tient l'identité.
  *
  * POURQUOI. Le service worker précache tous les morceaux — mais à partir de la
  * DEUXIÈME visite seulement. À la première, celle qui décide si la famille
@@ -48,7 +51,7 @@ const NAV_ITEMS = [
     label: 'Explorer',
     icon: Compass,
     end: true,
-    load: () => import('../../pages/ExplorePage'),
+    load: chargeurs.ExplorePage,
   },
   {
     to: '/carte',
@@ -56,28 +59,28 @@ const NAV_ITEMS = [
     icon: MapIcon,
     end: false,
     // Le plus lourd de tous : MapLibre GL pèse 989 ko avant compression.
-    load: () => import('../../pages/MapPage'),
+    load: chargeurs.MapPage,
   },
   {
     to: '/agenda',
     label: 'Agenda',
     icon: CalendarDays,
     end: false,
-    load: () => import('../../pages/AgendaPage'),
+    load: chargeurs.AgendaPage,
   },
   {
     to: '/favoris',
     label: 'Favoris',
     icon: Heart,
     end: false,
-    load: () => import('../../pages/FavoritesPage'),
+    load: chargeurs.FavoritesPage,
   },
   {
     to: '/profil',
     label: 'Profil',
     icon: UserRound,
     end: false,
-    load: () => import('../../pages/ProfilePage'),
+    load: chargeurs.ProfilePage,
   },
 ] as const;
 
