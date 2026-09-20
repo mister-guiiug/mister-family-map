@@ -1,15 +1,30 @@
 import { useCallback } from 'react';
 import { useToast } from '@mister-guiiug/dev-pwa-config/react/toast';
-import { newId } from '../lib/id';
 
 /**
  * « Supprimé · Annuler », quelques secondes, dans la notification.
  *
- * POURQUOI CE FICHIER EXISTE. Le `toast` du socle n'a pas d'action : un
- * message, une croix, c'est tout. L'action est donc écrite ici, dans l'app, en
- * profitant de ce que le socle accepte déjà — le message est un `ReactNode`, et
- * une notification peut porter un identifiant STABLE, ce qui donne de quoi la
- * refermer depuis l'intérieur.
+ * LE BOUTON EST CELUI DU SOCLE. Ce fichier a d'abord construit son propre
+ * bouton dans le message — le toast du socle n'avait alors aucune notion
+ * d'action, et l'ADR-0005 le disait : « brouillon local de cette pièce-là, à
+ * remonter ». Elle est remontée. Depuis la 4.5.0, `show(message, { action })`
+ * rend un vrai `<button>` DANS le message (`[data-dwc='toast-action']`,
+ * habillé par `components.css` : cible tactile de 2,75 rem, texte souligné),
+ * libellé « Annuler » dans les sept langues de `labels` (`toast.undo`), qui
+ * agit PUIS referme la notification dans le même geste — on n'annule pas deux
+ * fois. Le focus qui s'y pose suspend le rebours (WCAG 2.2.1).
+ *
+ * LA DURÉE EST UN PLANCHER DU SOCLE. Un toast porteur d'une action vit huit
+ * secondes au moins — lire, décider, puis atteindre le bouton ne tient pas
+ * dans les cinq de l'ordinaire —, et un fournisseur réglé plus haut garde sa
+ * valeur. Ce fichier ne porte donc plus `UNDO_MS` : c'est la même mesure
+ * qu'avant, décidée à un seul endroit. `durationMs` reste pour qui voudrait
+ * autre chose, et la durée redevient alors la responsabilité de l'appelant.
+ *
+ * Il ne reste ici que le vocabulaire de l'app — ce qui vient de se passer,
+ * comment le défaire — et l'identifiant qui fait qu'une seconde suppression
+ * REMPLACE la première notification au lieu d'empiler deux « Annuler »
+ * indiscernables.
  *
  * POURQUOI PAS UN DIALOGUE DE CONFIRMATION. « Êtes-vous sûr ? » fait payer à
  * chaque suppression volontaire — la quasi-totalité — le prix des rares
@@ -17,16 +32,6 @@ import { newId } from '../lib/id';
  * après coup inverse le marché : le geste courant est gratuit, et le geste
  * regretté se rattrape. Cf. docs/adr/0005-annuler-plutot-que-confirmer.md.
  */
-
-/**
- * Huit secondes, pas cinq (le défaut du socle).
- *
- * Cinq suffisent à LIRE une notification ; elles ne suffisent pas à réaliser
- * qu'on s'est trompé, à trouver le bouton et à l'atteindre au pouce. Le socle
- * suspend en plus le compte à rebours tant que le doigt ou le focus est sur la
- * pile (WCAG 2.2.1) : le délai est un plancher, pas un couperet.
- */
-export const UNDO_MS = 8000;
 
 export interface UndoRequest {
   /** Ce qui vient de se passer, au passé : « Lieu supprimé ». */
@@ -39,6 +44,10 @@ export interface UndoRequest {
    * quoi : le même identifiant fait que la seconde remplace la première.
    */
   id?: string;
+  /**
+   * Sans valeur : le plancher du socle pour un toast à action (8 s), ou la
+   * durée du fournisseur si elle est plus longue.
+   */
   durationMs?: number;
 }
 
@@ -47,29 +56,13 @@ export function useUndoToast(): (request: UndoRequest) => void {
   const toast = useToast();
 
   return useCallback(
-    ({ message, onUndo, id, durationMs = UNDO_MS }: UndoRequest) => {
-      const toastId = id ?? `undo-${newId()}`;
-      toast.show(
-        <span className="flex flex-1 flex-wrap items-center justify-between gap-2">
-          <span>{message}</span>
-          {/*
-            Un VRAI bouton : atteignable au clavier, annoncé comme tel, et
-            dimensionné à la cible tactile de la famille (`touch-target`).
-          */}
-          <button
-            type="button"
-            className="touch-target -my-2 rounded-(--radius-card) px-2 font-semibold text-primary underline"
-            onClick={() => {
-              // Refermer D'ABORD : sans cela, un double appui annule deux fois.
-              toast.dismiss(toastId);
-              void onUndo();
-            }}
-          >
-            Annuler
-          </button>
-        </span>,
-        { id: toastId, duration: durationMs }
-      );
+    ({ message, onUndo, id, durationMs }: UndoRequest) => {
+      toast.show(message, {
+        id,
+        duration: durationMs,
+        // Le socle referme la notification dans le même geste que l'action.
+        action: { onAction: () => void onUndo() },
+      });
     },
     [toast]
   );

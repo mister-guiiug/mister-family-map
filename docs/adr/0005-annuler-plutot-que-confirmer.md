@@ -68,6 +68,18 @@ C'est un manque du socle, pas de l'application : un `toast` avec action a sa
 place dans `dev-pwa-config`, et V12 le range d'ailleurs en couche socle. Ce
 fichier est le brouillon local de cette pièce-là, à remonter.
 
+**Mise à jour du 2026-09-20 — elle est remontée.** Le toast du socle porte une
+action depuis la 4.5.0 : `show(message, { action: { onAction } })` rend un vrai
+`<button>` dans le message (`[data-dwc='toast-action']`, habillé par
+`components.css`), libellé « Annuler » dans les sept langues, qui agit puis
+referme la notification dans le même geste ; le focus qui s'y pose suspend le
+rebours. **Les huit secondes sont devenues le plancher du socle** pour tout
+toast à action — un fournisseur réglé plus haut garde sa valeur. La décision
+ci-dessus ne change pas ; seul son porteur change : `useUndoToast.tsx` n'est
+plus qu'une mince enveloppe (le vocabulaire de l'app, l'identifiant stable qui
+fait remplacer plutôt qu'empiler), et son test tient les mêmes cinq propriétés
+en vérifiant que le bouton est bien celui du socle.
+
 ### 3. **Et** une corbeille — les deux, pas l'un ou l'autre
 
 L'énoncé du chantier laissait le choix entre l'annulation immédiate **ou** une

@@ -1,23 +1,31 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, render, screen } from '@testing-library/react';
 import { ToastProvider } from '@mister-guiiug/dev-pwa-config/react/toast';
-import { UNDO_MS, useUndoToast } from './useUndoToast';
+import { useUndoToast } from './useUndoToast';
 
 /**
  * CE QUE CE TEST TIENT.
  *
- * `toast` du socle n'a PAS d'action : il affiche un message et une croix, rien
- * d'autre. Or « Annuler » n'est utile que s'il est là, dans le message, à
- * portée de pouce, pendant quelques secondes — sinon il faut un dialogue de
- * confirmation AVANT chaque geste, c'est-à-dire faire payer à chaque
- * suppression volontaire le prix des rares suppressions par erreur.
+ * « Annuler » n'est utile que s'il est là, dans le message, à portée de pouce,
+ * pendant quelques secondes — sinon il faut un dialogue de confirmation AVANT
+ * chaque geste, c'est-à-dire faire payer à chaque suppression volontaire le
+ * prix des rares suppressions par erreur (ADR-0005).
  *
- * Trois propriétés, et pas une de plus :
+ * LE BOUTON EST CELUI DU SOCLE depuis la 4.5.0 (`show(message, { action })`,
+ * `[data-dwc='toast-action']`) ; ce dépôt ne le construit plus. Les propriétés
+ * tenues sont les mêmes qu'avant — c'est le COMPORTEMENT qui est verrouillé,
+ * pas qui rend le bouton :
  *  1. l'action EXISTE, et c'est un vrai bouton (clavier, lecteur d'écran) ;
  *  2. l'appuyer défait, et referme la notification tout de suite — sans quoi
  *     l'utilisateur peut annuler deux fois ;
  *  3. ne rien faire NE défait pas : la notification part seule au bout du
- *     délai, et la suppression tient.
+ *     délai, et la suppression tient ;
+ *  4. le délai laisse le temps de lire ET d'atteindre le bouton : huit
+ *     secondes, le plancher du socle pour un toast à action ;
+ *  5. une seconde suppression REMPLACE la première notification.
+ *
+ * Le jour où le socle ramènerait ce plancher à cinq secondes, ou cesserait de
+ * refermer au clic, c'est ICI que ça se verrait.
  */
 
 // `Ecran` sans accent : `react-hooks/rules-of-hooks` reconnaît un composant à
@@ -59,12 +67,15 @@ describe('annuler depuis la notification', () => {
     vi.useRealTimers();
   });
 
-  it('affiche le message ET un bouton « Annuler »', () => {
+  it('affiche le message ET le bouton « Annuler » — celui du socle', () => {
     monter(() => {});
     supprimer();
 
     expect(screen.getByText('Lieu supprimé')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Annuler' })).toBeInTheDocument();
+    const annuler = screen.getByRole('button', { name: 'Annuler' });
+    expect(annuler).toBeInTheDocument();
+    // Rendu par le socle, pas par ce dépôt : c'est l'adoption qui est tenue.
+    expect(annuler).toHaveAttribute('data-dwc', 'toast-action');
   });
 
   it('annule et referme la notification', () => {
@@ -86,8 +97,10 @@ describe('annuler depuis la notification', () => {
     monter(onUndo);
     supprimer();
 
+    // Huit secondes, écrites EN CLAIR : le plancher du socle pour un toast à
+    // action, pas une constante de l'app relue ici.
     act(() => {
-      vi.advanceTimersByTime(UNDO_MS - 100);
+      vi.advanceTimersByTime(7900);
     });
     expect(screen.getByText('Lieu supprimé')).toBeInTheDocument();
 
@@ -99,11 +112,10 @@ describe('annuler depuis la notification', () => {
   });
 
   it('laisse le temps de lire ET d’atteindre le bouton', () => {
-    // Cinq secondes (le défaut du socle) suffisent à LIRE ; elles ne
+    // Cinq secondes (l'ordinaire du socle) suffisent à LIRE ; elles ne
     // suffisent pas à comprendre qu'on s'est trompé, à viser et à appuyer.
-    // La durée est écrite EN CLAIR ici, pas relue depuis `UNDO_MS` : un test
-    // qui compare la constante à elle-même passerait encore le jour où
-    // quelqu'un la ramène à cinq secondes.
+    // La durée est écrite EN CLAIR : un test qui comparerait une constante à
+    // elle-même passerait encore le jour où quelqu'un la ramène à cinq.
     monter(() => {});
     supprimer();
 
