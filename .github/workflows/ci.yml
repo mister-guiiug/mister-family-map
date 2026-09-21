@@ -1,5 +1,11 @@
-# CI famille : délégué au reusable workflow pwa-ci.yml@v4 de dev-pwa-config
+# CI famille : délégué au reusable workflow pwa-ci.yml@v6 de dev-pwa-config
 # (format · lint · type-check · test · build · verify-lockfile · E2E · audit).
+#
+# L'étiquette écrite ici doit rester celle du `uses:` ci-dessous. Elle disait
+# `@v4` alors que l'appel était passé en `@v6` : un relevé du parc qui cherchait
+# la première occurrence du motif a lu ce commentaire, conclu que ce dépôt était
+# resté deux majeurs en arrière, et l'a écarté d'une campagne à laquelle il était
+# éligible. Un commentaire périmé ne trompe pas seulement un humain.
 #
 # 💰 Coût zéro : ce workflow ne s'exécute QUE sur le dépôt PUBLIC
 # mister-guiiug/mister-family-map (minutes Actions gratuites et illimitées),
@@ -57,3 +63,8 @@ jobs:
       # chaque route), jamais jouée depuis son ajout.
       run-e2e: true
       e2e-grep: '@critical|@a11y'
+      # Second avis TypeScript 7, NON BLOQUANT. La 6 reste la référence : c'est
+      # elle que typescript-eslint résout, et il refuse la 7.0 par une assertion
+      # à l'import. Le jour où typescript-eslint#10940 se ferme, cette entrée
+      # et l'alias `typescript-7` disparaissent ensemble.
+      run-type-check-7: true
