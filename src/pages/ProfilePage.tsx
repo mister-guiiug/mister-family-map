@@ -188,6 +188,11 @@ export default function ProfilePage() {
           className="mt-4 border-t border-line pt-4"
           currentAppId="mister-family-map"
           repoUrl="https://github.com/mister-guiiug/mister-family-map"
+          // Cette app n'a jamais réécrit l'habillage de la grille : elle prend
+          // la base du paquet telle quelle, donc pas de `layout` à poser. Ne
+          // manquait que le repli — dix-neuf cartes d'affilée font un mur,
+          // sept lignes non.
+          groupBy="category"
         />
       </div>
     </div>

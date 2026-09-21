@@ -234,7 +234,13 @@ test('@critical le profil offre la mise à jour forcée, le code source, le caf�
   await expect(sponsor).toBeVisible();
   await expect(sponsor).toHaveAttribute('href', /buymeacoffee\.com/);
 
-  // La grille des autres apps, alimentée par le catalogue du socle.
+  // La grille des autres apps, alimentée par le catalogue du socle, et REPLIÉE
+  // par catégorie (`groupBy`) : les cartes existent dans le DOM mais restent
+  // cachées tant qu'un groupe n'est pas ouvert. Vérifier une carte visible
+  // sans déplier échouerait — c'est ce qui est arrivé sur mister-doc.
+  const groupes = page.locator('[data-dwc="family-app-group"]');
+  await expect(groupes.first()).toBeVisible();
+  await groupes.first().locator('summary').click();
   await expect(page.locator('[data-dwc="family-app"]').first()).toBeVisible();
 
   // Le partage, et sa zone de retour : la région `status` doit exister AVANT
