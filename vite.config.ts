@@ -34,7 +34,7 @@ export default defineConfig(({ command }) => ({
       // Sans `logoPath`, le plugin ne calcule pas `logoUrl` et n'écrit donc
       // aucun `og:image` : un lien partagé sort sans vignette. Relevé par
       // probe-sites le 07/09/2026 — seule app du parc dans ce cas.
-      logoPath: '/icon-192.png',
+      logoPath: '/icon-512.png',
     }),
     // La version du package.json arrive dans le bundle, sur
     // `globalThis.__DWC_BUILD__` dans le `<head>`, et dans `dist/version.json`.
