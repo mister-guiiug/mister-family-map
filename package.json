@@ -34,10 +34,10 @@
     "_pourquoi": "RELEVÉ DE 750 À 809 LE 19/09/2026, APRÈS la bascule PostHog (ADR 0012). Le plafond tenait sans rien toucher — 734,6 kB pour 750 — et c'est justement le piège : 15,4 kB de marge, soit 2 %, là où la convention du parc en laisse 10 %. Un budget qu'on ne relève pas parce qu'il passe DE JUSTESSE casse au commit suivant, sur un changement sans rapport. 809 = mesure + 10 %. ET ICI LA MARGE COMPTE DOUBLE : ce dépôt privé n'a pas de minutes Actions, sa CI est sautée, et c'est le MIROIR public qui construit — une borne trop serrée s'y découvrirait après publication, pas avant."
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.116.0",
+    "@supabase/supabase-js": "^2.117.1",
     "lucide-react": "^1.47.0",
-    "maplibre-gl": "^6.10.0",
-    "posthog-js": "^1.434.7",
+    "maplibre-gl": "^6.11.1",
+    "posthog-js": "^1.434.11",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "react-router": "^8.4.0",
@@ -64,7 +64,7 @@
     "eslint-plugin-react-refresh": "^0.5.7",
     "globals": "^17.12.0",
     "jsdom": "^30.1.1",
-    "prettier": "^3.9.8",
+    "prettier": "^3.9.9",
     "sharp": "^0.35.4",
     "tailwindcss": "^4.3.3",
     "typescript": "~6.0.3",
