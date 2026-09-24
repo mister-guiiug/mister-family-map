@@ -22,7 +22,6 @@ import {
   UserRound,
 } from 'lucide-react';
 import { ConnectionBanner } from '@mister-guiiug/dev-pwa-config/react/connection-banner';
-import { AppFooter } from '@mister-guiiug/dev-pwa-config/react/app-footer';
 import { prefetch } from '@mister-guiiug/dev-pwa-config/prefetch';
 import { startTabSync } from '../../shared/api/tab-sync';
 import { UpdatePromptBanner } from '@mister-guiiug/dev-pwa-config/react/update-prompt-banner';
@@ -211,16 +210,10 @@ export function RootLayout() {
       <main id="contenu" className="flex-1 pb-24">
         <Outlet />
 
-        {/*
-          HORS des routes : le code source et « M'offrir un café » sont ainsi
-          sur le premier écran comme sur le Profil — la règle famille du
-          05/09/2026. Ils n'étaient que sur le Profil, via `FamilyApps`, qui
-          garde son rôle propre : la grille des applications sœurs.
-
-          DANS `<main>` à dessein : la navigation basse est `fixed`, et c'est
-          le `pb-24` qui lui réserve sa place. Posé après `</main>`, ce pied de
-          page passerait dessous.
-        */}
+        {/* PAS DE PIED DE PAGE ICI : la règle famille (06/09/2026) le veut sur
+            l'accueil (ExplorePage) et le Profil seulement. Sous toutes les
+            routes, il suivait la fiche d'un lieu et la saisie d'un
+            événement. */}
         {/* Une `region`, pas une boîte modale : elle ne recouvre rien et ne
             piège pas le focus. Ne rend RIEN tant que
             `VITE_POSTHOG_KEY` n'est pas posée — sans identifiant, il
@@ -229,10 +222,6 @@ export function RootLayout() {
           posthogKey={import.meta.env.VITE_POSTHOG_KEY}
           loader={() => import('posthog-js/dist/module.slim.js')}
           className="mt-8 px-fluid-md"
-        />
-        <AppFooter
-          className="mt-8 justify-center px-fluid-md text-fluid-sm"
-          repoUrl="https://github.com/mister-guiiug/mister-family-map"
         />
       </main>
 

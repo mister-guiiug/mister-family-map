@@ -11,9 +11,9 @@
  * la branche par défaut de ce dépôt n'est pas `main`, les PR atterrissaient
  * donc ailleurs, `main` ne bougeait plus, et le miroir public publiait
  * fidèlement une branche morte — 27 paquets de retard sans que rien ne le
- * signale. Le workflow `sync-from-private.yml` lit déjà la branche par défaut
- * à l'exécution ; ce script fait désormais pareil, et les deux mécanismes
- * désignent enfin la même chose.
+ * signale. Le workflow `sync-from-private.yml` (retiré le 24/09/2026, voir
+ * docs/MIRRORING.md) lisait déjà la branche par défaut à l'exécution ; ce
+ * script fait désormais pareil.
  *
  * La DESTINATION publique, elle, reste `main` : c'est la branche du miroir.
  *
@@ -232,8 +232,8 @@ function main() {
  * La publication est un `git push --force` : sans cette garde, elle EFFACE.
  * Ce n'est pas théorique — le 06/09/2026 le développement est passé du privé au
  * public sans que le miroir suive, et huit commits ont été perdus. Le workflow
- * `sync-from-private.yml` porte cette garde depuis ; le script, qui pousse
- * pourtant avec les mêmes armes, ne l'avait pas.
+ * `sync-from-private.yml`, retiré depuis, portait cette garde ; le script, qui
+ * pousse pourtant avec les mêmes armes, ne l'avait pas.
  *
  * Elle compte, et surtout elle NOMME ce qui disparaîtrait : un nombre seul ne
  * permet pas de décider.

@@ -47,7 +47,7 @@
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",
     "@eslint/js": "^10.0.1",
-    "@mister-guiiug/dev-pwa-config": "^6.13.0",
+    "@mister-guiiug/dev-pwa-config": "^6.15.1",
     "@playwright/test": "^1.63.0",
     "@tailwindcss/vite": "^4.3.3",
     "@testing-library/jest-dom": "^7.0.1",
@@ -77,6 +77,11 @@
   "overrides": {
     "eslint-plugin-jsx-a11y": {
       "eslint": "$eslint"
+    }
+  },
+  "pwaDoctor": {
+    "refus": {
+      "wf-keepalive": "Aucun projet Supabase n'est branché en production : deploy.yml laisse VITE_SUPABASE_URL en commentaire, et l'app tourne sur son backend local (src/app/config/backend.ts ne choisit Supabase que si l'URL et la clé sont posées). Un keep-alive n'aurait rien à réveiller — et le réutilisable, qui exige ces deux secrets, échouerait tous les trois jours. À ajouter le jour où un projet est provisionné."
     }
   }
 }

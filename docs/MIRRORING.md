@@ -63,9 +63,8 @@ Le script (`scripts/mirror.mjs`, Node ≥ 22, zéro dépendance) :
 > coûté trois semaines de dérive : la branche par défaut de ce dépôt n'est pas
 > `main`, les PR atterrissaient donc ailleurs, `main` ne bougeait plus, et le
 > miroir public publiait fidèlement une branche morte — **27 paquets de retard**
-> sans que rien ne le signale. `sync-from-private.yml` lisait déjà la branche
-> par défaut à l'exécution ; le script fait désormais pareil, et les deux
-> mécanismes désignent enfin la même chose.
+> sans que rien ne le signale. Le workflow `sync-from-private.yml` lisait déjà
+> la branche par défaut à l'exécution ; le script fait désormais pareil.
 
 Chaque publication sur le `main` public déclenche gratuitement, côté public :
 la CI complète (dont E2E `@critical`), Lighthouse, et le déploiement Pages →
@@ -124,6 +123,14 @@ gh release create vX.Y.Z --repo mister-guiiug/mister-family-map --generate-notes
 
 ## Limites connues
 
+- **Aucune publication côté serveur.** Un workflow `sync-from-private.yml`,
+  lancé à la main depuis le dépôt public, offrait une seconde voie : il lisait
+  la source avec un jeton `PRIVATE_READ_TOKEN`. Il a été retiré le 24/09/2026 :
+  son jeton lisait les métadonnées du dépôt privé mais pas son contenu (il lui
+  manquait « Contents : Read-only »), il échouait depuis le 18/09 et restait le
+  seul rouge du parc, alors que `npm run mirror` publiait sans lui. Le
+  rétablir demanderait ce jeton corrigé, puis de reprendre le fichier dans
+  l'historique.
 - La synchronisation est **manuelle par conception** (c'est ce qui la rend
   gratuite) : penser à `npm run mirror` après chaque série de PR. Un oubli ne
   casse rien — le public est simplement en retard. Mais il peut l'être

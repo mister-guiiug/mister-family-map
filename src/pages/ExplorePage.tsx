@@ -20,6 +20,7 @@ import { useFavoritesStore } from '../features/favorites/store';
 import { FilterSheet } from '../features/search/components/FilterSheet';
 import { PlaceCard } from '../features/places/components/PlaceCard';
 import { PageHeader } from '../shared/components/PageHeader';
+import { AppFooter } from '@mister-guiiug/dev-pwa-config/react/app-footer';
 
 /** Accueil « Explorer » : recherche, filtres, liste, suggestions transparentes. */
 export default function ExplorePage() {
@@ -195,6 +196,14 @@ export default function ExplorePage() {
           pas, donne la marche à suivre. Cadence du socle : au premier
           lancement, puis une fois par mois, trois fois. */}
       <PwaInstallPrompt />
+
+      {/* Le code source et le soutien : ici, sur l'accueil, et sur le Profil
+          (par `FamilyApps`), nulle part ailleurs — règle famille du
+          06/09/2026. */}
+      <AppFooter
+        className="mt-8 justify-center px-fluid-md text-fluid-sm"
+        repoUrl="https://github.com/mister-guiiug/mister-family-map"
+      />
     </div>
   );
 }
