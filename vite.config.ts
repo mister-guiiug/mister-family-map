@@ -5,6 +5,7 @@ import { VitePWA } from 'vite-plugin-pwa';
 import { pwaSeoPlugin } from '@mister-guiiug/dev-pwa-config/vite-pwa-base';
 import { cspPlugin } from '@mister-guiiug/dev-pwa-config/vite-csp';
 import { versionPlugin } from '@mister-guiiug/dev-pwa-config/vite-version';
+import { NAVIGATE_FALLBACK_DENY_FILES } from '@mister-guiiug/dev-pwa-config/vite-pwa';
 import {
   mapCspDirectives,
   mapTileRuntimeCaching,
@@ -119,6 +120,8 @@ export default defineConfig(({ command }) => ({
         ],
       },
       workbox: {
+        // Un fichier (sitemap.xml, llms.txt…) va au réseau, pas à index.html.
+        navigateFallbackDenylist: [NAVIGATE_FALLBACK_DENY_FILES],
         // Shell applicatif précaché → l'app démarre hors ligne ; les données
         // (lieux, favoris) sont servies par les adaptateurs locaux (IDB/LS).
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
