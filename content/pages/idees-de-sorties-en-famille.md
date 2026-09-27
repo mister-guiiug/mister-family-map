@@ -46,9 +46,9 @@ Un lieu très fréquenté un dimanche après-midi peut être calme un mercredi m
 4. Repérer les toilettes et un endroit pour se poser.
 5. Garder en tête une idée de repli à l'abri.
 
-## Comment Mister Family Map vous aide
+## Comment Mister FamilyMap vous aide
 
-Mister Family Map rassemble des idées de sorties en famille sur une carte, avec des fiches pensées pour les parents plutôt que des descriptions promotionnelles.
+[Mister FamilyMap](https://mister-guiiug.github.io/mister-family-map/) rassemble des idées de sorties en famille sur une carte, avec des fiches pensées pour les parents plutôt que des descriptions promotionnelles.
 
 - **Des filtres pratiques** : âge de l'enfant, gratuit ou payant, intérieur ou extérieur, compatible mauvais temps, adapté poussette, accessible, toilettes, point d'eau, aire de pique-nique, restauration à proximité, animaux autorisés, note minimale des familles.
 - **L'inconnu reste inconnu** : filtrer sur « poussette » n'écarte pas un lieu dont on ne sait pas encore s'il est adapté.
@@ -73,6 +73,6 @@ Consultez le site officiel du lieu, puis cherchez le retour d'une famille qui y 
 
 De l'eau, un goûter, une tenue de rechange, de quoi le changer, et un lieu pour faire une pause. Une sortie courte, avec un repli à l'abri en cas de pluie, se passe souvent mieux qu'une longue journée.
 
-### Faut-il un compte pour utiliser Mister Family Map ?
+### Faut-il un compte pour utiliser Mister FamilyMap ?
 
 Non pour consulter les fiches, la carte et l'agenda. Un compte sert à proposer un lieu, un événement ou un retour d'expérience.
