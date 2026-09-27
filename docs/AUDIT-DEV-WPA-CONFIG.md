@@ -8,6 +8,11 @@ Audit réalisé le 2026-08-21 sur l'état du dépôt `mister-guiiug/dev-wpa-conf
 > 05/09/2026 ; l'ancien nom reste publié en 3.34.0 et n'évolue plus. Ce
 > document garde le nom en vigueur à la date de l'audit : le réécrire lui
 > ferait affirmer ce qui était faux ce jour-là.
+>
+> **Le dépôt n'est plus un miroir.** Depuis le 27/09/2026 l'application est
+> `mister-guiiug/mister-family-map`, servie sur
+> <https://mister-guiiug.github.io/mister-family-map/>. Les mentions de
+> `bac-sable` plus bas décrivent l'état du 21/08/2026.
 
 ## Version du paquet partagé
 

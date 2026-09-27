@@ -4,7 +4,7 @@
  *
  * CE FICHIER EST LA SOURCE DE `@mister-guiiug/dev-pwa-config/dates`. Son
  * en-tête le dit — « PROMU, PAS INVENTÉ. Trois apps portaient chacune leur
- * module dates : bac-sable (arithmétique d'intervalles) […] ». L'app qui a
+ * module dates : mister-family-map (arithmétique d'intervalles) […] ». L'app qui a
  * donné le code ne l'avait jamais réadopté, et les deux copies étaient
  * identiques au caractère près.
  *
