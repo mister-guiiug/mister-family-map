@@ -40,7 +40,6 @@ Pour brancher Supabase : appliquer `supabase/migrations/`, puis définir
 | `npm run build`                          | `tsc -b` + Vite 8 + PWA (précache + manifest)                                 |
 | `npm run icons`                          | Régénère les icônes PWA depuis `public/favicon.svg` (bin famille `pwa-icons`) |
 | `npm run verify`                         | Portail qualité complet (format + lint + types + tests + build)               |
-| `npm run mirror` / `mirror:snapshot`     | Publication vers le dépôt public (cf. docs/MIRRORING.md)                      |
 
 ## Architecture
 
@@ -121,40 +120,11 @@ d'Ariane joint aux erreurs.
 
 Détails, menaces et restes à faire : [docs/THREAT-MODEL.md](./docs/THREAT-MODEL.md).
 
-## CI/CD — à coût zéro
+## CI/CD
 
-Les minutes Actions ne sont pas disponibles sur ce dépôt privé : toute
-l'automatisation s'exécute **gratuitement sur le miroir public**
-`mister-guiiug/mister-family-map`, alimenté par `npm run mirror`.
-
-Reusable workflows famille (permissions minimales au niveau caller), tous
-gardés par `if: github.repository == 'mister-guiiug/mister-family-map'` —
-`skipped` ici (0 minute, 0 rouge), exécutés sur le public :
-`ci.yml` → `pwa-ci.yml@v4` (format · lint · type · test · build · audit npm ·
-E2E `@critical`), `deploy.yml` → `pwa-deploy.yml@v4` (GitHub Pages publiques),
-`lighthouse.yml` → `pwa-lighthouse.yml@v4`.
-
-Côté privé, le portail qualité est **`npm run verify`**, exigé par le script
-de publication avant tout push (et exécutable à tout moment, y compris par
-les hooks git optionnels ci-dessous).
-
-⚠️ Bootstrap lockfile : le `package-lock.json` a été généré sans accès
-authentifié à GitHub Packages — l'entrée `@mister-guiiug/dev-pwa-config` est
-volontairement sans `resolved`/`integrity` (`npm ci` fonctionne). Premier
-contributeur : lancer `npm install` avec un accès au registre, committer le
-lockfile complété, puis passer `verify-lockfile: true` dans `ci.yml`.
-
-## Publication publique (mirroring)
-
-Ce dépôt privé est le dépôt principal de développement. La version publiée
-vit sur le dépôt public dédié
-[`mister-guiiug/mister-family-map`](https://github.com/mister-guiiug/mister-family-map),
-alimenté par **`npm run mirror`** depuis le poste de travail (aucune minute
-Actions, aucun secret — vos identifiants git suffisent) : **seules la branche
-`main` et les tags `v*` atteignables depuis `main`** y sont publiés, avec un
-mode `snapshot` (`npm run mirror:snapshot`) pour publier un historique filtré
-par `.github/mirror-exclude.txt`. Le contrôle qualité `npm run verify` est
-exigé avant chaque publication. Détails : [docs/MIRRORING.md](./docs/MIRRORING.md).
+Les workflows réutilisent ceux du socle, à l'étiquette `v6` : `ci.yml`
+(format, lint, types, tests, build, E2E), `deploy.yml` (GitHub Pages) et
+`lighthouse.yml`. `npm run verify` est le même contrôle, en local.
 
 ## Hooks git (optionnel, recommandé)
 

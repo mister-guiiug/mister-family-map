@@ -1,9 +1,6 @@
 # Budget qualité (perf / a11y / best-practices / SEO), via le reusable
 # pwa-lighthouse.yml@v4. Seuils dans .lighthouserc.json.
 #
-# 💰 Coût zéro : ne s'exécute QUE sur le dépôt PUBLIC
-# mister-guiiug/mister-family-map — à chaque publication sur main, ou à la
-# demande (Run workflow). Sur le dépôt privé, le job est `skipped`.
 name: Lighthouse
 on:
   push:
@@ -19,8 +16,6 @@ permissions:
 
 jobs:
   lighthouse:
-    # Exécution réservée au miroir public — cf. commentaire d'en-tête.
-    if: github.repository == 'mister-guiiug/mister-family-map'
     uses: mister-guiiug/dev-pwa-config/.github/workflows/pwa-lighthouse.yml@v6
     # PAS de `secrets: inherit` : ce workflow n'en déclare aucun, et
     # `GITHUB_TOKEN` lui est fourni d'office. Hériter enverrait TOUS les

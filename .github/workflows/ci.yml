@@ -7,13 +7,6 @@
 # resté deux majeurs en arrière, et l'a écarté d'une campagne à laquelle il était
 # éligible. Un commentaire périmé ne trompe pas seulement un humain.
 #
-# 💰 Coût zéro : ce workflow ne s'exécute QUE sur le dépôt PUBLIC
-# mister-guiiug/mister-family-map (minutes Actions gratuites et illimitées),
-# alimenté par `npm run mirror`. Sur le dépôt privé bac-sable — dont les
-# minutes Actions ne sont pas disponibles — le job est `skipped` (aucun
-# runner demandé, aucune minute, aucun échec) ; la qualité y est garantie
-# par `npm run verify`, exigé avant chaque publication.
-#
 # ⚠️ Permissions déclarées ICI (niveau caller) : les reusable workflows
 # héritent des permissions du caller (intersection uniquement).
 # `packages: read` est requis pour installer @mister-guiiug/dev-pwa-config
@@ -31,8 +24,6 @@ permissions:
 
 jobs:
   ci:
-    # Exécution réservée au miroir public — cf. commentaire d'en-tête.
-    if: github.repository == 'mister-guiiug/mister-family-map'
     uses: mister-guiiug/dev-pwa-config/.github/workflows/pwa-ci.yml@v6
     # PAS de `secrets: inherit` : ce workflow n'en déclare aucun, et
     # `GITHUB_TOKEN` lui est fourni d'office. Hériter enverrait TOUS les
