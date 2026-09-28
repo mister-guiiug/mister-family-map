@@ -3,15 +3,20 @@
 Carte collaborative d'idées de sorties en famille : lieux testés, agenda
 d'événements et retours d'expérience **réellement utiles** (pas de descriptions
 promotionnelles). PWA mobile-first, hors-ligne raisonné, privacy by design.
+Le site publié n'a pas encore de serveur de données : ses lieux sont des
+exemples lyonnais, et ce qu'un visiteur ajoute reste dans son navigateur, sans
+être partagé.
 
-> Squelette applicatif exécutable — construit sur les configurations partagées
-> [`@mister-guiiug/dev-pwa-config`](https://github.com/mister-guiiug/dev-pwa-config) v4.0.0.
-> Audit de compatibilité : [docs/AUDIT-DEV-WPA-CONFIG.md](./docs/AUDIT-DEV-WPA-CONFIG.md).
+> Construit sur le socle partagé
+> [`@mister-guiiug/dev-pwa-config`](https://github.com/mister-guiiug/dev-pwa-config)
+> (version : voir `package.json`).
+> Audit de compatibilité, état du 21/08/2026 : [docs/AUDIT-DEV-WPA-CONFIG.md](./docs/AUDIT-DEV-WPA-CONFIG.md).
 
 ## Démarrage
 
-Prérequis : Node ≥ 22 (`.nvmrc`) et un accès GitHub Packages pour le scope
-`@mister-guiiug` (PAT `read:packages`, cf. [README du paquet partagé](https://github.com/mister-guiiug/dev-pwa-config#installation-github-packages)) :
+Prérequis : la version de Node de `.nvmrc` (minimum dans `engines` du
+`package.json`) et un accès GitHub Packages pour le scope `@mister-guiiug`
+(PAT `read:packages`, cf. [README du paquet partagé](https://github.com/mister-guiiug/dev-pwa-config#installation-github-packages)) :
 
 ```bash
 npm login --scope=@mister-guiiug --auth-type=legacy --registry=https://npm.pkg.github.com
@@ -21,7 +26,8 @@ npm run dev
 
 Sans configuration, l'app tourne en **backend local** (localStorage + données
 de démonstration lyonnaises) : consultable, contribuable et testable sans
-serveur. Comptes de démonstration : n'importe quel e-mail (`membre`),
+serveur. C'est le mode du site publié, où aucun Supabase n'est branché.
+Comptes de démonstration : n'importe quel e-mail (`membre`),
 `modo@…` (modérateur), `admin@…` (administrateur).
 
 Pour brancher Supabase : appliquer `supabase/migrations/`, puis définir
@@ -37,7 +43,7 @@ Pour brancher Supabase : appliquer `supabase/migrations/`, puis définir
 | `npm run type-check`                     | `tsc -b` strict (ES2025, verbatimModuleSyntax)                                |
 | `npm test` / `test:coverage`             | Vitest (jsdom) — domaine + composants + ports                                 |
 | `npm run test:e2e` / `test:e2e:critical` | Playwright (parcours critiques `@critical`, a11y `@a11y`)                     |
-| `npm run build`                          | `tsc -b` + Vite 8 + PWA (précache + manifest)                                 |
+| `npm run build`                          | `tsc -b` + Vite 8 + PWA (précache + manifest) + `pwa-bundle-budget`           |
 | `npm run icons`                          | Régénère les icônes PWA depuis `public/favicon.svg` (bin famille `pwa-icons`) |
 | `npm run verify`                         | Portail qualité complet (format + lint + types + tests + build)               |
 
@@ -50,14 +56,14 @@ src/
                 événement, Favoris, Connexion, Profil, Contributions, Modération, 404…
   features/     par domaine fonctionnel : map (port + adaptateur MapLibre GL du paquet partagé),
                 search (store filtres), places, events, reviews, contributions (wizard),
-                favorites, auth, moderation
+                favorites, auth
   entities/     modèles + schémas Zod + logique métier pure (place, event, review,
                 user/permissions, category, moderation)
   shared/
     api/        ports.ts (11 interfaces) · local/ (adaptateurs local-first + seed)
                 · supabase/ (client + adaptateur de référence places)
-    lib/        geo, dates, dedupe, recommend, ics, sanitize, images,
-                rate-limit — pur et testé (le clustering vient du paquet partagé)
+    lib/        dates, dedupe, id, recommend, sanitize, rate-limit : pur et testé
+                (géo, iCal, validation d'image et clustering viennent du paquet partagé)
     schemas/    filtres de recherche (tri-état : oui / non / inconnu)
     hooks/ components/ constants/ styles/ types/
 ```
@@ -67,7 +73,7 @@ composants) ; les écrans ne dépendent que des **ports** (`shared/api/ports.ts`
 un seul fichier importe supabase-js. La carte n'est plus implémentée ici : le
 port `MapProvider`, l'adaptateur MapLibre, le regroupement de marqueurs et les
 helpers CSP/cache viennent de
-[`@mister-guiiug/dev-pwa-config/map`](https://github.com/mister-guiiug/dev-pwa-config#carte-mister-guiiugdev-pwa-configmap).
+[`@mister-guiiug/dev-pwa-config/map`](https://github.com/mister-guiiug/dev-pwa-config/blob/main/docs/DONNEES.md#carte-mister-guiiugdev-pwa-configmap).
 
 Décisions documentées : [ADR-0001 carte](./docs/adr/0001-map-provider.md) ·
 [ADR-0002 backend](./docs/adr/0002-backend.md) ·
@@ -90,12 +96,14 @@ rattrapées et `installCorrelation()` pose l'identifiant qui les relie :
 
 | Canal                                                    | Ce qu'il porte                                |
 | -------------------------------------------------------- | --------------------------------------------- |
-| Journal d'erreurs local (et Sentry si un DSN est fourni) | `correlationId` en contexte de session        |
+| Journal d'erreurs local (sans envoi, Sentry non branché) | `correlationId` en contexte de session        |
 | Requêtes Supabase                                        | en-têtes `X-Correlation-Id` et `X-Session-Id` |
 | Écran de crash (`ObservabilityBoundary`)                 | la référence à citer au support               |
 
-La télémétrie reste désactivée : l'app n'en a pas, et lier un identifiant
-stable à un profil analytique serait un choix à assumer, pas un défaut.
+Mesure d'audience : PostHog (nuage européen), chargé seulement après accord
+dans le bandeau `ConsentBanner`. Il compte les pages vues et les créations de
+lieu ou d'événement (le type seul, jamais le contenu). Sans `VITE_POSTHOG_KEY`,
+le bandeau ne s'affiche pas et rien n'est mesuré.
 
 Le journal nommé (`createLogger`) remplace les `console.warn` qui
 disparaissaient dans la console de l'utilisateur : ses lignes rejoignent le fil
@@ -105,10 +113,12 @@ d'Ariane joint aux erreurs.
 
 - Géolocalisation uniquement sur action explicite, jamais persistée.
 - Aucune donnée nominative sur les enfants (tranches d'âge anonymes).
-- Autorité côté serveur : RLS par table et par opération, statuts et auteur
-  imposés par triggers — le client n'est jamais cru sur son rôle.
-- Photos ré-encodées côté client (EXIF/GPS supprimés), types et tailles
-  contrôlés, modération a priori.
+- Avec la dorsale Supabase, pas encore branchée sur le site publié : RLS par
+  table et par opération, et le client n'est jamais cru sur son rôle. Statut et
+  auteur sont imposés par triggers sur les lieux ; les autres contributions
+  n'ont pas encore cette garde.
+- Photos : types et tailles contrôlés ; aucune photo n'est encore enregistrée
+  ni envoyée (voir « Restes à faire connus »).
 - CSP durcie à la build (hash SHA-256, hôtes explicites), aucun secret dans le
   code — la clé anon Supabase est publique par conception.
 - Portabilité : « Exporter mes contributions » (Profil) écrit un JSON de tout
@@ -116,7 +126,8 @@ d'Ariane joint aux erreurs.
   promesse de la page « Mentions », désormais tenue.
 - Suppression **logique** et réversible : « Annuler » huit secondes après le
   geste, puis une corbeille dans « Mes contributions » (ADR-0005). Aucune
-  politique DELETE en base, aucune migration ajoutée.
+  politique DELETE sur les lieux, les avis et les événements, aucune migration
+  ajoutée.
 
 Détails, menaces et restes à faire : [docs/THREAT-MODEL.md](./docs/THREAT-MODEL.md).
 
@@ -124,7 +135,8 @@ Détails, menaces et restes à faire : [docs/THREAT-MODEL.md](./docs/THREAT-MODE
 
 Les workflows réutilisent ceux du socle, à l'étiquette `v6` : `ci.yml`
 (format, lint, types, tests, build, E2E), `deploy.yml` (GitHub Pages) et
-`lighthouse.yml`. `npm run verify` est le même contrôle, en local.
+`lighthouse.yml`. `npm run verify` en rejoue l'essentiel en local, sans E2E ni
+diagnostic `pwa-doctor`.
 
 ## Hooks git (optionnel, recommandé)
 
@@ -149,6 +161,11 @@ npx husky init
 - Réimport du fichier d'export (l'export seul est promis par la page
   « Mentions » ; `createVersionedStore` fournit déjà `import()` si le besoin
   vient — ADR-0006).
+- Téléversement des photos : l'étape « photos » contrôle le type et la taille,
+  puis ignore le fichier. Le ré-encodage qui retire EXIF et GPS est à câbler
+  avec lui.
+- Garde serveur du statut et de l'auteur sur les contributions autres que les
+  lieux, avant de brancher Supabase.
 - Limitation de débit côté serveur avant ouverture publique (cf. THREAT-MODEL).
 - Icônes définitives (les icônes actuelles sont un pictogramme provisoire).
 - Textes légaux définitifs (pages actuelles marquées « provisoires »).
