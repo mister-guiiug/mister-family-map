@@ -1,6 +1,9 @@
 ---
 title: Idées de sorties en famille : bien choisir avec des enfants
 description: Âge, météo, poussette, toilettes, budget, affluence : les critères pour choisir une sortie en famille réussie avec des enfants, et une liste avant de partir.
+date: 2026-09-25
+updated: 2026-09-29
+answer: Pour choisir une sortie en famille, vérifiez d'abord l'âge conseillé et la durée, puis la météo et un repli à l'abri, l'accès en poussette, les toilettes, un point d'eau et de quoi manger, le budget et l'affluence du jour. Contrôlez les horaires et les tarifs sur le site officiel du lieu, le jour même.
 ---
 
 # Idées de sorties en famille : bien choisir une activité avec des enfants
@@ -13,11 +16,11 @@ C'est le premier filtre. Une activité pensée pour les 6 à 9 ans peut ennuyer 
 
 ## La météo : intérieur, extérieur ou les deux
 
-Un parc est idéal par beau temps, beaucoup moins sous la pluie. Gardez en réserve une idée à l'abri, comme un musée ou un lieu couvert, et pensez aux lieux mixtes, qui offrent un repli. Regardez la météo la veille, puis le matin même.
+Un parc est idéal par beau temps, beaucoup moins sous la pluie. Gardez en réserve une idée à l'abri, comme un musée ou un lieu couvert, et pensez aux lieux mixtes, qui offrent un repli. Regardez la météo la veille, puis le matin même, et consultez la carte de vigilance de Météo-France avant une sortie en plein air.
 
 ## L'accès : poussette et mobilité réduite
 
-Un chemin de terre, des escaliers ou une pente raide compliquent tout avec une poussette ou un fauteuil roulant. Cherchez l'information avant de partir : un lieu annoncé comme accessible ne l'est pas forcément partout. Sur ce point, le retour d'une famille qui y est allée vaut beaucoup.
+Un chemin de terre, des escaliers ou une pente raide compliquent tout avec une poussette ou un fauteuil roulant. Cherchez l'information avant de partir : un lieu annoncé comme accessible ne l'est pas forcément partout. Le label national Tourisme & Handicap aide à y voir clair : il est attribué pour cinq ans au plus, et précise pour quelles familles de handicap le lieu a été évalué, de deux à quatre parmi auditif, mental, moteur et visuel. Sur ce point, le retour d'une famille qui y est allée vaut aussi beaucoup.
 
 ## Le confort sur place
 
@@ -55,9 +58,9 @@ Un lieu très fréquenté un dimanche après-midi peut être calme un mercredi m
 - **Des retours d'expérience structurés** : points positifs, points de vigilance, accessibilité réellement constatée, affluence, rapport qualité-prix. Aucune donnée nominative sur les enfants n'est demandée.
 - **Un agenda** des sorties à venir, avec une rubrique « Ce week-end » et un bouton pour ajouter un événement à votre calendrier.
 - **Des favoris** pour garder vos idées de côté, même hors ligne.
-- **La carte autour de vous**, seulement si vous le demandez : la position n'est utilisée qu'après un appui sur « Autour de moi ».
+- **La carte autour de vous**, seulement si vous le demandez : la position n'est utilisée qu'après un appui sur « Autour de moi », et n'est jamais enregistrée.
 
-La consultation est libre ; un compte sert à contribuer. L'application est encore jeune : les lieux affichés aujourd'hui sont des exemples situés dans la région lyonnaise, et ce que vous ajoutez reste pour l'instant dans votre navigateur.
+La consultation est libre ; un compte sert à contribuer. L'application est encore jeune : les lieux affichés aujourd'hui sont six exemples situés dans l'agglomération lyonnaise, et ce que vous ajoutez reste pour l'instant dans votre navigateur. Les fonds de carte viennent d'OpenStreetMap.
 
 ## Questions fréquentes
 
@@ -75,4 +78,10 @@ De l'eau, un goûter, une tenue de rechange, de quoi le changer, et un lieu pour
 
 ### Faut-il un compte pour utiliser Mister FamilyMap ?
 
-Non pour consulter les fiches, la carte et l'agenda. Un compte sert à proposer un lieu, un événement ou un retour d'expérience.
+Non pour consulter les fiches, la carte et l'agenda. Un compte sert à proposer un lieu, un événement ou un retour d'expérience. Sur le site publié, cette connexion reste une démonstration locale : ni mot de passe, ni e-mail envoyé.
+
+## Sources
+
+- [Carte de vigilance, Météo-France](https://vigilance.meteofrance.fr/fr) : les vigilances météo du jour et du lendemain.
+- [Le label Tourisme & Handicap, attribution](https://tourisme-handicaps.org/les-marques-nationales/tourisme-handicap/th-presentation/th-attribution/) : deux à quatre familles de handicap, cinq ans au plus.
+- [Droits d'auteur et licence, OpenStreetMap](https://www.openstreetmap.org/copyright) : les données des fonds de carte.
