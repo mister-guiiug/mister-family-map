@@ -7,6 +7,7 @@ import {
 } from '@mister-guiiug/dev-pwa-config/react';
 import { ShareButton } from '@mister-guiiug/dev-pwa-config/react/share-button';
 import { ThemeToggle } from '@mister-guiiug/dev-pwa-config/react/theme-toggle';
+import { ConsentSection } from '@mister-guiiug/dev-pwa-config/react/consent-section';
 import { useBackend } from '../app/providers/BackendProvider';
 import { useAuthStore, useCurrentRole } from '../features/auth/store';
 import { ROLE_LABELS } from '../entities/user/model';
@@ -128,6 +129,19 @@ export default function ProfilePage() {
             />
           </div>
         </section>
+
+        {/*
+          Revenir sur son choix de mesure d’audience : le retrait se fait ici,
+          en un clic (RGPD, art. 7.3). Mêmes clé et chargeur que le bandeau.
+          Hors du bloc `session`, comme le thème : un visiteur aussi a choisi.
+        */}
+        <ConsentSection
+          posthogKey={import.meta.env.VITE_POSTHOG_KEY}
+          loader={() => import('posthog-js/dist/module.slim.js')}
+          className="mt-4 border-t border-line pt-4"
+          titleClassName="text-fluid-lg font-semibold"
+          actionClassName="touch-target rounded-(--radius-card) border border-line px-fluid-sm py-2 text-fluid-sm"
+        />
 
         <section
           aria-label="À propos"
