@@ -1,0 +1,33 @@
+# Tests pgTAP, délégués au réutilisable de la famille.
+#
+# LE SEUL ENDROIT OÙ LES MIGRATIONS S'EXÉCUTENT VRAIMENT. Le poste de
+# développement n'a pas de démon Docker qui démarre, et l'app n'a pas encore
+# de projet hébergé : jusqu'ici, `0001` n'avait jamais tourné, seulement été
+# relue. La pile jetable du runner applique les migrations depuis zéro —
+# exactement ce que ferait un premier `supabase db push` — puis joue
+# `supabase/tests/`.
+#
+# AUCUN SECRET, aucune condition : tout se passe dans une base jetable.
+name: Supabase tests
+
+on:
+  pull_request:
+    paths:
+      - 'supabase/config.toml'
+      - 'supabase/migrations/**'
+      - 'supabase/tests/**'
+      - '.github/workflows/supabase-tests.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'supabase/config.toml'
+      - 'supabase/migrations/**'
+      - 'supabase/tests/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pgtap:
+    uses: mister-guiiug/dev-pwa-config/.github/workflows/pwa-supabase-test.yml@v6
