@@ -1,0 +1,51 @@
+# Configuration de la pile Supabase LOCALE — `supabase start`, `supabase test db`.
+#
+# Elle n'existe que pour exécuter les migrations et les tests pgTAP depuis
+# zéro : en CI (`pwa-supabase-test.yml` du socle, sur le Postgres du runner)
+# et sur un poste où Docker démarre. Un projet hébergé, lui, se configure par
+# son tableau de bord et par `supabase link` + `db push` (voir README.md).
+#
+# Le strict nécessaire est démarré : Postgres et GoTrue. Les tests écrivent
+# en SQL et se font passer pour un utilisateur par `set local role` — ils
+# n'ont besoin ni de l'API REST, ni du studio, ni du stockage. Repris du
+# squelette pwa-starter-kit, sans son crochet de jeton, que cette app n'a pas.
+project_id = "mister-family-map"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54322
+shadow_port = 54320
+major_version = 17
+
+[db.migrations]
+enabled = true
+
+[db.seed]
+enabled = false
+
+[realtime]
+enabled = false
+
+[studio]
+enabled = false
+
+[storage]
+enabled = false
+
+[auth]
+enabled = true
+site_url = "http://127.0.0.1:5173"
+additional_redirect_urls = ["http://localhost:5173"]
+jwt_expiry = 3600
+enable_signup = true
+enable_anonymous_sign_ins = false
+
+[auth.email]
+enable_signup = true
+enable_confirmations = false
