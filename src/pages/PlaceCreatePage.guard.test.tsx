@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { act, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import { BackendProvider } from '../app/providers/BackendProvider';
@@ -6,6 +6,10 @@ import { createLocalBackend } from '../shared/api/local/local-backend';
 import type { Backend } from '../shared/api/ports';
 import { useAuthStore } from '../features/auth/store';
 import { usePlaceWizardStore } from '../features/contributions/place-wizard-store';
+import {
+  clearQueryClient,
+  wrapWithQueryClient,
+} from '../shared/queries/testing';
 import PlaceCreatePage from './PlaceCreatePage';
 
 /**
@@ -42,11 +46,13 @@ function renderRulesStep(backend: Backend, { rules = true } = {}) {
   useAuthStore.setState({ session });
   usePlaceWizardStore.setState({ step: 'regles', rulesAccepted: rules });
   render(
-    <MemoryRouter>
-      <BackendProvider backend={backend}>
-        <PlaceCreatePage />
-      </BackendProvider>
-    </MemoryRouter>
+    wrapWithQueryClient(
+      <MemoryRouter>
+        <BackendProvider backend={backend}>
+          <PlaceCreatePage />
+        </BackendProvider>
+      </MemoryRouter>
+    )
   );
 }
 
@@ -64,6 +70,9 @@ describe('l’envoi d’une contribution dit pourquoi il est bloqué', () => {
     localStorage.clear();
     useAuthStore.setState({ session: null });
     usePlaceWizardStore.setState({ step: 'position', rulesAccepted: false });
+  });
+  afterEach(() => {
+    clearQueryClient();
   });
 
   it('règles non acceptées : bouton désactivé ET motif affiché', () => {

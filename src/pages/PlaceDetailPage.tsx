@@ -12,7 +12,6 @@ import {
 } from '@mister-guiiug/dev-pwa-config/react';
 import { Flag, Heart, Share2 } from 'lucide-react';
 import { useBackend } from '../app/providers/BackendProvider';
-import { useAsync } from '@mister-guiiug/dev-pwa-config/react/use-async';
 import { averageRating } from '../entities/review/model';
 import { PUBLICATION_STATUS_LABELS } from '../entities/place/model';
 import {
@@ -26,6 +25,9 @@ import { TriStateChip } from '../features/places/components/TriStateChip';
 import { RatingStars } from '../features/reviews/components/RatingStars';
 import { ReviewForm } from '../features/reviews/components/ReviewForm';
 import { getDefaultLocale } from '@mister-guiiug/dev-pwa-config/format';
+import { useEventsList } from '../shared/queries/events';
+import { usePlace } from '../shared/queries/places';
+import { useReviewsForPlace } from '../shared/queries/reviews';
 
 function priceLabel(place: {
   price: { kind: string; minEuros?: number; maxEuros?: number };
@@ -49,26 +51,26 @@ export default function PlaceDetailPage() {
   const [reportSent, setReportSent] = useState(false);
   const [shareMessage, setShareMessage] = useState('');
 
-  const placeState = useAsync(() => backend.places.getById(id), id);
-  const reviewsState = useAsync(() => backend.reviews.listForPlace(id), id);
-  const eventsState = useAsync(() => backend.events.list({ placeId: id }), id);
+  const placeQuery = usePlace(id);
+  const reviewsQuery = useReviewsForPlace(id);
+  const eventsQuery = useEventsList({ placeId: id });
 
-  if (placeState.loading)
+  if (placeQuery.isPending)
     return (
       <div className="p-fluid-md">
         <SkeletonGroup label="Chargement de la fiche" lines={6} />
       </div>
     );
-  if (placeState.error)
+  if (placeQuery.error)
     return (
       <div className="p-fluid-md">
         <ErrorBanner
-          message={placeState.error.message}
-          onRetry={placeState.reload}
+          message={placeQuery.error.message}
+          onRetry={() => void placeQuery.refetch()}
         />
       </div>
     );
-  const place = placeState.data;
+  const place = placeQuery.data;
   if (!place)
     return (
       <div className="p-fluid-md">
@@ -84,7 +86,7 @@ export default function PlaceDetailPage() {
       </div>
     );
 
-  const reviews = reviewsState.data ?? [];
+  const reviews = reviewsQuery.data ?? [];
   const rating = averageRating(reviews);
   const isFavorite = favorites.ids.includes(place.id);
 
@@ -210,13 +212,13 @@ export default function PlaceDetailPage() {
         ) : null}
       </section>
 
-      {(eventsState.data?.length ?? 0) > 0 ? (
+      {(eventsQuery.data?.length ?? 0) > 0 ? (
         <section aria-label="Événements associés" className="mt-5">
           <h2 className="text-fluid-lg font-semibold">
             Événements à venir ici
           </h2>
           <ul className="mt-2 flex flex-col gap-1 text-fluid-sm">
-            {eventsState.data?.map(e => (
+            {eventsQuery.data?.map(e => (
               <li key={e.id}>
                 <Link to={`/agenda/${e.id}`} className="underline">
                   {e.title}
@@ -265,7 +267,10 @@ export default function PlaceDetailPage() {
         )}
 
         {session ? (
-          <ReviewForm placeId={place.id} onPublished={reviewsState.reload} />
+          <ReviewForm
+            placeId={place.id}
+            onPublished={() => void reviewsQuery.refetch()}
+          />
         ) : (
           <p className="mt-3 text-fluid-sm">
             <Link to="/connexion" className="underline">

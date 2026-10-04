@@ -10,7 +10,6 @@ import {
 } from '@mister-guiiug/dev-pwa-config/react';
 import { useActionGuard } from '@mister-guiiug/dev-pwa-config/react/use-action-guard';
 import { useBackend } from '../app/providers/BackendProvider';
-import { useAsync } from '@mister-guiiug/dev-pwa-config/react/use-async';
 import { placeDraftSchema } from '../entities/place/model';
 import { findPotentialDuplicates } from '../shared/lib/dedupe';
 import { formatDistance } from '@mister-guiiug/dev-pwa-config/geo';
@@ -24,6 +23,8 @@ import {
 } from '../features/contributions/place-wizard-store';
 import { MapView } from '../features/map/components/MapView';
 import { PageHeader } from '../shared/components/PageHeader';
+import { useActiveCategories } from '../shared/queries/categories';
+import { usePlacesList } from '../shared/queries/places';
 
 /**
  * Parcours guidé d'ajout d'un lieu (7 écrans) : position → doublons →
@@ -44,19 +45,16 @@ export default function PlaceCreatePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- restauration au montage uniquement
   }, []);
 
-  const placesState = useAsync(() => backend.places.list(), 'static');
-  const categoriesState = useAsync(
-    () => backend.categories.listActive(),
-    'static'
-  );
+  const placesQuery = usePlacesList();
+  const categoriesQuery = useActiveCategories();
 
   const duplicates = useMemo(() => {
-    if (!placesState.data || wizard.draft.name.length < 2) return [];
+    if (!placesQuery.data || wizard.draft.name.length < 2) return [];
     return findPotentialDuplicates(
       { name: wizard.draft.name, coordinates: wizard.draft.coordinates },
-      placesState.data
+      placesQuery.data
     );
-  }, [placesState.data, wizard.draft.name, wizard.draft.coordinates]);
+  }, [placesQuery.data, wizard.draft.name, wizard.draft.coordinates]);
 
   /**
    * « Envoyer la contribution » était grisé SANS UN MOT quand les règles
@@ -274,7 +272,7 @@ export default function PlaceCreatePage() {
               onChange={e => wizard.updateDraft({ categoryId: e.target.value })}
             >
               <option value="">Choisir…</option>
-              {(categoriesState.data ?? []).map(c => (
+              {(categoriesQuery.data ?? []).map(c => (
                 <option key={c.id} value={c.id}>
                   {c.label}
                 </option>

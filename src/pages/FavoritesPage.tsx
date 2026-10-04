@@ -6,10 +6,10 @@ import {
   SkeletonGroup,
 } from '@mister-guiiug/dev-pwa-config/react';
 import { useBackend } from '../app/providers/BackendProvider';
-import { useAsync } from '@mister-guiiug/dev-pwa-config/react/use-async';
 import { useFavoritesStore } from '../features/favorites/store';
 import { PlaceCard } from '../features/places/components/PlaceCard';
 import { PageHeader } from '../shared/components/PageHeader';
+import { usePlacesList } from '../shared/queries/places';
 
 /**
  * Favoris — disponibles hors ligne : les identifiants vivent en stockage
@@ -21,11 +21,11 @@ export default function FavoritesPage() {
   const navigate = useNavigate();
   const favorites = useFavoritesStore();
 
-  const placesState = useAsync(() => backend.places.list(), 'static');
+  const placesQuery = usePlacesList();
 
   const favoritePlaces = useMemo(
-    () => (placesState.data ?? []).filter(p => favorites.ids.includes(p.id)),
-    [placesState.data, favorites.ids]
+    () => (placesQuery.data ?? []).filter(p => favorites.ids.includes(p.id)),
+    [placesQuery.data, favorites.ids]
   );
 
   return (
@@ -35,7 +35,7 @@ export default function FavoritesPage() {
         subtitle="Vos idées de sorties mises de côté"
       />
       <div className="px-fluid-md pb-8">
-        {placesState.loading ? (
+        {placesQuery.isPending ? (
           <SkeletonGroup label="Chargement des favoris" lines={3} />
         ) : favoritePlaces.length === 0 ? (
           <EmptyState
