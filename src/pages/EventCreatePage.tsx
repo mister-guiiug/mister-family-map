@@ -9,21 +9,18 @@ import {
   TextField,
 } from '@mister-guiiug/dev-pwa-config/react';
 import { useBackend } from '../app/providers/BackendProvider';
-import { useAsync } from '@mister-guiiug/dev-pwa-config/react/use-async';
 import { eventDraftSchema } from '../entities/event/model';
 import { sanitizeSingleLine, sanitizeUserText } from '../shared/lib/sanitize';
 import { useAuthStore } from '../features/auth/store';
 import { PageHeader } from '../shared/components/PageHeader';
+import { useActiveCategories } from '../shared/queries/categories';
 
 /** Proposition d'événement (statut `proposed`, validé par la modération). */
 export default function EventCreatePage() {
   const backend = useBackend();
   const navigate = useNavigate();
   const session = useAuthStore(s => s.session);
-  const categoriesState = useAsync(
-    () => backend.categories.listActive(),
-    'static'
-  );
+  const categoriesQuery = useActiveCategories();
 
   const [title, setTitle] = useState('');
   const [categoryId, setCategoryId] = useState('');
@@ -135,7 +132,7 @@ export default function EventCreatePage() {
           onChange={e => setCategoryId(e.target.value)}
         >
           <option value="">Choisir…</option>
-          {(categoriesState.data ?? []).map(c => (
+          {(categoriesQuery.data ?? []).map(c => (
             <option key={c.id} value={c.id}>
               {c.label}
             </option>

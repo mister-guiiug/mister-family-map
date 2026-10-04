@@ -8,8 +8,6 @@ import {
   TextField,
 } from '@mister-guiiug/dev-pwa-config/react';
 import { Plus } from 'lucide-react';
-import { useBackend } from '../app/providers/BackendProvider';
-import { useAsync } from '@mister-guiiug/dev-pwa-config/react/use-async';
 import {
   eventsOnDay,
   upcomingEvents,
@@ -19,17 +17,17 @@ import { distanceKm } from '@mister-guiiug/dev-pwa-config/geo';
 import { useSearchStore } from '../features/search/store';
 import { EventCard } from '../features/events/components/EventCard';
 import { PageHeader } from '../shared/components/PageHeader';
+import { useEventsList } from '../shared/queries/events';
 
 /** Agenda : « Ce week-end », « À une date précise », « À proximité », liste chronologique. */
 export default function AgendaPage() {
-  const backend = useBackend();
   const navigate = useNavigate();
   const [pickedDate, setPickedDate] = useState('');
   const { origin } = useSearchStore();
   const now = useMemo(() => new Date(), []);
 
-  const eventsState = useAsync(() => backend.events.list(), 'static');
-  const events = eventsState.data ?? [];
+  const eventsQuery = useEventsList();
+  const events = eventsQuery.data ?? [];
 
   const weekend = useMemo(() => weekendEvents(events, now), [events, now]);
   const onDate = useMemo(
@@ -62,12 +60,12 @@ export default function AgendaPage() {
       />
 
       <div className="flex flex-col gap-6 px-fluid-md pb-8">
-        {eventsState.loading ? (
+        {eventsQuery.isPending ? (
           <SkeletonGroup label="Chargement de l'agenda" lines={4} />
-        ) : eventsState.error ? (
+        ) : eventsQuery.error ? (
           <ErrorBanner
-            message={eventsState.error.message}
-            onRetry={eventsState.reload}
+            message={eventsQuery.error.message}
+            onRetry={() => void eventsQuery.refetch()}
           />
         ) : (
           <>

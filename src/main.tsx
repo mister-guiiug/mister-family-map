@@ -1,5 +1,6 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { RouterProvider } from 'react-router/dom';
 import { ObservabilityBoundary } from '@mister-guiiug/dev-pwa-config/react';
 import { VersionProvider } from '@mister-guiiug/dev-pwa-config/react/version';
@@ -11,6 +12,7 @@ import { BackendProvider } from './app/providers/BackendProvider';
 import { createBackend } from './app/config/backend';
 import { THEME_COLOR, THEME_STORAGE_KEY } from './app/config/theme';
 import { router } from './app/router';
+import { getQueryClient } from './shared/queries/client';
 import './shared/styles/index.css';
 
 /**
@@ -73,9 +75,15 @@ createRoot(container).render(
             « Annuler », qui est précisément ce qu'il faut pouvoir atteindre.
           */}
           <ToastProvider className="pb-24">
-            <BackendProvider backend={backend}>
-              <RouterProvider router={router} />
-            </BackendProvider>
+            {/*
+              Query autour du backend : les hooks de lecture appellent
+              `useBackend()` — le client doit donc voir le même contexte.
+            */}
+            <QueryClientProvider client={getQueryClient()}>
+              <BackendProvider backend={backend}>
+                <RouterProvider router={router} />
+              </BackendProvider>
+            </QueryClientProvider>
           </ToastProvider>
         </ThemeProvider>
       </VersionProvider>

@@ -28,11 +28,12 @@
     "verify": "npm run format:check && npm run lint && npm run type-check && npm run test && npm run build"
   },
   "bundleBudget": {
-    "totalGzipKb": 809,
-    "_pourquoi": "RELEVÉ DE 750 À 809 LE 19/09/2026, APRÈS la bascule PostHog (ADR 0012). Le plafond tenait sans rien toucher — 734,6 kB pour 750 — et c'est justement le piège : 15,4 kB de marge, soit 2 %, là où la convention du parc en laisse 10 %. Un budget qu'on ne relève pas parce qu'il passe DE JUSTESSE casse au commit suivant, sur un changement sans rapport. 809 = mesure + 10 %."
+    "totalGzipKb": 822,
+    "_pourquoi": "RELEVÉ DE 809 À 822 LE 05/10/2026, APRÈS TanStack Query (^5.104.1) pour les lectures ciblées (lieux, événements, catégories, avis). Le runtime Query pèse ~13 kB gzip ; 822 = ancien plafond + cette marge, sans re-mesure CI — à affiner après le prochain build Pages."
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.2",
+    "@tanstack/react-query": "^5.104.1",
     "lucide-react": "^1.51.0",
     "maplibre-gl": "^6.11.2",
     "posthog-js": "^1.435.8",
@@ -47,7 +48,7 @@
     "@commitlint/cli": "^21.2.3",
     "@commitlint/config-conventional": "^21.2.3",
     "@eslint/js": "^10.0.1",
-    "@mister-guiiug/dev-pwa-config": "^6.23.0",
+    "@mister-guiiug/dev-pwa-config": "^6.24.0",
     "@playwright/test": "^1.63.0",
     "@tailwindcss/vite": "^4.3.3",
     "@testing-library/jest-dom": "^7.0.1",

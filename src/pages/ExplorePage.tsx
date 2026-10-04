@@ -10,9 +10,7 @@ import {
   TextField,
 } from '@mister-guiiug/dev-pwa-config/react';
 import { useBackend } from '../app/providers/BackendProvider';
-import { useAsync } from '@mister-guiiug/dev-pwa-config/react/use-async';
 import { applyFilters, countActiveFilters } from '../shared/schemas/filters';
-import { averageRating } from '../entities/review/model';
 import { distanceKm } from '@mister-guiiug/dev-pwa-config/geo';
 import { recommendPlaces } from '../shared/lib/recommend';
 import { useSearchStore } from '../features/search/store';
@@ -21,6 +19,9 @@ import { FilterSheet } from '../features/search/components/FilterSheet';
 import { PlaceCard } from '../features/places/components/PlaceCard';
 import { PageHeader } from '../shared/components/PageHeader';
 import { AppFooter } from '@mister-guiiug/dev-pwa-config/react/app-footer';
+import { useActiveCategories } from '../shared/queries/categories';
+import { usePlacesList } from '../shared/queries/places';
+import { usePlaceRatingsMap } from '../shared/queries/reviews';
 
 /** Accueil « Explorer » : recherche, filtres, liste, suggestions transparentes. */
 export default function ExplorePage() {
@@ -30,49 +31,36 @@ export default function ExplorePage() {
   const { filters, setFilters, origin } = useSearchStore();
   const favorites = useFavoritesStore();
 
-  const placesState = useAsync(() => backend.places.list(), 'static');
-  const categoriesState = useAsync(
-    () => backend.categories.listActive(),
-    'static'
-  );
-  const reviewsByPlace = useAsync(async () => {
-    const places = await backend.places.list();
-    const ratings = new Map<string, number>();
-    for (const place of places) {
-      const rating = averageRating(
-        await backend.reviews.listForPlace(place.id)
-      );
-      if (rating !== null) ratings.set(place.id, rating);
-    }
-    return ratings;
-  }, 'static');
+  const placesQuery = usePlacesList();
+  const categoriesQuery = useActiveCategories();
+  const ratingsQuery = usePlaceRatingsMap(Boolean(placesQuery.data));
 
-  const categories = categoriesState.data ?? [];
+  const categories = categoriesQuery.data ?? [];
   const categoryById = useMemo(
     () => new Map(categories.map(c => [c.id, c])),
     [categories]
   );
 
   const filtered = useMemo(() => {
-    if (!placesState.data) return [];
-    return applyFilters(placesState.data, filters, {
+    if (!placesQuery.data) return [];
+    return applyFilters(placesQuery.data, filters, {
       ...(origin ? { origin } : {}),
-      ...(reviewsByPlace.data ? { ratings: reviewsByPlace.data } : {}),
+      ...(ratingsQuery.data ? { ratings: ratingsQuery.data } : {}),
     });
-  }, [placesState.data, filters, origin, reviewsByPlace.data]);
+  }, [placesQuery.data, filters, origin, ratingsQuery.data]);
 
   const suggestions = useMemo(() => {
-    if (!placesState.data) return [];
+    if (!placesQuery.data) return [];
     return recommendPlaces(
-      placesState.data,
+      placesQuery.data,
       {
         ...(origin ? { origin } : {}),
         favoriteCategoryIds: [],
       },
-      reviewsByPlace.data ? { ratings: reviewsByPlace.data } : {},
+      ratingsQuery.data ? { ratings: ratingsQuery.data } : {},
       3
     );
-  }, [placesState.data, origin, reviewsByPlace.data]);
+  }, [placesQuery.data, origin, ratingsQuery.data]);
 
   const activeFilters = countActiveFilters(filters);
 
@@ -118,12 +106,12 @@ export default function ExplorePage() {
       </div>
 
       <section aria-label="Résultats" className="mt-4 px-fluid-md">
-        {placesState.loading ? (
+        {placesQuery.isPending ? (
           <SkeletonGroup label="Chargement des lieux" lines={4} />
-        ) : placesState.error ? (
+        ) : placesQuery.error ? (
           <ErrorBanner
-            message={placesState.error.message}
-            onRetry={placesState.reload}
+            message={placesQuery.error.message}
+            onRetry={() => void placesQuery.refetch()}
           />
         ) : filtered.length === 0 ? (
           <EmptyState

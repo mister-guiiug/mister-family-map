@@ -7,7 +7,6 @@ import {
 } from '@mister-guiiug/dev-pwa-config/react';
 import { ErrorBanner } from '@mister-guiiug/dev-pwa-config/react/error-banner';
 import { useBackend } from '../app/providers/BackendProvider';
-import { useAsync } from '@mister-guiiug/dev-pwa-config/react/use-async';
 import { useUndoToast } from '../shared/hooks/useUndoToast';
 import { useAuthStore } from '../features/auth/store';
 import {
@@ -17,6 +16,10 @@ import {
 import { EVENT_STATUSES } from '../entities/event/model';
 import { PageHeader } from '../shared/components/PageHeader';
 import { getDefaultLocale } from '@mister-guiiug/dev-pwa-config/format';
+import { useEventsList } from '../shared/queries/events';
+import { useInvalidateContributions } from '../shared/queries/invalidate';
+import { usePlacesList } from '../shared/queries/places';
+import { useReviewsByAuthor } from '../shared/queries/reviews';
 
 /**
  * Suivi des contributions de l'utilisateur, avec leur statut de validation —
@@ -39,36 +42,31 @@ export default function MyContributionsPage() {
   const backend = useBackend();
   const session = useAuthStore(s => s.session);
   const showUndo = useUndoToast();
+  const invalidateContributions = useInvalidateContributions();
 
-  const placesState = useAsync(
-    () =>
-      session
-        ? backend.places.list({
-            authorId: session.userId,
-            statuses: PUBLICATION_STATUSES,
-            includeDeleted: true,
-          })
-        : Promise.resolve([]),
-    session?.userId ?? 'anon'
+  const placesQuery = usePlacesList(
+    session
+      ? {
+          authorId: session.userId,
+          statuses: PUBLICATION_STATUSES,
+          includeDeleted: true,
+        }
+      : undefined,
+    { enabled: Boolean(session) }
   );
-  const eventsState = useAsync(
-    () =>
-      session
-        ? backend.events.list({
-            authorId: session.userId,
-            statuses: EVENT_STATUSES,
-            includeDeleted: true,
-          })
-        : Promise.resolve([]),
-    session?.userId ?? 'anon'
+  const eventsQuery = useEventsList(
+    session
+      ? {
+          authorId: session.userId,
+          statuses: EVENT_STATUSES,
+          includeDeleted: true,
+        }
+      : undefined,
+    { enabled: Boolean(session) }
   );
-  const reviewsState = useAsync(
-    () =>
-      session
-        ? backend.reviews.listByAuthor(session.userId, { includeDeleted: true })
-        : Promise.resolve([]),
-    session?.userId ?? 'anon'
-  );
+  const reviewsQuery = useReviewsByAuthor(session?.userId, {
+    includeDeleted: true,
+  });
 
   if (!session) {
     return (
@@ -84,16 +82,11 @@ export default function MyContributionsPage() {
     );
   }
 
-  const reloadAll = () => {
-    placesState.reload();
-    eventsState.reload();
-    reviewsState.reload();
-  };
-
   /**
-   * Supprime, puis propose de défaire. `reload` d'abord : l'écran doit dire la
-   * vérité avant que la notification ne s'affiche, sinon « Annuler » porte sur
-   * une ligne encore visible et l'utilisateur ne sait plus ce qui s'est passé.
+   * Supprime, puis propose de défaire. `invalidate` d'abord : l'écran doit
+   * dire la vérité avant que la notification ne s'affiche, sinon « Annuler »
+   * porte sur une ligne encore visible et l'utilisateur ne sait plus ce qui
+   * s'est passé.
    */
   const supprimer = (
     label: string,
@@ -101,11 +94,14 @@ export default function MyContributionsPage() {
     restore: () => Promise<void>
   ) => {
     void remove().then(() => {
-      reloadAll();
+      invalidateContributions();
       showUndo({
         // « Lieu », « Événement », « Retour » : masculins tous les trois.
         message: `${label} supprimé`,
-        onUndo: () => restore().then(reloadAll),
+        onUndo: () =>
+          restore().then(() => {
+            invalidateContributions();
+          }),
       });
     });
   };
@@ -122,16 +118,16 @@ export default function MyContributionsPage() {
   const vivants = <T extends { deletedAt: string | null }>(items: T[] | null) =>
     (items ?? []).filter(i => i.deletedAt === null);
 
-  const places = vivants(placesState.data);
-  const events = vivants(eventsState.data);
-  const reviews = vivants(reviewsState.data);
+  const places = vivants(placesQuery.data ?? null);
+  const events = vivants(eventsQuery.data ?? null);
+  const reviews = vivants(reviewsQuery.data ?? null);
 
   const visite = (isoDay: string) =>
     new Date(isoDay).toLocaleDateString(getDefaultLocale());
 
   /** Tout ce qui est supprimé, à plat : la corbeille est une seule liste. */
   const corbeille = [
-    ...(placesState.data ?? [])
+    ...(placesQuery.data ?? [])
       .filter(p => p.deletedAt !== null)
       .map(p => ({
         key: `place-${p.id}`,
@@ -140,7 +136,7 @@ export default function MyContributionsPage() {
         deletedAt: p.deletedAt as string,
         restore: () => backend.places.restoreOwn(p.id),
       })),
-    ...(eventsState.data ?? [])
+    ...(eventsQuery.data ?? [])
       .filter(e => e.deletedAt !== null)
       .map(e => ({
         key: `event-${e.id}`,
@@ -149,7 +145,7 @@ export default function MyContributionsPage() {
         deletedAt: e.deletedAt as string,
         restore: () => backend.events.restoreOwn(e.id),
       })),
-    ...(reviewsState.data ?? [])
+    ...(reviewsQuery.data ?? [])
       .filter(r => r.deletedAt !== null)
       .map(r => ({
         key: `review-${r.id}`,
@@ -161,8 +157,9 @@ export default function MyContributionsPage() {
   ].sort((a, b) => b.deletedAt.localeCompare(a.deletedAt));
 
   const chargement =
-    placesState.loading || eventsState.loading || reviewsState.loading;
-  const erreur = placesState.error ?? eventsState.error ?? reviewsState.error;
+    placesQuery.isPending || eventsQuery.isPending || reviewsQuery.isPending;
+  const erreur =
+    placesQuery.error ?? eventsQuery.error ?? reviewsQuery.error ?? null;
 
   return (
     <div>
@@ -172,7 +169,10 @@ export default function MyContributionsPage() {
       />
       <div className="flex flex-col gap-5 px-fluid-md pb-8">
         {erreur ? (
-          <ErrorBanner message={erreur.message} onRetry={reloadAll} />
+          <ErrorBanner
+            message={erreur.message}
+            onRetry={invalidateContributions}
+          />
         ) : null}
 
         <section aria-label="Mes lieux">
@@ -327,7 +327,11 @@ export default function MyContributionsPage() {
                     variant="secondary"
                     size="sm"
                     aria-label={`Restaurer ${item.label}`}
-                    onClick={() => void item.restore().then(reloadAll)}
+                    onClick={() =>
+                      void item.restore().then(() => {
+                        invalidateContributions();
+                      })
+                    }
                   >
                     Restaurer
                   </Button>

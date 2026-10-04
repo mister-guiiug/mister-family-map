@@ -8,6 +8,10 @@ import { createLocalBackend } from '../shared/api/local/local-backend';
 import type { Backend } from '../shared/api/ports';
 import { useAuthStore } from '../features/auth/store';
 import { UNKNOWN_FEATURES, type PlaceDraft } from '../entities/place/model';
+import {
+  clearQueryClient,
+  wrapWithQueryClient,
+} from '../shared/queries/testing';
 import MyContributionsPage from './MyContributionsPage';
 
 /**
@@ -61,13 +65,15 @@ async function avecUnLieu(): Promise<Backend> {
 
 function monter(backend: Backend) {
   render(
-    <MemoryRouter>
-      <ToastProvider>
-        <BackendProvider backend={backend}>
-          <MyContributionsPage />
-        </BackendProvider>
-      </ToastProvider>
-    </MemoryRouter>
+    wrapWithQueryClient(
+      <MemoryRouter>
+        <ToastProvider>
+          <BackendProvider backend={backend}>
+            <MyContributionsPage />
+          </BackendProvider>
+        </ToastProvider>
+      </MemoryRouter>
+    )
   );
 }
 
@@ -80,6 +86,7 @@ describe('supprimer une contribution, et se rattraper', () => {
   });
   afterEach(() => {
     vi.useRealTimers();
+    clearQueryClient();
   });
 
   it('supprime le lieu de la liste', async () => {

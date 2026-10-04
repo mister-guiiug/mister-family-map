@@ -8,7 +8,6 @@ import {
 } from '@mister-guiiug/dev-pwa-config/react';
 import { ListFilter } from 'lucide-react';
 import { useBackend } from '../app/providers/BackendProvider';
-import { useAsync } from '@mister-guiiug/dev-pwa-config/react/use-async';
 import { applyFilters } from '../shared/schemas/filters';
 import {
   isInBoundingBox,
@@ -21,6 +20,8 @@ import { MapView } from '../features/map/components/MapView';
 import { FilterSheet } from '../features/search/components/FilterSheet';
 import { PlaceCard } from '../features/places/components/PlaceCard';
 import { PageHeader } from '../shared/components/PageHeader';
+import { useActiveCategories } from '../shared/queries/categories';
+import { usePlacesList } from '../shared/queries/places';
 
 /**
  * Carte et liste SYNCHRONISÉES : mêmes filtres (store partagé), la liste se
@@ -35,27 +36,24 @@ export default function MapPage() {
   const { filters, origin, setOrigin } = useSearchStore();
   const favorites = useFavoritesStore();
 
-  const placesState = useAsync(() => backend.places.list(), 'static');
-  const categoriesState = useAsync(
-    () => backend.categories.listActive(),
-    'static'
-  );
-  const categories = categoriesState.data ?? [];
+  const placesQuery = usePlacesList();
+  const categoriesQuery = useActiveCategories();
+  const categories = categoriesQuery.data ?? [];
   const categoryById = useMemo(
     () => new Map(categories.map(c => [c.id, c])),
     [categories]
   );
 
   const filtered = useMemo(() => {
-    if (!placesState.data) return [];
-    const base = applyFilters(placesState.data, filters, {
+    if (!placesQuery.data) return [];
+    const base = applyFilters(placesQuery.data, filters, {
       ...(origin ? { origin } : {}),
     });
     if (restrictToArea && visibleArea) {
       return base.filter(p => isInBoundingBox(p.coordinates, visibleArea));
     }
     return base;
-  }, [placesState.data, filters, origin, restrictToArea, visibleArea]);
+  }, [placesQuery.data, filters, origin, restrictToArea, visibleArea]);
 
   return (
     <div>
@@ -75,10 +73,10 @@ export default function MapPage() {
       />
 
       <div className="px-fluid-md">
-        {placesState.error ? (
+        {placesQuery.error ? (
           <ErrorBanner
-            message={placesState.error.message}
-            onRetry={placesState.reload}
+            message={placesQuery.error.message}
+            onRetry={() => void placesQuery.refetch()}
           />
         ) : (
           <MapView
@@ -113,7 +111,7 @@ export default function MapPage() {
         aria-label="Liste des lieux visibles"
         className="mt-4 px-fluid-md"
       >
-        {placesState.loading ? (
+        {placesQuery.isPending ? (
           <SkeletonGroup label="Chargement des lieux" lines={3} />
         ) : filtered.length === 0 ? (
           <EmptyState

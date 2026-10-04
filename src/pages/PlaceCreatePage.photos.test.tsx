@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import { IMAGE_MAX_BYTES } from '@mister-guiiug/dev-pwa-config/image';
@@ -6,6 +6,10 @@ import { BackendProvider } from '../app/providers/BackendProvider';
 import { createLocalBackend } from '../shared/api/local/local-backend';
 import { useAuthStore } from '../features/auth/store';
 import { usePlaceWizardStore } from '../features/contributions/place-wizard-store';
+import {
+  clearQueryClient,
+  wrapWithQueryClient,
+} from '../shared/queries/testing';
 import PlaceCreatePage from './PlaceCreatePage';
 
 /**
@@ -38,11 +42,13 @@ function renderPhotosStep() {
   useAuthStore.setState({ session });
   usePlaceWizardStore.setState({ step: 'photos' });
   render(
-    <MemoryRouter>
-      <BackendProvider backend={createLocalBackend()}>
-        <PlaceCreatePage />
-      </BackendProvider>
-    </MemoryRouter>
+    wrapWithQueryClient(
+      <MemoryRouter>
+        <BackendProvider backend={createLocalBackend()}>
+          <PlaceCreatePage />
+        </BackendProvider>
+      </MemoryRouter>
+    )
   );
 }
 
@@ -57,6 +63,9 @@ describe('étape photos : l’écran refuse ce que le bucket refuserait', () => 
     localStorage.clear();
     useAuthStore.setState({ session: null });
     usePlaceWizardStore.setState({ step: 'position' });
+  });
+  afterEach(() => {
+    clearQueryClient();
   });
 
   it('refuse un PDF choisi à la place d’une photo', async () => {

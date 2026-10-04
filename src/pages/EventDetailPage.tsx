@@ -9,8 +9,6 @@ import {
 } from '@mister-guiiug/dev-pwa-config/react';
 import { ICAL_MIME, toIcalendar } from '@mister-guiiug/dev-pwa-config/ical';
 import { CalendarPlus } from 'lucide-react';
-import { useBackend } from '../app/providers/BackendProvider';
-import { useAsync } from '@mister-guiiug/dev-pwa-config/react/use-async';
 import {
   displayStatus,
   eventToIcal,
@@ -19,29 +17,29 @@ import {
 import { EVENT_STATUS_LABELS } from '../entities/event/model';
 import { formatDayTime } from '../shared/lib/dates';
 import { getDefaultLocale } from '@mister-guiiug/dev-pwa-config/format';
+import { useEvent } from '../shared/queries/events';
 
 export default function EventDetailPage() {
   const { id = '' } = useParams();
-  const backend = useBackend();
   const now = useMemo(() => new Date(), []);
-  const eventState = useAsync(() => backend.events.getById(id), id);
+  const eventQuery = useEvent(id);
 
-  if (eventState.loading)
+  if (eventQuery.isPending)
     return (
       <div className="p-fluid-md">
         <SkeletonGroup label="Chargement de l'événement" lines={5} />
       </div>
     );
-  if (eventState.error)
+  if (eventQuery.error)
     return (
       <div className="p-fluid-md">
         <ErrorBanner
-          message={eventState.error.message}
-          onRetry={eventState.reload}
+          message={eventQuery.error.message}
+          onRetry={() => void eventQuery.refetch()}
         />
       </div>
     );
-  const event = eventState.data;
+  const event = eventQuery.data;
   if (!event)
     return (
       <div className="p-fluid-md">
