@@ -40,4 +40,7 @@ jobs:
       # est lu dans le dépôt qui EXÉCUTE. Absente, la ligne vaut la chaîne
       # vide et rien n'est mesuré.
       build-env: |
+        VITE_BACKEND=${{ vars.VITE_BACKEND }}
         VITE_POSTHOG_KEY=${{ vars.VITE_POSTHOG_KEY }}
+        VITE_SUPABASE_ANON_KEY=${{ vars.VITE_SUPABASE_ANON_KEY }}
+        VITE_SUPABASE_URL=${{ vars.VITE_SUPABASE_URL }}
