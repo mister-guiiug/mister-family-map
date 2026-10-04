@@ -24,8 +24,7 @@ export const queryKeys = {
   },
   reviews: {
     all: ['reviews'] as const,
-    forPlace: (placeId: string) =>
-      ['reviews', 'forPlace', placeId] as const,
+    forPlace: (placeId: string) => ['reviews', 'forPlace', placeId] as const,
     byAuthor: (authorId: string, options?: { includeDeleted?: boolean }) =>
       ['reviews', 'byAuthor', authorId, options ?? {}] as const,
     /** Moyennes par lieu — dérivé d'Explorer, pas un port du backend. */
