@@ -32,11 +32,11 @@
     "_pourquoi": "RELEVÉ DE 809 À 822 LE 05/10/2026, APRÈS TanStack Query (^5.104.1) pour les lectures ciblées (lieux, événements, catégories, avis). Le runtime Query pèse ~13 kB gzip ; 822 = ancien plafond + cette marge, sans re-mesure CI — à affiner après le prochain build Pages."
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.117.2",
+    "@supabase/supabase-js": "^2.117.3",
     "@tanstack/react-query": "^5.104.1",
     "lucide-react": "^1.52.0",
-    "maplibre-gl": "^6.12.0",
-    "posthog-js": "^1.438.1",
+    "maplibre-gl": "^6.13.0",
+    "posthog-js": "^1.438.2",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "react-router": "^8.4.0",
@@ -57,7 +57,7 @@
     "@types/node": "^26.6.4",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
-    "@vitejs/plugin-react": "^6.1.1",
+    "@vitejs/plugin-react": "^6.1.2",
     "@vitest/coverage-v8": "^5.0.3",
     "eslint": "^10.12.0",
     "eslint-plugin-jsx-a11y": "^6.10.2",
@@ -78,6 +78,9 @@
   "overrides": {
     "eslint-plugin-jsx-a11y": {
       "eslint": "$eslint"
+    },
+    "@rolldown/plugin-babel": {
+      "@babel/plugin-transform-runtime": "^7.29.0"
     }
   },
   "pwaDoctor": {
