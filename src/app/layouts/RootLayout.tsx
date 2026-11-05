@@ -201,10 +201,16 @@ export function RootLayout() {
 
         Le texte reste celui de l'app : « hors ligne » ne dit pas ce qui
         marche encore, et c'est la seule chose que la famille veut savoir.
+        Il dépend donc du backend : avec Supabase, rien n'est gardé sur
+        l'appareil, et promettre les fiches déjà consultées serait faux.
       */}
       <ConnectionBanner
         className="mx-fluid-md mt-2"
-        label="Hors ligne — vos favoris et les fiches déjà consultées restent disponibles."
+        label={
+          backend.places.requiresNetwork
+            ? 'Hors ligne — les lieux se chargeront au retour du réseau.'
+            : 'Hors ligne — vos favoris et les fiches déjà consultées restent disponibles.'
+        }
       />
 
       <main id="contenu" className="flex-1 pb-24">

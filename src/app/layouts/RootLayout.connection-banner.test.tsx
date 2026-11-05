@@ -25,8 +25,11 @@ vi.mock('virtual:pwa-register', () => ({
   registerSW: () => () => {},
 }));
 
+// `requiresNetwork` dit si les lieux viennent du réseau (Supabase) ou de
+// l'appareil (backend local) : le bandeau n'a pas la même chose à promettre.
+const places = vi.hoisted(() => ({ requiresNetwork: false }));
 vi.mock('../providers/BackendProvider', () => ({
-  useBackend: () => ({ auth: {}, favorites: {} }),
+  useBackend: () => ({ auth: {}, favorites: {}, places }),
 }));
 vi.mock('../../features/auth/store', () => ({
   useAuthStore: (select: (s: unknown) => unknown) =>
@@ -70,6 +73,7 @@ describe('le shell dit qu’on est hors connexion — après un délai, pas avan
   });
   afterEach(() => {
     vi.useRealTimers();
+    places.requiresNetwork = false;
   });
 
   it('ne dit rien tant que la coupure n’a pas duré', () => {
@@ -107,6 +111,21 @@ describe('le shell dit qu’on est hors connexion — après un délai, pas avan
     expect(shown).toHaveTextContent(
       /vos favoris et les fiches déjà consultées restent disponibles/
     );
+  });
+
+  it('avec Supabase, ne promet pas ce que l’appareil n’a pas gardé', () => {
+    // Rien n'est gardé sur l'appareil quand les lieux viennent de Supabase :
+    // hors ligne, une liste jamais chargée ne se chargera pas. Le texte du
+    // backend local serait ici une promesse fausse (audit du 05/11/2026).
+    places.requiresNetwork = true;
+    mountShell();
+    goOffline();
+    wait(1500);
+
+    const shown = banner();
+    expect(shown).not.toBeNull();
+    expect(shown).not.toHaveTextContent(/fiches déjà consultées/);
+    expect(shown).toHaveTextContent(/se chargeront au retour du réseau/);
   });
 
   it('se tait dès le retour du réseau', () => {

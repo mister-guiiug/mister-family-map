@@ -17,6 +17,7 @@ import { useSearchStore } from '../features/search/store';
 import { useFavoritesStore } from '../features/favorites/store';
 import { FilterSheet } from '../features/search/components/FilterSheet';
 import { PlaceCard } from '../features/places/components/PlaceCard';
+import { OfflineEmptyState } from '../shared/components/OfflineEmptyState';
 import { PageHeader } from '../shared/components/PageHeader';
 import { AppFooter } from '@mister-guiiug/dev-pwa-config/react/app-footer';
 import { useActiveCategories } from '../shared/queries/categories';
@@ -106,7 +107,9 @@ export default function ExplorePage() {
       </div>
 
       <section aria-label="Résultats" className="mt-4 px-fluid-md">
-        {placesQuery.isPending ? (
+        {placesQuery.isPending && placesQuery.isPaused ? (
+          <OfflineEmptyState what="Les lieux" />
+        ) : placesQuery.isPending ? (
           <SkeletonGroup label="Chargement des lieux" lines={4} />
         ) : placesQuery.error ? (
           <ErrorBanner

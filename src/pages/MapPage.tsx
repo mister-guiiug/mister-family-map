@@ -19,6 +19,7 @@ import { isClusterId } from '@mister-guiiug/dev-pwa-config/map';
 import { MapView } from '../features/map/components/MapView';
 import { FilterSheet } from '../features/search/components/FilterSheet';
 import { PlaceCard } from '../features/places/components/PlaceCard';
+import { OfflineEmptyState } from '../shared/components/OfflineEmptyState';
 import { PageHeader } from '../shared/components/PageHeader';
 import { useActiveCategories } from '../shared/queries/categories';
 import { usePlacesList } from '../shared/queries/places';
@@ -111,7 +112,9 @@ export default function MapPage() {
         aria-label="Liste des lieux visibles"
         className="mt-4 px-fluid-md"
       >
-        {placesQuery.isPending ? (
+        {placesQuery.isPending && placesQuery.isPaused ? (
+          <OfflineEmptyState what="Les lieux" />
+        ) : placesQuery.isPending ? (
           <SkeletonGroup label="Chargement des lieux" lines={3} />
         ) : filtered.length === 0 ? (
           <EmptyState
