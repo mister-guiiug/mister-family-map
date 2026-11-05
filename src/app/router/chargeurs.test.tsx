@@ -53,7 +53,11 @@ vi.mock('virtual:pwa-register', () => ({
 }));
 
 vi.mock('../providers/BackendProvider', () => ({
-  useBackend: () => ({ auth: {}, favorites: {} }),
+  useBackend: () => ({
+    auth: {},
+    favorites: {},
+    places: { requiresNetwork: false },
+  }),
 }));
 vi.mock('../../features/auth/store', () => ({
   useAuthStore: Object.assign(
