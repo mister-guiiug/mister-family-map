@@ -8,6 +8,7 @@ import {
 import { ShareButton } from '@mister-guiiug/dev-pwa-config/react/share-button';
 import { ThemeToggle } from '@mister-guiiug/dev-pwa-config/react/theme-toggle';
 import { ConsentSection } from '@mister-guiiug/dev-pwa-config/react/consent-section';
+import { PrivacyNotice } from '@mister-guiiug/dev-pwa-config/react/privacy-notice';
 import { useBackend } from '../app/providers/BackendProvider';
 import { useAuthStore, useCurrentRole } from '../features/auth/store';
 import { ROLE_LABELS } from '../entities/user/model';
@@ -130,6 +131,11 @@ export default function ProfilePage() {
           </div>
         </section>
 
+        <PrivacyNotice
+          env={import.meta.env}
+          className="mt-4 border-t border-line pt-4"
+          titleClassName="text-fluid-lg font-semibold"
+        />
         {/*
           Revenir sur son choix de mesure d’audience : le retrait se fait ici,
           en un clic (RGPD, art. 7.3). Mêmes clé et chargeur que le bandeau.
