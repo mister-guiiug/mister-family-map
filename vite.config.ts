@@ -18,8 +18,9 @@ const MAP_TILES = osmRasterTiles();
 const MAP_CSP = mapCspDirectives(MAP_TILES);
 
 // Autres hôtes externes — toute évolution DOIT être répercutée ici ET dans
-// docs/THREAT-MODEL.md (section CSP).
-const SUPABASE_HOSTS = ['https://*.supabase.co', 'wss://*.supabase.co'];
+// docs/THREAT-MODEL.md (section CSP). Le projet Supabase n'y figure plus :
+// `cspPlugin` ajoute son origine EXACTE, lue dans `VITE_SUPABASE_URL`
+// (socle 6.32.0), au lieu du joker `*.supabase.co`.
 const NOMINATIM_HOST = 'https://nominatim.openstreetmap.org';
 
 export default defineConfig(({ command }) => ({
@@ -55,19 +56,8 @@ export default defineConfig(({ command }) => ({
       // `mapCspDirectives` place les hôtes de tuiles dans connect-src ET
       // img-src : MapLibre charge par `fetch`, Leaflet et le repli des
       // navigateurs sans `createImageBitmap` par <img>.
-      connectSrc: [
-        "'self'",
-        ...MAP_CSP.connectSrc,
-        ...SUPABASE_HOSTS,
-        NOMINATIM_HOST,
-      ],
-      imgSrc: [
-        "'self'",
-        'data:',
-        'blob:',
-        ...MAP_CSP.imgSrc,
-        ...SUPABASE_HOSTS,
-      ],
+      connectSrc: ["'self'", ...MAP_CSP.connectSrc, NOMINATIM_HOST],
+      imgSrc: ["'self'", 'data:', 'blob:', ...MAP_CSP.imgSrc],
     }),
     VitePWA({
       // Mise à jour contrôlée : l'utilisateur est prévenu (UpdatePromptBanner)

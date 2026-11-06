@@ -83,10 +83,11 @@ journal de modération conservés 12 mois (base légale : intérêt légitime).
 ## CSP (récapitulatif)
 
 Prod (via `cspPlugin`, hash SHA-256 des scripts inline) : `default-src 'self'` ;
-`connect-src` : self + `tile.openstreetmap.org` + `*.supabase.co` (+wss) +
+`connect-src` : self + `tile.openstreetmap.org` + l'origine exacte du projet
+Supabase (+wss, lue par le socle dans `VITE_SUPABASE_URL`) +
 `nominatim.openstreetmap.org` — MapLibre charge les tuiles par `fetch`, elles
 relèvent donc de `connect-src` et non de `img-src` ;
-`img-src` : self + data/blob + `tile.openstreetmap.org` + `*.supabase.co`
+`img-src` : self + data/blob + `tile.openstreetmap.org` + l'origine du projet Supabase
 (repli `<img>` des navigateurs sans `createImageBitmap`) ;
 `worker-src 'self'` : le worker MapLibre est un asset de l'origine, émis par
 Vite — aucune URL `blob:` n'est autorisée ;
