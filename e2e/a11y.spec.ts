@@ -34,6 +34,8 @@ const RÈGLES_SUSPENDUES: Record<string, string[]> = {
 
 const ROUTES: Array<[string, string]> = [
   ['accueil', '/'],
+  // La carte porte le bandeau de démonstration : elle entre dans la suite.
+  ['carte', '/carte'],
   ['agenda', '/agenda'],
   ['favoris', '/favoris'],
   ['connexion', '/connexion'],

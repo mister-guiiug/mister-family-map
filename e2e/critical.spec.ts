@@ -15,7 +15,7 @@ async function signIn(page: Page, email: string) {
   await page.goto('/connexion');
   await page.getByLabel('Adresse e-mail').fill(email);
   await page
-    .getByRole('button', { name: 'Recevoir le lien de connexion' })
+    .getByRole('button', { name: 'Ouvrir une session de démonstration' })
     .click();
   await expect(page.getByText(/Connecté en tant que/)).toBeVisible();
 }
@@ -37,6 +37,37 @@ test('@critical un visiteur consulte la carte et ouvre un lieu', async ({
   await expect(
     page.getByText('Retours d’expérience', { exact: false })
   ).toBeVisible();
+});
+
+/*
+ * LE SITE PUBLIÉ EST UNE DÉMONSTRATION, ET IL LE DIT LÀ OÙ L'ON CROIT
+ * CONTRIBUER : sur la carte, et à la connexion — dont le bouton promettait un
+ * lien par e-mail qui ne partait jamais. Le bandeau se replie, une seule fois
+ * pour les deux écrans, et garde son étiquette.
+ */
+test('@critical la carte et la connexion disent la démonstration', async ({
+  page,
+}) => {
+  await page.goto('/carte');
+  await expect(page.getByTestId('map-container')).toBeVisible();
+  const bandeau = page.getByRole('note');
+  await expect(bandeau).toContainText(
+    'Ce que vous ajoutez reste dans ce navigateur, rien n’est partagé.'
+  );
+  await bandeau.getByRole('button', { name: 'Démonstration' }).click();
+  await expect(bandeau).not.toContainText('rien n’est partagé');
+
+  await page.goto('/connexion');
+  const bascule = page
+    .getByRole('note')
+    .getByRole('button', { name: 'Démonstration' });
+  await expect(bascule).toHaveAttribute('aria-expanded', 'false');
+  await bascule.click();
+  await expect(page.getByRole('note')).toContainText('rien n’est partagé');
+  await expect(page.getByText(/Aucun e-mail n’est envoyé/)).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: 'Recevoir le lien de connexion' })
+  ).toHaveCount(0);
 });
 
 test('@critical un membre ajoute un lieu et le système propose les doublons', async ({

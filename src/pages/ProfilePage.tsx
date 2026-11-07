@@ -194,7 +194,7 @@ export default function ProfilePage() {
           <ShareButton
             className="mt-3"
             title="Mister Family Map"
-            text="Des idées de sorties en famille, partagées entre parents."
+            text="Des idées de sorties en famille : lieux, agenda et retours d’expérience."
           />
         </section>
 

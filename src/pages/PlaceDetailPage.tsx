@@ -12,6 +12,7 @@ import {
 } from '@mister-guiiug/dev-pwa-config/react';
 import { Flag, Heart, Share2 } from 'lucide-react';
 import { useBackend } from '../app/providers/BackendProvider';
+import { useModeDemo } from '../shared/hooks/useModeDemo';
 import { averageRating } from '../entities/review/model';
 import { PUBLICATION_STATUS_LABELS } from '../entities/place/model';
 import {
@@ -43,6 +44,7 @@ function priceLabel(place: {
 export default function PlaceDetailPage() {
   const { id = '' } = useParams();
   const backend = useBackend();
+  const demo = useModeDemo();
   const session = useAuthStore(s => s.session);
   const favorites = useFavoritesStore();
   const [reportOpen, setReportOpen] = useState(false);
@@ -235,7 +237,9 @@ export default function PlaceDetailPage() {
         </h2>
         {reviews.length === 0 ? (
           <p className="mt-1 text-fluid-sm text-ink-soft">
-            Aucun retour pour l’instant — le vôtre aidera d’autres familles.
+            {demo
+              ? 'Aucun retour pour l’instant.'
+              : 'Aucun retour pour l’instant — le vôtre aidera d’autres familles.'}
           </p>
         ) : (
           <ul className="mt-2 flex flex-col gap-3">
@@ -276,7 +280,7 @@ export default function PlaceDetailPage() {
             <Link to="/connexion" className="underline">
               Connectez-vous
             </Link>{' '}
-            pour publier un retour d’expérience.
+            pour donner un retour d’expérience.
           </p>
         )}
       </section>

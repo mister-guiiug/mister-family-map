@@ -7,6 +7,7 @@ import {
 } from '@mister-guiiug/dev-pwa-config/react';
 import { ErrorBanner } from '@mister-guiiug/dev-pwa-config/react/error-banner';
 import { useBackend } from '../app/providers/BackendProvider';
+import { useModeDemo } from '../shared/hooks/useModeDemo';
 import { useUndoToast } from '../shared/hooks/useUndoToast';
 import { useAuthStore } from '../features/auth/store';
 import {
@@ -40,6 +41,7 @@ import { useReviewsByAuthor } from '../shared/queries/reviews';
  */
 export default function MyContributionsPage() {
   const backend = useBackend();
+  const demo = useModeDemo();
   const session = useAuthStore(s => s.session);
   const showUndo = useUndoToast();
   const invalidateContributions = useInvalidateContributions();
@@ -182,7 +184,11 @@ export default function MyContributionsPage() {
           ) : places.length === 0 ? (
             <EmptyState
               title="Aucun lieu proposé"
-              description="Votre premier lieu aidera toutes les familles du coin."
+              description={
+                demo
+                  ? 'En démonstration, vos lieux restent dans ce navigateur.'
+                  : 'Votre premier lieu aidera toutes les familles du coin.'
+              }
             />
           ) : (
             <ul className="flex flex-col gap-2">
