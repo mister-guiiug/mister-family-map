@@ -10,6 +10,7 @@ import {
 } from '@mister-guiiug/dev-pwa-config/react';
 import { useActionGuard } from '@mister-guiiug/dev-pwa-config/react/use-action-guard';
 import { useBackend } from '../app/providers/BackendProvider';
+import { useModeDemo } from '../shared/hooks/useModeDemo';
 import { placeDraftSchema } from '../entities/place/model';
 import { findPotentialDuplicates } from '../shared/lib/dedupe';
 import { formatDistance } from '@mister-guiiug/dev-pwa-config/geo';
@@ -33,6 +34,7 @@ import { usePlacesList } from '../shared/queries/places';
  */
 export default function PlaceCreatePage() {
   const backend = useBackend();
+  const demo = useModeDemo();
   const navigate = useNavigate();
   const session = useAuthStore(s => s.session);
   const wizard = usePlaceWizardStore();
@@ -98,7 +100,9 @@ export default function PlaceCreatePage() {
           <Link to="/connexion" className="underline">
             Connectez-vous
           </Link>{' '}
-          pour proposer un lieu à la communauté.
+          {demo
+            ? 'pour essayer l’ajout d’un lieu — en démonstration, il restera dans ce navigateur.'
+            : 'pour proposer un lieu à la communauté.'}
         </p>
       </div>
     );
@@ -182,8 +186,7 @@ export default function PlaceCreatePage() {
           <section>
             <p className="mb-2 text-fluid-sm text-ink-soft">
               Déplacez la carte puis utilisez « Autour de moi » ou saisissez les
-              coordonnées. La position précise aide les autres familles à
-              trouver l’entrée.
+              coordonnées. La position précise situe l’entrée du lieu.
             </p>
             <MapView
               places={[]}
@@ -417,8 +420,9 @@ export default function PlaceCreatePage() {
                 </li>
                 <li>Pas de contenu promotionnel déguisé.</li>
                 <li>
-                  Vos contributions sont publiées sous votre pseudonyme et
-                  modérées a priori.
+                  {demo
+                    ? 'En démonstration, vos contributions restent dans ce navigateur : personne d’autre ne les voit.'
+                    : 'Vos contributions sont publiées sous votre pseudonyme et modérées a priori.'}
                 </li>
               </ul>
             </div>

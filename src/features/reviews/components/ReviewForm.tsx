@@ -7,6 +7,7 @@ import {
   TextField,
 } from '@mister-guiiug/dev-pwa-config/react';
 import { useBackend } from '../../../app/providers/BackendProvider';
+import { useModeDemo } from '../../../shared/hooks/useModeDemo';
 import {
   AGE_BRACKETS,
   isVisitDateValid,
@@ -27,6 +28,7 @@ export function ReviewForm({
   onPublished: () => void;
 }) {
   const backend = useBackend();
+  const demo = useModeDemo();
   const [visitedOn, setVisitedOn] = useState('');
   const [rating, setRating] = useState(4);
   const [brackets, setBrackets] = useState<AgeBracket[]>([]);
@@ -42,7 +44,9 @@ export function ReviewForm({
   if (done) {
     return (
       <p role="status" className="mt-3 text-fluid-sm">
-        Merci ! Votre retour est publié.
+        {demo
+          ? 'Merci ! Votre retour est enregistré dans ce navigateur.'
+          : 'Merci ! Votre retour est publié.'}
       </p>
     );
   }
@@ -152,7 +156,11 @@ export function ReviewForm({
       />
       <TextAreaField
         label="Points de vigilance"
-        hint="Restez factuel : l'objectif est d'aider les autres familles."
+        hint={
+          demo
+            ? 'Restez factuel : c’est ce qui rend un retour utile.'
+            : "Restez factuel : l'objectif est d'aider les autres familles."
+        }
         rows={2}
         value={watchouts}
         onChange={e => setWatchouts(e.target.value)}

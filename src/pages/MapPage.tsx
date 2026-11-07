@@ -21,6 +21,12 @@ import { FilterSheet } from '../features/search/components/FilterSheet';
 import { PlaceCard } from '../features/places/components/PlaceCard';
 import { OfflineEmptyState } from '../shared/components/OfflineEmptyState';
 import { PageHeader } from '../shared/components/PageHeader';
+import { BandeauDemo } from '../shared/components/BandeauDemo';
+import {
+  CLE_BANDEAU_DEMO,
+  MESSAGE_DEMO,
+  useModeDemo,
+} from '../shared/hooks/useModeDemo';
 import { useActiveCategories } from '../shared/queries/categories';
 import { usePlacesList } from '../shared/queries/places';
 
@@ -30,6 +36,7 @@ import { usePlacesList } from '../shared/queries/places';
  */
 export default function MapPage() {
   const backend = useBackend();
+  const demo = useModeDemo();
   const navigate = useNavigate();
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [visibleArea, setVisibleArea] = useState<BoundingBox | null>(null);
@@ -74,6 +81,17 @@ export default function MapPage() {
       />
 
       <div className="px-fluid-md">
+        {/* LA CARTE EST LE LIEU OÙ L'ON CROIT CONTRIBUER : le catalogue la
+            présente comme « collaborative ». Sur le site publié, rien n'est
+            partagé — le dire ici, au-dessus de ce qu'on va enrichir. */}
+        {demo ? (
+          <BandeauDemo
+            etiquette="Démonstration"
+            message={MESSAGE_DEMO}
+            cleStockage={CLE_BANDEAU_DEMO}
+            className="mb-fluid-sm"
+          />
+        ) : null}
         {placesQuery.error ? (
           <ErrorBanner
             message={placesQuery.error.message}

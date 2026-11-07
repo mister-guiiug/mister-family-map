@@ -10,6 +10,7 @@ import {
   TextField,
 } from '@mister-guiiug/dev-pwa-config/react';
 import { useBackend } from '../app/providers/BackendProvider';
+import { useModeDemo } from '../shared/hooks/useModeDemo';
 import { applyFilters, countActiveFilters } from '../shared/schemas/filters';
 import { distanceKm } from '@mister-guiiug/dev-pwa-config/geo';
 import { recommendPlaces } from '../shared/lib/recommend';
@@ -27,6 +28,7 @@ import { usePlaceRatingsMap } from '../shared/queries/reviews';
 /** Accueil « Explorer » : recherche, filtres, liste, suggestions transparentes. */
 export default function ExplorePage() {
   const backend = useBackend();
+  const demo = useModeDemo();
   const navigate = useNavigate();
   const [filtersOpen, setFiltersOpen] = useState(false);
   const { filters, setFilters, origin } = useSearchStore();
@@ -69,7 +71,13 @@ export default function ExplorePage() {
     <div>
       <PageHeader
         title="Explorer"
-        subtitle="Des idées de sorties testées par des familles"
+        // Les six lieux du site publié sont des exemples écrits pour la
+        // démonstration (README) : « testées par des familles » était faux.
+        subtitle={
+          demo
+            ? 'Des idées de sorties en famille — exemples de démonstration'
+            : 'Des idées de sorties testées par des familles'
+        }
         actions={
           <Button
             variant="primary"
