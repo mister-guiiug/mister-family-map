@@ -12,6 +12,11 @@ exemples lyonnais, et ce qu'un visiteur ajoute reste dans son navigateur, sans
 > (version : voir `package.json`).
 > Audit de compatibilité, état du 21/08/2026 : [docs/AUDIT-DEV-WPA-CONFIG.md](./docs/AUDIT-DEV-WPA-CONFIG.md).
 
+## Guides
+
+- [Idées de sorties en famille](https://mister-guiiug.github.io/mister-family-map/idees-de-sorties-en-famille.html)
+- [Sorties gratuites en famille](https://mister-guiiug.github.io/mister-family-map/sorties-gratuites-en-famille.html)
+
 ## Démarrage
 
 Prérequis : la version de Node de `.nvmrc` (minimum dans `engines` du
